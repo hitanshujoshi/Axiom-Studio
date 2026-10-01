@@ -57,7 +57,7 @@
   let openTabs = [];
   let activeTabId = null;
   let tabSequence = 0;
-  let workspaceFolders = [{ id: "workspace-root", name: "SS", parentId: null, expanded: true }];
+  let workspaceFolders = [{ id: "workspace-root", name: "root", parentId: null, expanded: true }];
   let workspaceFiles = [];
   let activeFolderId = "workspace-root";
   let selectedExplorerItem = { kind: "folder", id: "workspace-root" };
