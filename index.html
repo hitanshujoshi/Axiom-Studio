@@ -17,7 +17,9 @@
       --border: #282c34;
       --accent: #61afef;
       --accent-hover: #4fa1e2;
-      --signals-width: 48%;
+      --status-success: #3f8f6b;
+      --status-danger: #b84b59;
+      --signals-width: 25%;
       --terminal-height: 30%;
     }
     body.light-theme {
@@ -31,6 +33,8 @@
       --border: #d1d5da;
       --accent: #0366d6;
       --accent-hover: #0256b9;
+      --status-success: #2d7958;
+      --status-danger: #b43f4d;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -54,6 +58,7 @@
       position: relative;
       transition: background 0.15s, box-shadow 0.15s;
       z-index: 5;
+      touch-action: none;
     }
     .splitter:hover {
       background: var(--accent);
@@ -132,6 +137,11 @@
     .btn:hover { background: var(--border); }
     .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
     .icon-btn { min-width: 30px; padding: 4px 7px; }
+    .icon-svg { width: 16px; height: 16px; display: block; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .history-controls { display: flex; align-items: center; gap: 4px; }
+    .history-controls .btn:disabled { opacity: .4; cursor: default; }
+    .btn-status-success { background: var(--status-success); border-color: var(--status-success); color: #fff; }
+    .btn-status-danger { background: var(--status-danger); border-color: var(--status-danger); color: #fff; }
     .app-header { flex: 0 0 38px; }
     .settings-wrap { position: relative; }
     #settings-menu {
@@ -170,6 +180,38 @@
       min-width: 0;
       position: relative;
     }
+    #project-explorer {
+      width: var(--explorer-width, 220px);
+      flex: 0 0 var(--explorer-width, 220px);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 12px;
+    }
+    #project-explorer[hidden] { display: none; }
+    .explorer-header { min-height: 35px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 8px 0 12px; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 700; color: var(--text-muted); }
+    .explorer-actions { display: flex; align-items: center; gap: 2px; }
+    .explorer-actions .btn { width: 27px; height: 27px; padding: 4px; }
+    #explorer-tree { min-height: 0; flex: 1; overflow: auto; padding: 5px 0; }
+    .explorer-row { width: 100%; min-height: 27px; display: flex; align-items: center; gap: 7px; padding: 3px 8px; border: 0; border-left: 3px solid transparent; background: transparent; color: var(--text-main); cursor: pointer; white-space: nowrap; text-align: left; font: inherit; }
+    .explorer-row:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+    .explorer-row[aria-selected="true"] { background: color-mix(in srgb, var(--accent) 26%, var(--bg-sidebar)); border-left-color: var(--accent); color: var(--text-main); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent); }
+    .explorer-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .explorer-row.is-drop-target { background: color-mix(in srgb, var(--status-success) 28%, var(--bg-sidebar)); outline: 1px dashed var(--status-success); }
+    .explorer-row.is-dragging { opacity: .45; }
+    .explorer-row svg { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .explorer-row-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+    .explorer-row.is-dirty .explorer-row-name::after { content: " •"; color: var(--accent); }
+    #explorer-context-menu { position: fixed; z-index: 12000; min-width: 176px; padding: 4px; border: 1px solid var(--border); background: var(--bg-sidebar); box-shadow: 0 8px 24px rgba(0, 0, 0, .42); }
+    #explorer-context-menu[hidden] { display: none; }
+    #explorer-context-menu button { width: 100%; min-height: 30px; padding: 5px 9px; border: 0; background: transparent; color: var(--text-main); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+    #explorer-context-menu button:hover, #explorer-context-menu button:focus-visible { background: color-mix(in srgb, var(--accent) 22%, var(--bg-sidebar)); outline: none; }
+    #explorer-context-menu button:disabled { opacity: .45; cursor: default; }
+    #explorer-context-menu .explorer-menu-danger { color: #ff7b86; }
+    #explorer-toggle { display: none; }
     .editor-tabs {
       height: 35px;
       background: var(--bg-sidebar);
@@ -354,6 +396,7 @@
       font-size: 13px;
       line-height: 1.5;
       user-select: none;
+      overflow: hidden;
       border-right: 1px solid var(--border);
     }
     #editor {
@@ -439,18 +482,25 @@
     }
     #console {
       flex: 1;
+      min-height: 0;
       padding: 8px 12px;
       font-size: 12px;
       overflow-y: auto;
       white-space: pre-wrap;
       font-family: inherit;
     }
+    #terminal-command-form { display: flex; flex: 0 0 32px; align-items: center; gap: 7px; padding: 0 10px 6px; }
+    #terminal-command-form label { color: var(--accent); font-size: 12px; }
+    #terminal-command { flex: 1; min-width: 0; padding: 5px 7px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-main); font: inherit; font-size: 12px; }
+    #terminal-command:focus { outline: 1px solid var(--accent); }
 
     /* Right: Signals Inspector with Rulers */
     #signals-dock {
       width: var(--signals-width);
       min-width: 240px;
       flex: 0 0 auto;
+      container-type: inline-size;
+      container-name: signal-dock;
       background: var(--bg-panel);
       display: flex;
       flex-direction: column;
@@ -468,7 +518,28 @@
       font-size: 11.5px;
       gap: 8px;
     }
-    .controls-group { display: flex; align-items: center; gap: 8px; font-size: 11px; min-width: 0; }
+    .controls-group { display: flex; align-items: center; gap: 8px; font-size: 11px; min-width: 0; flex-wrap: wrap; }
+    .zoom-controls-menu { display: block; position: relative; flex: 0 0 auto; }
+    .zoom-controls-menu > summary { display: flex; list-style: none; cursor: pointer; }
+    .zoom-controls-menu > summary::-webkit-details-marker { display: none; }
+    .zoom-controls-panel {
+      display: none;
+      position: absolute;
+      top: calc(100% + 5px);
+      right: 0;
+      z-index: 20;
+      grid-template-columns: repeat(3, 34px);
+      gap: 4px;
+      padding: 6px;
+      min-width: 174px;
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, .35);
+    }
+    .snap-toggle-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 7px; min-height: 28px; padding: 2px 4px; color: var(--text-main); font-size: 10px; white-space: nowrap; cursor: pointer; }
+    .snap-toggle-row input { margin: 0; accent-color: var(--accent); }
+    .zoom-controls-menu[open] > summary { color: var(--accent); }
+    .zoom-controls-menu[open] .zoom-controls-panel { display: grid; }
     .channel-dropdown, .range-input {
       background: var(--bg-main);
       color: var(--text-main);
@@ -529,6 +600,9 @@
     .signals-collapsed #signals-dock { display: none; }
     .signals-collapsed #editor-container { border-right: 0; }
     .mobile-nav { display: none; }
+    #mobile-symbol-catalog { display: none; }
+    #symbol-tooltip { position: fixed; z-index: 11000; max-width: min(300px, calc(100vw - 24px)); padding: 8px 10px; border: 1px solid var(--accent); background: var(--bg-sidebar); color: var(--text-main); box-shadow: 0 6px 20px rgba(0,0,0,.35); font-size: 11px; line-height: 1.4; white-space: pre-line; pointer-events: none; }
+    #symbol-tooltip[hidden] { display: none; }
     body {
       zoom: var(--view-zoom, 1);
       width: calc(100vw / var(--view-zoom, 1));
@@ -578,6 +652,10 @@
       }
       .mobile-nav button[aria-current="page"] { color: var(--accent); box-shadow: inset 0 2px var(--accent); }
       #workspace { min-height: 0; }
+      #project-explorer { display: none; position: absolute; z-index: 30; inset: 0 auto 0 0; width: min(78vw, 280px); box-shadow: 8px 0 24px rgba(0, 0, 0, .35); }
+      #explorer-splitter { display: none; }
+      body.explorer-open #project-explorer { display: flex; }
+      #explorer-toggle { display: inline-flex; }
       #signals-dock { display: none; width: 100%; min-width: 0; border-left: 0; }
       #editor-container { width: 100%; border-right: 0; }
       body.mobile-view-signals #editor-container { display: none; }
@@ -585,12 +663,19 @@
       body.mobile-view-editor #signals-dock,
       body.mobile-view-terminal #signals-dock { display: none; }
       body.mobile-view-terminal #editor-container { display: flex; }
-      body.mobile-view-editor #bottom-panel,
       body.mobile-view-signals #bottom-panel { display: none; }
       body.mobile-view-terminal #editor-container > :not(#bottom-panel) { display: none; }
       body.mobile-view-terminal #bottom-panel { display: flex; height: 100%; min-height: 0; }
+      body.mobile-view-editor #bottom-panel { display: flex; height: clamp(96px, var(--terminal-height), 70%); min-height: 96px; }
+      body.mobile-view-editor #vsplitter { height: 10px; flex-basis: 10px; }
+      body.mobile-view-terminal #vsplitter { display: none; }
       body.mobile-view-symbols #editor-container > :not(.symbol-bar) { display: none; }
       body.mobile-view-symbols .symbol-bar { flex: 1; max-height: none; align-content: flex-start; }
+      body.mobile-view-symbols #reserved-open { display: none; }
+      body.mobile-view-symbols #mobile-symbol-catalog { display: block; flex-basis: 100%; }
+      body.mobile-view-symbols .symbol-name-list { display: flex; flex-wrap: wrap; gap: 4px; padding-top: 6px; }
+      body.mobile-view-symbols .symbol-group-title { flex-basis: 100%; padding-top: 8px; color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
+      body.mobile-view-symbols .symbol-catalog-button { min-height: 32px; padding: 4px 7px; border: 1px solid var(--border); background: var(--bg-main); color: var(--text-main); font: inherit; font-size: 11px; }
       #signals-dock.is-collapsed { width: 100%; min-width: 0; }
       .symbol-bar { max-height: 62px; overflow-y: auto; }
       .dock-header { align-items: flex-start; padding: 7px 8px; flex-wrap: wrap; }
@@ -615,6 +700,7 @@
       }
       .mobile-chart-tabs button[aria-pressed="true"] { color: var(--accent); box-shadow: inset 0 -2px var(--accent); }
       .chart-box { display: none; flex: 1; min-height: 0; }
+      .chart-box, .chart-box canvas { touch-action: none; }
       body:not(.mobile-chart-frequency) #time-chart-box,
       body.mobile-chart-frequency #freq-chart-box { display: block; }
       #signals-dock { min-height: 0; }
@@ -657,17 +743,22 @@
     <div class="header-left">
       <div class="logo"><span>⚡</span> Axiom Studio</div>
       <div class="file-actions" aria-label="File actions">
+        <button class="btn icon-btn" id="explorer-toggle" type="button" aria-label="Toggle file explorer" title="Toggle file explorer"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16M13 8h5M13 12h5M13 16h5"/></svg></button>
         <button class="btn" id="new-file" title="New file">＋<span class="action-label"> New</span></button>
         <button class="btn" id="open-file" title="Open file">↥<span class="action-label"> Open</span></button>
         <button class="btn" id="find-file" title="Find in editor (Ctrl+F)">⌕<span class="action-label"> Find</span></button>
         <button class="btn" id="rename-file" title="Rename file">✎<span class="action-label"> Rename</span></button>
         <button class="btn" onclick="saveFile()" aria-label="Save file" title="Save file"><span aria-hidden="true">↓</span><span class="btn-save-label"> Save</span></button>
-        <button class="btn" onclick="runTestSuite()" aria-label="Run test suite" title="Run validation tests" style="background:#98c379;border-color:#98c379;color:#1e2227;">🧪<span class="action-label"> Test</span></button>
-        <button class="btn" onclick="downloadErrorLog()" aria-label="Download error log" title="Download structured error log" style="background:#e06c75;border-color:#e06c75;color:#1e2227;">📋<span class="action-label"> Log</span></button>
+        <button class="btn btn-status-success" onclick="runTestSuite()" aria-label="Run test suite" title="Run validation tests"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/></svg><span class="action-label"> Test</span></button>
+        <button class="btn btn-status-danger" onclick="downloadErrorLog()" aria-label="Download error log" title="Download structured error log"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h8"/></svg><span class="action-label"> Log</span></button>
       </div>
       <input id="file-picker" type="file" accept=".axiom,.txt,.math,text/plain" hidden>
     </div>
     <div class="header-right">
+      <div class="history-controls" aria-label="Editor history">
+        <button type="button" class="btn icon-btn" id="undo-button" aria-label="Undo" title="Undo (Ctrl+Z)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 0 14h-2"/></svg></button>
+        <button type="button" class="btn icon-btn" id="redo-button" aria-label="Redo" title="Redo (Ctrl+Y)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5m5 5h-9a7 7 0 0 0 0 14h2"/></svg></button>
+      </div>
       <div class="settings-wrap">
         <button class="btn" id="settings-toggle" aria-expanded="false" aria-controls="settings-menu">Settings</button>
         <section id="settings-menu" aria-label="Appearance and editor settings" hidden>
@@ -711,6 +802,18 @@
 
   <div id="workspace">
 
+    <aside id="project-explorer" aria-label="File explorer">
+      <div class="explorer-header">
+        <span>EXPLORER</span>
+        <div class="explorer-actions">
+          <button type="button" class="btn icon-btn" id="explorer-new-file" aria-label="New file" title="New file"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9zM13 3v7h7M12 13v6M9 16h6"/></svg></button>
+          <button type="button" class="btn icon-btn" id="explorer-new-folder" aria-label="New folder" title="New folder"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 10v7M8.5 13.5h7"/></svg></button>
+        </div>
+      </div>
+      <div id="explorer-tree" role="tree" aria-label="Workspace files"></div>
+    </aside>
+    <div id="explorer-splitter" class="splitter splitter-v" title="Drag left/right to resize File Explorer"></div>
+
     <div id="editor-container">
       <div class="editor-tabs">
         <div class="editor-tab-strip" id="editor-tabs" role="tablist" aria-label="Open files"></div>
@@ -735,6 +838,7 @@
         <button class="sym-btn" onclick="insertText('u(t)')">u(t)</button>
         <button class="sym-btn" onclick="insertText('i')">i</button>
         <button class="sym-btn" id="reserved-open">Reserved names</button>
+        <div id="mobile-symbol-catalog" aria-label="Language names"></div>
       </div>
 
       <div id="editor-find" hidden>
@@ -757,13 +861,12 @@
       <div id="bottom-panel">
         <div class="panel-header">
           <span>Terminal / Calculus & Equations Output</span>
-          <label style="display:flex;align-items:center;gap:6px;font-size:11px;opacity:0.85;">
-            Height:
-            <input type="range" id="terminal-height-scale" min="15" max="65" value="30" style="width:110px;" oninput="setTerminalHeight(this.value)">
-            <span id="terminal-height-label">30%</span>
-          </label>
         </div>
         <div id="console">Ready.</div>
+        <form id="terminal-command-form" autocomplete="off">
+          <label for="terminal-command" aria-hidden="true">›</label>
+          <input id="terminal-command" type="text" spellcheck="false" aria-label="Terminal command" placeholder="Enter an expression or command (CLS clears output)">
+        </form>
       </div>
     </div>
 
@@ -779,21 +882,24 @@
           <span>Span ±T:</span>
           <input type="number" id="time-span-input" class="range-input" value="10" min="1" max="100" onchange="updateTimeSpan()">
           <span style="border-left:1px solid var(--border);margin:0 4px;height:18px;"></span>
-          <button class="btn icon-btn" id="zoom-x-in" title="Zoom X-axis in (or Wheel+Shift)" onclick="zoomChartX(1.25)">⤚⤛</button>
-          <button class="btn icon-btn" id="zoom-x-out" title="Zoom X-axis out" onclick="zoomChartX(0.8)">⤜⤝</button>
-          <button class="btn icon-btn" id="zoom-y-in" title="Zoom Y-axis in (or Wheel+Ctrl)" onclick="zoomChartY(1.25)">↕⤊</button>
-          <button class="btn icon-btn" id="zoom-y-out" title="Zoom Y-axis out" onclick="zoomChartY(0.8)">↕⤋</button>
-          <button class="btn icon-btn" id="reset-zoom" title="Reset pan & zoom (or double-click)" onclick="resetChartViewports()">⟳</button>
-          <span style="border-left:1px solid var(--border);margin:0 4px;height:18px;"></span>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;">
-            Width:
-            <input type="range" id="signals-width-scale" min="20" max="85" value="48" style="width:90px;" oninput="setSignalsWidth(this.value)">
-            <span id="signals-width-label">48%</span>
-          </label>
+          <details class="zoom-controls-menu" id="zoom-controls-menu">
+            <summary class="btn icon-btn" aria-label="More signal zoom controls" title="More signal zoom controls"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></summary>
+            <div class="zoom-controls-panel">
+              <label class="snap-toggle-row" title="Magnet the cursor to peaks, troughs, and zero crossings">
+                <input id="signal-snap-toggle" type="checkbox" checked>
+                <span>Snap peaks / zeros / points</span>
+              </label>
+              <button class="btn icon-btn" id="zoom-x-in" title="Zoom X-axis in" aria-label="Zoom X-axis in" onclick="zoomChartX(1.25)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M10.5 7v7M7 10.5h7M15.5 15.5 21 21"/></svg></button>
+              <button class="btn icon-btn" id="zoom-x-out" title="Zoom X-axis out" aria-label="Zoom X-axis out" onclick="zoomChartX(0.8)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7 10.5h7M15.5 15.5 21 21"/></svg></button>
+              <button class="btn icon-btn" id="zoom-y-in" title="Zoom Y-axis in" aria-label="Zoom Y-axis in" onclick="zoomChartY(1.25)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21V3M7 8l5-5 5 5M7 16l5 5 5-5"/></svg></button>
+              <button class="btn icon-btn" id="zoom-y-out" title="Zoom Y-axis out" aria-label="Zoom Y-axis out" onclick="zoomChartY(0.8)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4v16M7 15l5 5 5-5M7 9l5-5 5 5"/></svg></button>
+              <button class="btn icon-btn" id="reset-zoom" title="Reset pan and zoom" aria-label="Reset pan and zoom" onclick="resetChartViewports()"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7v5h-5M4.9 9A8 8 0 1 1 4 14"/></svg></button>
+            </div>
+          </details>
         </div>
         <div class="setting-control" id="signals-toggle-wrap">
           <button class="btn icon-btn" id="signals-toggle" aria-label="Hide signal panel" aria-pressed="false" title="Hide signal panel">◧</button>
-          <button class="btn btn-primary" onclick="toggleFullScreen(true)">⛶ Fullscreen</button>
+          <button class="btn btn-primary icon-btn" aria-label="Open fullscreen signal view" title="Open fullscreen signal view" onclick="toggleFullScreen(true)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
         </div>
       </div>
 
@@ -830,7 +936,7 @@
     <div style="display:flex; flex-direction:column; gap:6px;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div style="font-weight:700; color:var(--accent);">FULL-SCREEN OSCILLOSCOPE</div>
-        <button class="btn" onclick="toggleFullScreen(false)">✕ Close (Esc)</button>
+        <button class="btn icon-btn" aria-label="Close fullscreen signal view" title="Close fullscreen signal view (Esc)" onclick="toggleFullScreen(false)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
       </div>
       <div class="dock-header" style="border-radius:4px;">
         <div class="controls-group">
@@ -841,11 +947,11 @@
           <span>Span ±T:</span>
           <input type="number" id="fs-time-span-input" class="range-input" value="10" min="1" max="100" onchange="updateFsTimeSpan()">
           <span style="border-left:1px solid var(--border);margin:0 4px;height:18px;"></span>
-          <button class="btn icon-btn" title="Zoom X-axis in (or Wheel)" onclick="zoomChartX(1.25)">⤚⤛</button>
-          <button class="btn icon-btn" title="Zoom X-axis out" onclick="zoomChartX(0.8)">⤜⤝</button>
-          <button class="btn icon-btn" title="Zoom Y-axis in (or Ctrl+Wheel)" onclick="zoomChartY(1.25)">↕⤊</button>
-          <button class="btn icon-btn" title="Zoom Y-axis out" onclick="zoomChartY(0.8)">↕⤋</button>
-          <button class="btn icon-btn" title="Reset pan & zoom (or double-click chart)" onclick="resetChartViewports()">⟳</button>
+          <button class="btn icon-btn" title="Zoom X-axis in" aria-label="Zoom X-axis in" onclick="zoomChartX(1.25)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M10.5 7v7M7 10.5h7M15.5 15.5 21 21"/></svg></button>
+          <button class="btn icon-btn" title="Zoom X-axis out" aria-label="Zoom X-axis out" onclick="zoomChartX(0.8)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M7 10.5h7M15.5 15.5 21 21"/></svg></button>
+          <button class="btn icon-btn" title="Zoom Y-axis in" aria-label="Zoom Y-axis in" onclick="zoomChartY(1.25)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 21V3M7 8l5-5 5 5M7 16l5 5 5-5"/></svg></button>
+          <button class="btn icon-btn" title="Zoom Y-axis out" aria-label="Zoom Y-axis out" onclick="zoomChartY(0.8)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 4v16M7 15l5 5 5-5M7 9l5-5 5 5"/></svg></button>
+          <button class="btn icon-btn" title="Reset pan and zoom" aria-label="Reset pan and zoom" onclick="resetChartViewports()"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M20 7v5h-5M4.9 9A8 8 0 1 1 4 14"/></svg></button>
         </div>
       </div>
       <div class="ruler-readout-bar" style="border-radius:4px;">
@@ -874,6 +980,7 @@
       <footer class="reserved-dialog-footer">Listed names are reserved and cannot be assigned to.</footer>
     </section>
   </div>
+  <div id="symbol-tooltip" role="tooltip" hidden></div>
 
   <script>
 
@@ -931,11 +1038,29 @@
       'round': { sig: 'round(x[, digits])', param: 'x: real number | optional digits: decimal places', desc: 'Rounds to the nearest value at the requested decimal place.', example: 'round(pi, 2)' },
       'min': { sig: 'min(x, ...)', param: 'one or more real numbers', desc: 'Smallest argument.', example: 'min(3, -1, 2)' },
       'max': { sig: 'max(x, ...)', param: 'one or more real numbers', desc: 'Largest argument.', example: 'max(3, -1, 2)' },
+      'count': { sig: 'count(data, ...)', param: 'finite real values, a set, or a range', desc: 'Number of observations. Duplicate values in a set are already removed.', example: 'count(range(1:5, x, 4))' },
+      'sum': { sig: 'sum(data, ...)', param: 'finite real values, a set, or a range', desc: 'Sum of all observations.', example: 'sum({1, 2, 3})' },
+      'mean': { sig: 'mean(data, ...)', param: 'finite real values, a set, or a range', desc: 'Arithmetic mean; average() is an alias.', example: 'mean(range(0:10, x, 10))' },
+      'average': { sig: 'average(data, ...)', param: 'finite real values, a set, or a range', desc: 'Alias for mean().', example: 'average({1, 2, 3})' },
+      'median': { sig: 'median(data, ...)', param: 'finite real values, a set, or a range', desc: 'Middle observation; averages the two middle values for even-sized data.', example: 'median({1, 2, 9, 10})' },
+      'mode': { sig: 'mode(data, ...)', param: 'finite real values, a set, or a range', desc: 'Most frequent observation; ties return the smallest tied value.', example: 'mode(1, 2, 2, 3)' },
+      'variance': { sig: 'variance(data, ...)', param: 'finite real values, a set, or a range', desc: 'Population variance (divides by n).', example: 'variance(1, 2, 3)' },
+      'populationvariance': { sig: 'populationVariance(data, ...)', param: 'finite real values, a set, or a range', desc: 'Alias for population variance().', example: 'populationVariance({1, 2, 3})' },
+      'samplevariance': { sig: 'sampleVariance(data, ...)', param: 'at least two finite real values', desc: 'Sample variance (divides by n - 1).', example: 'sampleVariance(1, 2, 3)' },
+      'stddev': { sig: 'stddev(data, ...)', param: 'finite real values, a set, or a range', desc: 'Population standard deviation; standardDeviation() is an alias.', example: 'stddev(1, 2, 3)' },
+      'standarddeviation': { sig: 'standardDeviation(data, ...)', param: 'finite real values, a set, or a range', desc: 'Alias for population standard deviation.', example: 'standardDeviation(1, 2, 3)' },
+      'samplestddev': { sig: 'sampleStdDev(data, ...)', param: 'at least two finite real values', desc: 'Sample standard deviation (uses n - 1).', example: 'sampleStdDev(1, 2, 3)' },
+      'samplestandarddeviation': { sig: 'sampleStandardDeviation(data, ...)', param: 'at least two finite real values', desc: 'Alias for sample standard deviation.', example: 'sampleStandardDeviation(1, 2, 3)' },
+      'quantile': { sig: 'quantile(data, p)', param: 'data: values, set, or range | p: probability in [0, 1]', desc: 'Linearly interpolated quantile using position p * (n - 1).', example: 'quantile({1, 2, 9, 10}, 0.5)' },
+      'percentile': { sig: 'percentile(data, p)', param: 'data: values, set, or range | p: percentile in [0, 100]', desc: 'Linearly interpolated percentile; equivalent to quantile(data, p / 100).', example: 'percentile(range(1:5, x, 4), 25)' },
       'trunc': { sig: 'trunc(x)', param: 'x: real number', desc: 'Rounds toward zero.', example: 'trunc(-2.8)' },
       'sign': { sig: 'sign(x)', param: 'x: real number', desc: 'Returns -1, 0, or 1 according to the sign of x.', example: 'sign(-4)' },
       'pow': { sig: 'pow(x, y)', param: 'x, y: real numbers', desc: 'Raises x to the power y; equivalent to x^y.', example: 'pow(2, 3)' },
       'hypot': { sig: 'hypot(x, y, ...)', param: 'two or more real numbers', desc: 'Square root of the sum of squared arguments.', example: 'hypot(3, 4)' },
       'clamp': { sig: 'clamp(x, minimum, maximum)', param: 'x, minimum, maximum: real numbers', desc: 'Restricts x to the inclusive interval [minimum, maximum].', example: 'clamp(12, 0, 10)' },
+        'type': { sig: 'type(value)', param: 'one expression or variable', desc: 'Returns the runtime type: number, complex, string, boolean, null, set, range, array, function, or a class name.', example: 'type(30 + 2.5)' },
+        'type': { sig: 'type(value)', param: 'one expression or variable', desc: 'Returns the runtime type: number, complex, string, null, set, range, array, function, or the class name of an instance. Comparisons return number.', example: 'type(30 + 2.5)' },
+        'plot': { sig: 'plot(yValues) | plot(x, y [, fig = 1])', param: 'a numeric point, or sets/ranges of coordinates with matching lengths | fig: optional chart group key', desc: 'Plots a point, a sequence of y-values against their indices, or paired x/y values in the time-domain chart. Repeated fig keys share a figure selector.', example: 'plot({0, 1, 2}, {2, 5, 3}, fig = 1)' },
       'deg': { sig: 'deg(x)', param: 'x: radians', desc: 'Converts radians to degrees.', example: 'deg(pi)' },
       'rad': { sig: 'rad(x)', param: 'x: degrees', desc: 'Converts degrees to radians.', example: 'rad(180)' },
       'asinh': { sig: 'asinh(x)', param: 'x: real number', desc: 'Inverse hyperbolic sine.', example: 'asinh(1)' },
@@ -947,6 +1072,32 @@
       'conj': { sig: 'conj(z)', param: 'complex number z', desc: 'Returns the complex conjugate of z.', example: 'conj(2 + 3*i)' },
       'arg': { sig: 'arg(z)', param: 'complex number z', desc: 'Returns the principal argument of z in radians.', example: 'arg(i)' },
       'range': { sig: 'range(start:stop, variable, steps)', param: 'start, stop: finite bounds | variable: identifier label | steps: positive integer intervals', desc: 'Returns steps + 1 evenly spaced samples including both endpoints (descending when start > stop). The variable is descriptive only and is not assigned.', example: 'range(0:1, x, 4)' },
+      'class': { sig: 'class Name { field = value; function constructor(...) { ... } }', param: 'per-instance fields, methods, and optional constructor', desc: 'Declares a class. Field initializers run separately for each instance before its constructor.', example: 'class Point { x = null; function constructor(x) { this.x = x; } }' },
+      'new': { sig: 'new ClassName(arguments)', param: 'class name and constructor arguments', desc: 'Creates an independent class instance and selects a constructor overload by argument count.', example: 'p = new Point(3, 4);' },
+      'constructor': { sig: 'function constructor(...) { ... }', param: 'an instance initializer; overloads must have distinct parameter counts', desc: 'Runs after fields initialize. The matching overload is chosen from the arguments passed to new.', example: 'function constructor(x) { this.x = x; }' },
+      'this': { sig: 'this.field', param: 'the current object inside a class method or constructor', desc: 'Reads or writes a field on the current instance.', example: 'this.x = x;' },
+      'function': { sig: 'function name(parameters) { ... }', param: 'function name and optional parameters', desc: 'Declares a reusable function. Inside a class, function declarations define methods.', example: 'function square(x) { return x^2; }' },
+      'fn': { sig: 'fn name(parameters) { ... }', param: 'alias for function', desc: 'Declares a reusable function.', example: 'fn square(x) { return x^2; }' },
+      'if': { sig: 'if (condition) { ... }', param: 'condition: a comparison, chained comparison, or other expression', desc: 'Runs the block when the condition is truthy. Comparisons evaluate to 1 or 0.', example: 'if (0 < x < 10) { print(x); }' },
+      'else': { sig: 'else { ... }', param: 'optional branch following if', desc: 'Runs when the preceding if condition is false.', example: 'if (x > 0) { print(x); } else { print(0); }' },
+      'while': { sig: 'while (condition) { ... }', param: 'condition tested before each iteration', desc: 'Repeats the block while its condition is truthy.', example: 'while (x < 3) { x = x + 1; }' },
+      'for': { sig: 'for (init; condition; update) { ... }', param: 'classic counted loop or for name in iterable', desc: 'Repeats a block with an optional counter, or iterates over a range or set.', example: 'for (let k = 0; k < 3; k = k + 1) { print(k); }' },
+      'switch': { sig: 'switch (value) { case value: ... default: ... }', param: 'one value compared with case labels', desc: 'Runs the first matching case, or default when none match. Use break to stop a case.', example: 'switch (n) { case 1: print("one"); break; default: print("other"); }' },
+      'case': { sig: 'case value:', param: 'a value label inside switch', desc: 'Begins a switch branch when its value equals the switched value.', example: 'case 1: print("one"); break;' },
+      'default': { sig: 'default:', param: 'optional final switch branch', desc: 'Runs when no case value matches.', example: 'default: print("other"); break;' },
+      'break': { sig: 'break', param: 'valid inside loops and switch cases', desc: 'Exits the nearest loop or switch.', example: 'if (x == 3) { break; }' },
+      'continue': { sig: 'continue', param: 'valid inside loops', desc: 'Skips to the next loop iteration.', example: 'if (x == 0) { continue; }' },
+      'return': { sig: 'return expression', param: 'valid inside a function or method', desc: 'Ends the current function and returns a value.', example: 'return x^2;' },
+      'let': { sig: 'let name = expression', param: 'new mutable variable', desc: 'Declares and assigns a variable.', example: 'let total = 0;' },
+      'print': { sig: 'print(value, ...)', param: 'zero or more values', desc: 'Writes values to the terminal output.', example: 'print("sum:", 2 + 3);' },
+      'in': { sig: 'value in set', param: 'value and finite set', desc: 'Tests whether a value belongs to a set; returns 1 or 0.', example: '2 in {1, 2, 3}' },
+      'belongsto': { sig: 'value belongsto set', param: 'alias for in', desc: 'Tests set membership; the symbol ∈ is also accepted.', example: '2 ∈ {1, 2, 3}' },
+      'forall': { sig: 'forall(variable, finiteSet, condition)', param: 'variable: identifier bound to each set element | condition: expression returning truthy or false', desc: 'Returns 1 when every element satisfies the condition; the symbol ∀ is an alias. Empty finite sets satisfy forall vacuously.', example: 'forall(x, {1, 2, 3}, x > 0)' },
+      '∀': { sig: '∀(variable, finiteSet, condition)', param: 'finite set and a condition evaluated once per element', desc: 'Universal quantifier alias for forall().', example: '∀(x, {1, 2, 3}, 0 < x < 4)' },
+      'mod': { sig: 'left mod right', param: 'real operands', desc: 'Returns the remainder after division.', example: '10 mod 3' },
+      'null': { sig: 'null', param: 'empty value', desc: 'Represents no value; none is an alias.', example: 'x = null;' },
+      'none': { sig: 'none', param: 'empty value', desc: 'Alias for null.', example: 'x = none;' },
+      'otherwise': { sig: 'otherwise', param: 'fallback condition in a piecewise expression', desc: 'Selects the final piecewise branch when no earlier condition matches.', example: 'y = { 1: x > 0, 0: otherwise };' },
       'rect': {
         sig: 'rect(t)',
         param: 't: continuous real time variable',
@@ -962,8 +1113,8 @@
       'delta': {
         sig: 'delta(t - t0)',
         param: 't0: time shift offset',
-        desc: 'Dirac delta impulse distribution: infinite spike at t = t0 with area = 1.',
-        example: 'x = delta(t - 1) + delta(t + 2);'
+        desc: 'Dirac delta distribution: sampled signals use a normalized approximation; integrate() applies its impulse contribution.',
+        example: 'area = integrate(delta(t - 1), t, 0, 2);'
       },
       'u': {
         sig: 'u(t)',
@@ -1062,6 +1213,7 @@
     const SUGGESTIONS = [
       { name: 'diff', type: 'calculus', snippet: 'diff(, t, at = null)' },
       { name: 'integrate', type: 'calculus', snippet: 'integrate(, t, 0, pi)' },
+        { name: 'plot', type: 'plot', snippet: 'plot()' },
       { name: 'ft', type: 'transform', snippet: 'ft(, t, omega)' },
       { name: 'fs', type: 'series', snippet: 'fs(, t, tau, 1)' },
       { name: 'rect', type: 'signal', snippet: 'rect(t)' },
@@ -1101,11 +1253,27 @@
       { name: 'round', type: 'function', snippet: 'round()' },
       { name: 'min', type: 'function', snippet: 'min()' },
       { name: 'max', type: 'function', snippet: 'max()' },
+      { name: 'count', type: 'statistics', snippet: 'count()' },
+      { name: 'sum', type: 'statistics', snippet: 'sum()' },
+      { name: 'mean', type: 'statistics', snippet: 'mean()' },
+      { name: 'average', type: 'statistics', snippet: 'average()' },
+      { name: 'median', type: 'statistics', snippet: 'median()' },
+      { name: 'mode', type: 'statistics', snippet: 'mode()' },
+      { name: 'variance', type: 'statistics', snippet: 'variance()' },
+      { name: 'populationVariance', type: 'statistics', snippet: 'populationVariance()' },
+      { name: 'sampleVariance', type: 'statistics', snippet: 'sampleVariance()' },
+      { name: 'stddev', type: 'statistics', snippet: 'stddev()' },
+      { name: 'standardDeviation', type: 'statistics', snippet: 'standardDeviation()' },
+      { name: 'sampleStdDev', type: 'statistics', snippet: 'sampleStdDev()' },
+      { name: 'sampleStandardDeviation', type: 'statistics', snippet: 'sampleStandardDeviation()' },
+      { name: 'quantile', type: 'statistics', snippet: 'quantile(, 0.5)' },
+      { name: 'percentile', type: 'statistics', snippet: 'percentile(, 50)' },
         { name: 'trunc', type: 'function', snippet: 'trunc()' },
         { name: 'sign', type: 'function', snippet: 'sign()' },
         { name: 'pow', type: 'function', snippet: 'pow(, )' },
         { name: 'hypot', type: 'function', snippet: 'hypot(, )' },
         { name: 'clamp', type: 'function', snippet: 'clamp(, , )' },
+          { name: 'type', type: 'function', snippet: 'type()' },
         { name: 'deg', type: 'function', snippet: 'deg()' },
         { name: 'rad', type: 'function', snippet: 'rad()' },
         { name: 'asinh', type: 'function', snippet: 'asinh()' },
@@ -1118,6 +1286,12 @@
         { name: 'i', type: 'constant', snippet: 'i' },
       { name: 'range', type: 'range', snippet: 'range(0:1, x, 10)' },
         { name: 'function', type: 'keyword', snippet: 'function name() {\n  \n}' },
+      { name: 'class', type: 'keyword', snippet: 'class Name {\n  function constructor() {\n    \n  }\n}' },
+      { name: 'new', type: 'keyword', snippet: 'new ClassName()' },
+      { name: 'constructor', type: 'keyword', snippet: 'constructor()' },
+      { name: 'this', type: 'keyword', snippet: 'this' },
+      { name: 'null', type: 'keyword', snippet: 'null' },
+      { name: 'none', type: 'keyword', snippet: 'none' },
         { name: 'if', type: 'keyword', snippet: 'if () {\n  \n}' },
         { name: 'else', type: 'keyword', snippet: 'else {\n  \n}' },
         { name: 'while', type: 'keyword', snippet: 'while () {\n  \n}' },
@@ -1136,6 +1310,8 @@
       { name: 'and', type: 'operator', snippet: 'and ' },
       { name: 'or', type: 'operator', snippet: 'or ' },
       { name: 'not', type: 'operator', snippet: 'not ' },
+      { name: 'forall', type: 'logic', snippet: 'forall(x, {1, 2, 3}, x > 0)' },
+      { name: '∀', type: 'logic', snippet: '∀(x, {1, 2, 3}, x > 0)' },
       { name: 'let', type: 'keyword', snippet: 'let ' },
       { name: 'print', type: 'keyword', snippet: 'print()' },
       { name: 'omega', type: 'constant', snippet: 'omega' },
@@ -1152,19 +1328,55 @@
         names: ['pi', 'tau', 'e', 'phi', 'inf', 'c', 'i']
       },
       {
-        title: 'Reserved symbol aliases',
-        names: ['π (pi)', 'τ (tau)', 'φ (phi)', 'ℯ (e)']
+        title: 'Built-in functions',
+        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'average', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'count', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'forall', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'mean', 'median', 'min', 'mode', 'percentile', 'plot', 'populationVariance', 'pow', 'pulse', 'quantile', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sampleStandardDeviation', 'sampleStdDev', 'sampleVariance', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'standardDeviation', 'stddev', 'step', 'sum', 'tan', 'tanh', 'tri', 'trunc', 'type', 'u', 'variance']
       },
       {
-        title: 'Built-in functions',
-        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'min', 'pow', 'pulse', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'step', 'tan', 'tanh', 'tri', 'trunc', 'u']
+        title: 'Mathematical types',
+        names: ['+R', '-R', 'COMPLEX', 'N', 'Q', 'R', 'WHOLE', 'Z', '∀']
       },
       {
         title: 'Language keywords and operators',
-        names: ['and', 'belongsto', 'break', 'case', 'continue', 'default', 'diff', 'else', 'for', 'fn', 'function', 'if', 'in', 'intersect', 'let', 'mod', 'none', 'not', 'null', 'or', 'otherwise', 'print', 'return', 'switch', 'union', 'while']
+        names: ['and', 'belongsto', 'break', 'case', 'class', 'constructor', 'continue', 'default', 'diff', 'else', 'for', 'fn', 'function', 'if', 'in', 'intersect', 'let', 'mod', 'new', 'none', 'not', 'null', 'or', 'otherwise', 'print', 'return', 'switch', 'this', 'union', 'while']
       }
     ];
-    const RESERVED_NAMES = new Set(RESERVED_NAME_GROUPS.flatMap(group => group.names.map(name => name.toLowerCase())));
+    const MATH_SET_TYPE_NAMES = new Set(['N', 'WHOLE', 'Z', 'Q', 'R', 'COMPLEX']);
+    const RESERVED_NAMES = new Set(RESERVED_NAME_GROUPS
+      .filter(group => !['Mathematical types', 'Immutable constants'].includes(group.title))
+      .flatMap(group => group.names.map(name => name.toLowerCase())));
+    const CASE_SENSITIVE_RESERVED_NAMES = new Set([
+      ...RESERVED_NAME_GROUPS.filter(group => ['Mathematical types', 'Immutable constants'].includes(group.title)).flatMap(group => group.names),
+      'pi', 'tau', 'e', 'phi', 'inf', 'c', 'i'
+    ]);
+    function isReservedName(name) {
+      return RESERVED_NAMES.has(name.toLowerCase()) || CASE_SENSITIVE_RESERVED_NAMES.has(name);
+    }
+    const suggestionCatalog = new Map(SUGGESTIONS.map(item => [item.name.toLowerCase(), item]));
+    RESERVED_NAME_GROUPS.forEach(group => {
+      const type = group.title === 'Built-in functions'
+        ? 'function'
+        : group.title === 'Immutable constants' ? 'constant'
+        : group.title === 'Mathematical types' ? 'type' : 'keyword';
+      group.names.forEach(name => {
+        if (!suggestionCatalog.has(name.toLowerCase())) {
+          suggestionCatalog.set(name.toLowerCase(), {
+            name,
+            type,
+            snippet: type === 'function' ? `${name}()` : type === 'keyword' ? `${name} ` : name
+          });
+        }
+      });
+    });
+    Object.entries(DOCS).forEach(([key, doc]) => {
+      if (key.includes('_') || suggestionCatalog.has(key.toLowerCase())) return;
+      const signatureName = doc.sig.match(/^([a-zA-Z_][a-zA-Z0-9_]*)\s*\(/)?.[1];
+      const name = signatureName || key;
+      suggestionCatalog.set(key.toLowerCase(), {
+        name,
+        type: signatureName ? 'function' : 'language',
+        snippet: signatureName ? `${name}()` : name
+      });
+    });
 
     /* ==========================================================================
        3. HARDWARE RULER & ACCURATE 2D POINT SNAPPER (BOTH TIME & FREQ)
@@ -1191,7 +1403,7 @@
               const mx = x0 + j * step;
               ctx.beginPath();
               ctx.moveTo(mx, top); ctx.lineTo(mx, top + (j === 2 ? 6 : 3.5));
-              ctx.moveTo(mx, bottom); ctx.lineTo(mx, bottom - (j === 2 ? 6 : 3.5));
+               ctx.moveTo(mx, bottom); ctx.lineTo(mx, bottom - (j === 2 ? 6 : 3.5));
               ctx.stroke();
             }
           }
@@ -1236,7 +1448,7 @@
             ctx.stroke();
 
             const unit = pt.isFreq ? 'Hz, Mag' : 's, V';
-            const text = `${pt.name}: (${pt.x.toFixed(3)}${pt.isFreq ? 'Hz' : 's'}, ${pt.y.toFixed(3)}${pt.isFreq ? '' : 'V'})`;
+                        const text = `${pt.name}: (${pt.x.toFixed(3)}${pt.isFreq ? 'Hz' : 's'}, ${pt.y.toFixed(3)}${pt.isFreq ? '' : 'V'})${pt.snapType ? ` · ${pt.snapType}` : ''}`;
             ctx.font = 'bold 11px Consolas, monospace';
             const textWidth = ctx.measureText(text).width;
             const badgeW = textWidth + 14;
@@ -1263,27 +1475,86 @@
       }
     };
     Chart.register(HardwareInspectorPlugin);
+    let signalSnapEnabled = true;
+    const signalSnapToggle = document.getElementById('signal-snap-toggle');
+    try {
+      signalSnapEnabled = localStorage.getItem('axiom-ui-signal-snap') !== 'false';
+    } catch {}
+    signalSnapToggle.checked = signalSnapEnabled;
+    signalSnapToggle.addEventListener('change', () => {
+      signalSnapEnabled = signalSnapToggle.checked;
+      try { localStorage.setItem('axiom-ui-signal-snap', String(signalSnapEnabled)); } catch {}
+      activeHoverPoint = null;
+      renderActiveChannel();
+    });
+
+    function getSignalSnapPoints(data) {
+      if (!data || data.length < 3) return [];
+      const largestMagnitude = data.reduce((largest, point) => Math.max(largest, Math.abs(point.y)), 0);
+      const zeroTolerance = Math.max(1e-12, largestMagnitude * 1e-6);
+      const points = [];
+      for (let index = 1; index < data.length - 1; index++) {
+        const previous = data[index - 1];
+        const current = data[index];
+        const next = data[index + 1];
+        const risingIntoPoint = current.y > previous.y;
+        const fallingAfterPoint = next.y < current.y;
+        const fallingIntoPoint = current.y < previous.y;
+        const risingAfterPoint = next.y > current.y;
+        if ((risingIntoPoint && next.y <= current.y) || (fallingIntoPoint && next.y >= current.y)) {
+          points.push({
+            x: current.x,
+            y: current.y,
+            snapType: Math.abs(current.y) <= zeroTolerance
+              ? 'Zero touch'
+              : risingIntoPoint && fallingAfterPoint ? 'Peak' : 'Trough'
+          });
+        }
+        if ((previous.y < 0 && next.y > 0) || (previous.y > 0 && next.y < 0)) {
+          if (current.y === 0) points.push({ x: current.x, y: 0, snapType: 'Zero crossing' });
+        }
+      }
+      for (let index = 0; index < data.length - 1; index++) {
+        const left = data[index];
+        const right = data[index + 1];
+        if (left.y * right.y < 0) {
+          const ratio = Math.abs(left.y) / (Math.abs(left.y) + Math.abs(right.y));
+          points.push({
+            x: left.x + (right.x - left.x) * ratio,
+            y: 0,
+            snapType: 'Zero crossing'
+          });
+        }
+      }
+      return points.sort((left, right) => left.x - right.x);
+    }
 
     /* ==========================================================================
        4. LEXER & PARSER
        ========================================================================== */
     const TT = {
       LET: 'LET', PRINT: 'PRINT', UNION: 'UNION', INTERSECT: 'INTERSECT',
-      FUNCTION: 'FUNCTION', RETURN: 'RETURN', IF: 'IF', ELSE: 'ELSE', WHILE: 'WHILE', FOR: 'FOR',
+      FUNCTION: 'FUNCTION', CLASS: 'CLASS', NEW: 'NEW', RETURN: 'RETURN', IF: 'IF', ELSE: 'ELSE', WHILE: 'WHILE', FOR: 'FOR',
       SWITCH: 'SWITCH', CASE: 'CASE', DEFAULT: 'DEFAULT', BREAK: 'BREAK', CONTINUE: 'CONTINUE',
       INCREMENT: 'INCREMENT', DECREMENT: 'DECREMENT',
       AND: 'AND', OR: 'OR', NOT: 'NOT', OTHERWISE: 'OTHERWISE',
       BELONGS_TO: 'BELONGS_TO', IN: 'IN', NULL: 'NULL',
+      ARROW: 'ARROW', ELLIPSIS: 'ELLIPSIS', TRUE: 'TRUE', FALSE: 'FALSE', LBRACKET: '[', RBRACKET: ']',
       IDENTIFIER: 'IDENTIFIER', NUMBER: 'NUMBER', STRING: 'STRING',
       PLUS: '+', MINUS: '-', MUL: '*', DIV: '/', MOD: '%', POW: '^',
-      ASSIGN: '=', COLON: ':', QUESTION: '?', SEMICOLON: ';', COMMA: ',',
+      ASSIGN: '=', COLON: ':', QUESTION: '?', SEMICOLON: ';', COMMA: ',', DOT: '.',
       LPAREN: '(', RPAREN: ')', LBRACE: '{', RBRACE: '}',
       EQ: '==', NEQ: '!=', LT: '<', GT: '>', LTE: '<=', GTE: '>=', EOF: 'EOF'
     };
 
     class Lexer {
-      constructor(src) { this.src = src; this.pos = 0; this.c = src[0] || null; }
-      advance() { this.pos++; this.c = this.pos < this.src.length ? this.src[this.pos] : null; }
+      constructor(src) { this.src = src; this.pos = 0; this.line = 1; this.column = 1; this.c = src[0] || null; }
+      advance() {
+        if (this.c === '\n') { this.line++; this.column = 1; }
+        else this.column++;
+        this.pos++;
+        this.c = this.pos < this.src.length ? this.src[this.pos] : null;
+      }
       peek() { return this.pos + 1 < this.src.length ? this.src[this.pos + 1] : null; }
       tokenize() {
         const tokens = [];
@@ -1293,48 +1564,63 @@
             while (this.c !== null && this.c !== '\n') this.advance();
             continue;
           }
-          if (this.c === '"' || this.c === "'") { tokens.push(this.readString()); continue; }
-          if (/\d|\./.test(this.c)) { tokens.push(this.readNumber()); continue; }
-          if (/[a-zA-Z_πωτℝℤℕδΔΩΦφΠΤℯ]/.test(this.c)) { tokens.push(this.readId()); continue; }
+          const location = { offset: this.pos, line: this.line, column: this.column };
+          const pushToken = token => tokens.push({ ...token, ...location });
+          if (this.src.slice(this.pos, this.pos + 3) === '...') {
+            this.advance(); this.advance(); this.advance();
+            pushToken({ type: TT.ELLIPSIS, value: '...' });
+            continue;
+          }
+          if (this.c === '∀') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'forall' }); continue; }
+          if (this.c === '"' || this.c === "'") { pushToken(this.readString()); continue; }
+          if (/\d/.test(this.c) || (this.c === '.' && /\d/.test(this.peek() || ''))) { pushToken(this.readNumber()); continue; }
+          if (/[a-zA-Z_πωτℝℤℕδΔΩΦφΠΤℯ]/.test(this.c)) { pushToken(this.readId()); continue; }
 
           const c = this.c;
           if ((c === '+' || c === '-') && this.peek() === c) {
             this.advance();
             this.advance();
-            tokens.push({ type: c === '+' ? TT.INCREMENT : TT.DECREMENT, value: c + c });
+            pushToken({ type: c === '+' ? TT.INCREMENT : TT.DECREMENT, value: c + c });
             continue;
           }
-          if (c === '&' && this.peek() === '&') { this.advance(); this.advance(); tokens.push({ type: TT.AND, value: 'and' }); continue; }
-          if (c === '|' && this.peek() === '|') { this.advance(); this.advance(); tokens.push({ type: TT.OR, value: 'or' }); continue; }
-          if (c === '=' && this.peek() === '=') { this.advance(); this.advance(); tokens.push({ type: TT.EQ, value: '==' }); continue; }
-          if (c === '!' && this.peek() === '=') { this.advance(); this.advance(); tokens.push({ type: TT.NEQ, value: '!=' }); continue; }
-          if (c === '!') { this.advance(); tokens.push({ type: TT.NOT, value: 'not' }); continue; }
-          if (c === '<' && this.peek() === '=') { this.advance(); this.advance(); tokens.push({ type: TT.LTE, value: '<=' }); continue; }
-          if (c === '>' && this.peek() === '=') { this.advance(); this.advance(); tokens.push({ type: TT.GTE, value: '>=' }); continue; }
-          if (c === '≤') { this.advance(); tokens.push({ type: TT.LTE, value: '<=' }); continue; }
-          if (c === '≥') { this.advance(); tokens.push({ type: TT.GTE, value: '>=' }); continue; }
-          if (c === '≠') { this.advance(); tokens.push({ type: TT.NEQ, value: '!=' }); continue; }
-          if (c === '∈') { this.advance(); tokens.push({ type: TT.BELONGS_TO, value: 'belongsTo' }); continue; }
-          if (c === '×' || c === '·') { this.advance(); tokens.push({ type: TT.MUL, value: '*' }); continue; }
-          if (c === '÷') { this.advance(); tokens.push({ type: TT.DIV, value: '/' }); continue; }
-          if (c === '−') { this.advance(); tokens.push({ type: TT.MINUS, value: '-' }); continue; }
-          if (c === '∞') { this.advance(); tokens.push({ type: TT.IDENTIFIER, value: 'inf' }); continue; }
-          if (c === '*' && this.peek() === '*') { this.advance(); this.advance(); tokens.push({ type: TT.POW, value: '^' }); continue; }
+          if (c === '-' && this.peek() === '>') {
+            this.advance();
+            this.advance();
+            pushToken({ type: TT.ARROW, value: '->' });
+            continue;
+          }
+          if (c === '&' && this.peek() === '&') { this.advance(); this.advance(); pushToken({ type: TT.AND, value: 'and' }); continue; }
+          if (c === '|' && this.peek() === '|') { this.advance(); this.advance(); pushToken({ type: TT.OR, value: 'or' }); continue; }
+          if (c === '=' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.EQ, value: '==' }); continue; }
+          if (c === '!' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
+          if (c === '!') { this.advance(); pushToken({ type: TT.NOT, value: 'not' }); continue; }
+          if (c === '<' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
+          if (c === '>' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
+          if (c === '≤') { this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
+          if (c === '≥') { this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
+          if (c === '≠') { this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
+          if (c === '∈') { this.advance(); pushToken({ type: TT.BELONGS_TO, value: 'belongsTo' }); continue; }
+          if (c === '×' || c === '·') { this.advance(); pushToken({ type: TT.MUL, value: '*' }); continue; }
+          if (c === '÷') { this.advance(); pushToken({ type: TT.DIV, value: '/' }); continue; }
+          if (c === '−') { this.advance(); pushToken({ type: TT.MINUS, value: '-' }); continue; }
+          if (c === '∞') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'inf' }); continue; }
+          if (c === '*' && this.peek() === '*') { this.advance(); this.advance(); pushToken({ type: TT.POW, value: '^' }); continue; }
 
           const singles = {
             '+': TT.PLUS, '-': TT.MINUS, '*': TT.MUL, '/': TT.DIV, '%': TT.MOD, '^': TT.POW,
-            '=': TT.ASSIGN, ':': TT.COLON, '?': TT.QUESTION, ';': TT.SEMICOLON, ',': TT.COMMA,
+            '=': TT.ASSIGN, ':': TT.COLON, '?': TT.QUESTION, ';': TT.SEMICOLON, ',': TT.COMMA, '.': TT.DOT,
+            '[': TT.LBRACKET, ']': TT.RBRACKET,
             '(': TT.LPAREN, ')': TT.RPAREN, '{': TT.LBRACE, '}': TT.RBRACE,
             '<': TT.LT, '>': TT.GT
           };
           if (singles[c]) {
-            tokens.push({ type: singles[c], value: c });
+            pushToken({ type: singles[c], value: c });
             this.advance();
             continue;
           }
           throw new Error(`Unexpected character '${c}'`);
         }
-        tokens.push({ type: TT.EOF, value: '' });
+        tokens.push({ type: TT.EOF, value: '', offset: this.pos, line: this.line, column: this.column });
         return tokens;
       }
       readNumber() {
@@ -1371,15 +1657,19 @@
         if (r === 'ℯ') return { type: TT.IDENTIFIER, value: 'e' };
         const lower = r.toLowerCase();
         if (lower === 'null' || lower === 'none') return { type: TT.NULL, value: null };
+        if (lower === 'true') return { type: TT.TRUE, value: true };
+        if (lower === 'false') return { type: TT.FALSE, value: false };
         const kw = {
           'let': TT.LET, 'print': TT.PRINT, 'function': TT.FUNCTION, 'fn': TT.FUNCTION,
+          'class': TT.CLASS, 'new': TT.NEW,
           'return': TT.RETURN, 'if': TT.IF, 'else': TT.ELSE, 'while': TT.WHILE, 'for': TT.FOR,
           'switch': TT.SWITCH, 'case': TT.CASE, 'default': TT.DEFAULT,
           'break': TT.BREAK, 'continue': TT.CONTINUE, 'belongsto': TT.BELONGS_TO, 'in': TT.IN,
           'union': TT.UNION, 'intersect': TT.INTERSECT, 'mod': TT.MOD,
           'and': TT.AND, 'or': TT.OR, 'not': TT.NOT, 'otherwise': TT.OTHERWISE
         };
-        return { type: kw[lower] || TT.IDENTIFIER, value: lower === 'mod' ? '%' : r };
+        const type = Object.prototype.hasOwnProperty.call(kw, lower) ? kw[lower] : TT.IDENTIFIER;
+        return { type, value: lower === 'mod' ? '%' : r };
       }
     }
 
@@ -1397,13 +1687,26 @@
       parseProgram() {
         const stmts = [];
         while (this.peek().type !== TT.EOF) {
-          stmts.push(this.parseStatement());
-          this.match(TT.SEMICOLON);
+          const start = this.peek();
+          try {
+            const statement = this.parseStatement();
+            Object.defineProperty(statement, 'sourceLocation', {
+              value: { offset: start.offset, line: start.line, column: start.column }
+            });
+            stmts.push(statement);
+            this.match(TT.SEMICOLON);
+          } catch (error) {
+            throw attachSourceLocation(error, this.peek());
+          }
         }
         return stmts;
       }
       parseStatement() {
+        if (this.match(TT.CLASS)) return this.parseClassDeclaration();
         if (this.match(TT.FUNCTION)) return this.parseFunctionDeclaration();
+        if (this.peek().type === TT.IDENTIFIER && this.tokens[this.idx + 1]?.type === TT.COLON) {
+          return this.parseTypedFunctionDeclaration();
+        }
         if (this.match(TT.IF)) return this.parseIfTail();
         if (this.match(TT.WHILE)) return this.parseWhileStatement();
         if (this.match(TT.FOR)) return this.parseForStatement();
@@ -1435,6 +1738,14 @@
           const delta = this.advance().type === TT.INCREMENT ? 1 : -1;
           return { type: 'UpdateStatement', name, delta };
         }
+        if (this.peek().type === TT.IDENTIFIER && this.tokens[this.idx + 1]?.type === TT.DOT &&
+            this.tokens[this.idx + 2]?.type === TT.IDENTIFIER && this.tokens[this.idx + 3]?.type === TT.ASSIGN) {
+          const object = { type: 'Variable', name: this.advance().value };
+          this.advance();
+          const name = this.advance().value;
+          this.advance();
+          return { type: 'MemberAssignStatement', object, name, expr: this.parseExpression() };
+        }
         if (this.peek().type === TT.IDENTIFIER && this.tokens[this.idx + 1]?.type === TT.ASSIGN) {
           const id = this.advance().value;
           this.advance();
@@ -1443,8 +1754,98 @@
         }
         return this.parseExpression();
       }
-      parseFunctionDeclaration() {
-        const name = this.expect(TT.IDENTIFIER, 'function requires a name').value;
+      parseTypedFunctionDeclaration() {
+        const name = this.expect(TT.IDENTIFIER, 'typed function requires a name').value;
+        this.expect(TT.COLON);
+        const domain = this.parseTypeSpec();
+        this.expect(TT.ARROW, 'Expected -> between function domain and range');
+        const range = this.parseTypeSpec();
+        this.expect(TT.COMMA, 'Expected , before typed function definition');
+        const assignedName = this.expect(TT.IDENTIFIER, 'Expected function name before =').value;
+        if (assignedName !== name) throw new Error(`Typed function name '${assignedName}' must match '${name}'`);
+        this.expect(TT.ASSIGN, 'Expected = before typed function expression');
+        return { type: 'TypedFunctionDeclaration', name, domain, range, expression: this.parseExpression() };
+      }
+      parseTypeSpec() {
+        const opening = this.match(TT.LBRACKET) || this.match(TT.LPAREN);
+        if (opening) {
+          const lower = this.parseAdditive();
+          this.expect(TT.COMMA, 'Expected , between interval bounds');
+          const upper = this.parseAdditive();
+          const closing = this.peek().type;
+          if (![TT.RBRACKET, TT.RPAREN].includes(closing)) throw new Error('Expected ] or ) after interval bounds');
+          this.advance();
+          return {
+            type: 'MathIntervalType',
+            lower,
+            upper,
+            includeLower: opening.type === TT.LBRACKET,
+            includeUpper: closing === TT.RBRACKET
+          };
+        }
+        if ([TT.PLUS, TT.MINUS].includes(this.peek().type) && this.tokens[this.idx + 1]?.value === 'R') {
+          const sign = this.advance().value;
+          this.advance();
+          return { type: 'MathSetType', name: `${sign}R` };
+        }
+        const name = this.expect(TT.IDENTIFIER, 'Expected a predefined uppercase math type or interval').value;
+        if (!MATH_SET_TYPE_NAMES.has(name)) throw new Error(`Unknown math type '${name}'; use an uppercase predefined type`);
+        return { type: 'MathSetType', name };
+      }
+      parseClassDeclaration() {
+        const name = this.expect(TT.IDENTIFIER, 'class requires a name').value;
+        this.expect(TT.LBRACE, 'Expected { after class name');
+        const methods = [];
+        const fields = [];
+        const memberNames = new Set();
+        const constructorSignatures = new Set();
+        while (this.peek().type !== TT.RBRACE) {
+          if (this.peek().type === TT.EOF) throw new Error('Unterminated class; expected }');
+          if (this.match(TT.FUNCTION)) {
+            const method = this.parseFunctionDeclaration(true);
+            const normalizedName = method.name.toLowerCase();
+            if (normalizedName === 'constructor') {
+              const signature = method.parameters.map(parameter => parameter.toLowerCase()).join(',');
+              if (memberNames.has(normalizedName) || constructorSignatures.has(signature)) {
+                throw new Error(`Class '${name}' has duplicate constructor signature (${method.parameters.join(', ')})`);
+              }
+              constructorSignatures.add(signature);
+            } else {
+              if (memberNames.has(normalizedName)) throw new Error(`Class '${name}' has duplicate member '${method.name}'`);
+              memberNames.add(normalizedName);
+            }
+            methods.push(method);
+            this.match(TT.SEMICOLON);
+          } else {
+            const parseField = () => {
+              const fieldName = this.expect(TT.IDENTIFIER, 'Class fields must be identifiers').value;
+              const normalizedName = fieldName.toLowerCase();
+              if (memberNames.has(normalizedName) || normalizedName === 'constructor') {
+                throw new Error(`Class '${name}' has duplicate member '${fieldName}'`);
+              }
+              memberNames.add(normalizedName);
+              const initializer = this.match(TT.ASSIGN)
+                ? this.parseExpression()
+                : { type: 'NullLiteral', value: null };
+              fields.push({ name: fieldName, initializer });
+            };
+            parseField();
+            while (this.match(TT.COMMA)) {
+              if (this.peek().type === TT.FUNCTION) break;
+              parseField();
+            }
+            if (!this.match(TT.SEMICOLON) && ![TT.FUNCTION, TT.RBRACE].includes(this.peek().type)) {
+              throw new Error('Expected , or ; after class field declaration');
+            }
+          }
+        }
+        this.advance();
+        return { type: 'ClassDeclaration', name, fields, methods };
+      }
+      parseFunctionDeclaration(allowPrintName = false) {
+        const name = allowPrintName && this.peek().type === TT.PRINT
+          ? this.advance().value
+          : this.expect(TT.IDENTIFIER, 'function requires a name').value;
         this.expect(TT.LPAREN, 'Expected ( after function name');
         const parameters = [];
         if (this.peek().type !== TT.RPAREN) {
@@ -1642,6 +2043,11 @@
         return left;
       }
       parseUnary() {
+        if ([TT.PLUS, TT.MINUS].includes(this.peek().type) && this.tokens[this.idx + 1]?.value === 'R') {
+          const sign = this.advance().value;
+          this.advance();
+          return { type: 'MathSetType', name: `${sign}R` };
+        }
         if (this.peek().type === TT.MINUS || this.peek().type === TT.PLUS || this.peek().type === TT.NOT) {
           const op = this.advance().value;
           const operand = this.parseUnary();
@@ -1652,8 +2058,25 @@
       parsePrimary() {
         const tok = this.peek();
         if (tok.type === TT.NULL) { this.advance(); return { type: 'NullLiteral', value: null }; }
+        if (tok.type === TT.TRUE || tok.type === TT.FALSE) { this.advance(); return { type: 'BooleanLiteral', value: tok.type === TT.TRUE }; }
         if (tok.type === TT.NUMBER) { this.advance(); return { type: 'NumberLiteral', value: tok.value }; }
         if (tok.type === TT.STRING) { this.advance(); return { type: 'StringLiteral', value: tok.value }; }
+        if (tok.type === TT.IDENTIFIER && MATH_SET_TYPE_NAMES.has(tok.value)) {
+          this.advance();
+          return { type: 'MathSetType', name: tok.value };
+        }
+        if (tok.type === TT.NEW) {
+          this.advance();
+          const name = this.expect(TT.IDENTIFIER, 'new requires a class name').value;
+          this.expect(TT.LPAREN, 'Expected ( after class name');
+          const args = [];
+          if (this.peek().type !== TT.RPAREN) {
+            args.push(this.parseFunctionArg());
+            while (this.match(TT.COMMA)) args.push(this.parseFunctionArg());
+          }
+          this.expect(TT.RPAREN, 'Expected ) after constructor arguments');
+          return this.parsePostfix({ type: 'NewExpression', name, args });
+        }
         if (tok.type === TT.LBRACE) {
           this.advance();
           if (this.peek().type === TT.RBRACE) {
@@ -1662,6 +2085,15 @@
           }
           const firstExpr = this.parseExpression();
           if (this.match(TT.COLON)) {
+            if (firstExpr.type === 'Variable' && this.peek().type === TT.IDENTIFIER && this.tokens[this.idx + 1]?.type === TT.ASSIGN) {
+              const bindingName = this.advance().value;
+              this.advance();
+              const expression = this.parseExpression();
+              const conditions = [];
+              while (this.match(TT.COMMA)) conditions.push(this.parseExpression());
+              this.expect(TT.RBRACE, 'Expected } after set-builder conditions');
+              return { type: 'SetComprehensionExpression', resultName: firstExpr.name, bindingName, expression, conditions };
+            }
             const branches = [];
             branches.push({ value: firstExpr, condition: this.parseExpression() });
             while (this.match(TT.COMMA)) {
@@ -1691,19 +2123,40 @@
             return piecewise;
           } else {
             const items = [firstExpr];
-            while (this.match(TT.COMMA)) items.push(this.parseExpression());
+            while (this.match(TT.COMMA)) {
+              if (this.match(TT.ELLIPSIS)) {
+                if (items.length < 2) throw new Error('An ellipsis set requires at least two starting values');
+                this.expect(TT.RBRACE, 'Expected } after sequence ellipsis');
+                return { type: 'SequenceSetLiteral', items };
+              }
+              items.push(this.parseExpression());
+            }
             this.match(TT.RBRACE);
             return { type: 'SetLiteral', items };
           }
         }
         if (tok.type === TT.IDENTIFIER) {
           this.advance();
+          let expression;
           if (this.match(TT.LPAREN)) {
             if (tok.value.toLowerCase() === 'range') {
               const start = this.parseAdditive();
               if (!this.match(TT.COLON)) throw new Error('range() bounds must use start:stop syntax');
               const stop = this.parseAdditive();
               if (!this.match(TT.COMMA)) throw new Error('range() expects range(start:stop, variable, steps)');
+              if (this.peek().type === TT.LBRACE) {
+                const flags = this.parsePrimary();
+                if (flags.type !== 'SetLiteral' || flags.items.length !== 2 ||
+                    flags.items.some(item => item.type !== 'BooleanLiteral')) {
+                  throw new Error('range() interval flags must be {startClosed, endClosed}, for example {true, false}');
+                }
+                this.expect(TT.RPAREN, 'Expected ) after range interval flags');
+                return {
+                  type: 'IntervalExpression', start, stop,
+                  includeStart: flags.items[0].value,
+                  includeStop: flags.items[1].value
+                };
+              }
               const variable = this.advance();
               if (variable.type !== TT.IDENTIFIER) throw new Error('range() variable must be an identifier');
               if (!this.match(TT.COMMA)) throw new Error('range() expects a steps argument');
@@ -1716,10 +2169,12 @@
               args.push(this.parseFunctionArg());
               while (this.match(TT.COMMA)) args.push(this.parseFunctionArg());
             }
-            this.match(TT.RPAREN);
-            return { type: 'FunctionCall', name: tok.value, args };
+            this.expect(TT.RPAREN, 'Expected ) after function arguments');
+            expression = { type: 'FunctionCall', name: tok.value, args };
+          } else {
+            expression = { type: 'Variable', name: tok.value };
           }
-          return { type: 'Variable', name: tok.value };
+          return this.parsePostfix(expression);
         }
         if (this.match(TT.LPAREN)) {
           const expr = this.parseExpression();
@@ -1737,8 +2192,54 @@
         }
         return this.parseExpression();
       }
+      parsePostfix(expression) {
+        while (this.match(TT.DOT)) {
+          const name = this.peek().type === TT.PRINT
+            ? this.advance().value
+            : this.expect(TT.IDENTIFIER, 'Expected a property or method name after .').value;
+          if (this.match(TT.LPAREN)) {
+            const args = [];
+            if (this.peek().type !== TT.RPAREN) {
+              args.push(this.parseFunctionArg());
+              while (this.match(TT.COMMA)) args.push(this.parseFunctionArg());
+            }
+            this.expect(TT.RPAREN, 'Expected ) after method arguments');
+            expression = { type: 'MethodCallExpression', object: expression, name, args };
+          } else {
+            expression = { type: 'MemberExpression', object: expression, name };
+          }
+        }
+        return expression;
+      }
     }
 
+
+    function sourceLocationAt(source, offset) {
+      const prefix = source.slice(0, Math.max(0, offset));
+      const lines = prefix.split('\n');
+      return { offset, line: lines.length, column: lines[lines.length - 1].length + 1 };
+    }
+
+    function attachSourceLocation(error, location) {
+      const locatedError = error instanceof Error ? error : new Error(String(error));
+      if (!locatedError.sourceLocation) {
+        const resolved = location?.line ? location : { line: 1, column: 1 };
+        locatedError.sourceLocation = resolved;
+        locatedError.message += ` (line ${resolved.line}, column ${resolved.column})`;
+      }
+      return locatedError;
+    }
+
+    function parseSource(source) {
+      const lexer = new Lexer(source);
+      let tokens;
+      try {
+        tokens = lexer.tokenize();
+      } catch (error) {
+        throw attachSourceLocation(error, sourceLocationAt(source, lexer.pos));
+      }
+      return new Parser(tokens).parseProgram();
+    }
     /* ==========================================================================
        5. SYMBOLIC ENGINE (REDUCTION & TEXTBOOK DISPLAY FORMATTING)
        ========================================================================== */
@@ -2119,6 +2620,47 @@
       return value instanceof ComplexNumber;
     }
 
+    function isValueInMathSet(value, name) {
+      if (name === 'COMPLEX') {
+        return isComplexNumber(value)
+          ? Number.isFinite(value.real) && Number.isFinite(value.imaginary)
+          : typeof value === 'number' && Number.isFinite(value);
+      }
+      if (typeof value !== 'number' || !Number.isFinite(value)) return false;
+      switch (name) {
+        case 'N': return Number.isInteger(value) && value > 0;
+        case 'WHOLE': return Number.isInteger(value) && value >= 0;
+        case 'Z': return Number.isInteger(value);
+        case 'Q':
+        case 'R': return true;
+        case '+R': return value > 0;
+        case '-R': return value < 0;
+        default: return false;
+      }
+    }
+
+    function isValueInMathType(value, type) {
+      if (type?.isMathSetType) return isValueInMathSet(value, type.name);
+      if (!type?.isMathInterval || typeof value !== 'number' || !Number.isFinite(value)) return false;
+      const aboveLower = type.includeLower ? value >= type.lower : value > type.lower;
+      const belowUpper = type.includeUpper ? value <= type.upper : value < type.upper;
+      return aboveLower && belowUpper;
+    }
+
+    function isValueInSet(value, set) {
+      if (!set?.isSet) return false;
+      if (set.elements.has(value)) return true;
+      if (!set.sequence || typeof value !== 'number' || !Number.isFinite(value)) return false;
+      const { start, step } = set.sequence;
+      const index = (value - start) / step;
+      return index >= 0 && Math.abs(index - Math.round(index)) <= 1e-10 * Math.max(1, Math.abs(index));
+    }
+
+    function formatSetValue(value) {
+      const values = Array.from(value.elements).map(item => isComplexNumber(item) ? item.toString() : String(item));
+      return `{${values.join(', ')}${value.sequence ? `${values.length ? ', ' : ''}...` : ''}}`;
+    }
+
     function makeComplex(real, imaginary = 0) {
       const normalizedReal = Math.abs(real) < 1e-14 || Object.is(real, -0) ? 0 : real;
       const normalizedImaginary = Math.abs(imaginary) < 1e-14 || Object.is(imaginary, -0) ? 0 : imaginary;
@@ -2236,6 +2778,21 @@
       return value;
     }
 
+    function collectStatisticsValues(name, inputs) {
+      const values = inputs.flatMap(value => {
+        if (Array.isArray(value)) return value;
+        if (value?.isSet) return Array.from(value.elements);
+        return [value];
+      });
+      if (!values.length) throw new Error(`${name}() expects at least one observation`);
+      return values.map((value, index) => {
+        if (typeof value !== 'number' || !Number.isFinite(value)) {
+          throw new Error(`${name}() observation ${index + 1} must be a finite real number`);
+        }
+        return value;
+      });
+    }
+
     class ReturnSignal {
       constructor(value) { this.value = value; }
     }
@@ -2255,18 +2812,30 @@
           'inf': Infinity,
           'c': 2.99792e8,
           't': 0,
-          'i': new ComplexNumber(0, 1)
+          'i': new ComplexNumber(0, 1),
+          'N': { isMathSetType: true, name: 'N' },
+          'WHOLE': { isMathSetType: true, name: 'WHOLE' },
+          'Z': { isMathSetType: true, name: 'Z' },
+          'Q': { isMathSetType: true, name: 'Q' },
+          'R': { isMathSetType: true, name: 'R' },
+          'COMPLEX': { isMathSetType: true, name: 'COMPLEX' },
+          '+R': { isMathSetType: true, name: '+R' },
+          '-R': { isMathSetType: true, name: '-R' }
         };
         this.logs = [];
+        this.plots = [];
         this.functions = new Map();
+        this.classes = new Map();
         this.loopDepth = 0;
         this.switchDepth = 0;
         this.functionDepth = 0;
       }
       assertAssignableName(name) {
         const normalizedName = name.toLowerCase();
-        if (RESERVED_NAMES.has(normalizedName)) throw new Error(`Cannot assign to reserved name '${name}'`);
+        if (isReservedName(name)) throw new Error(`Cannot assign to reserved name '${name}'`);
         if (this.functions.has(normalizedName)) throw new Error(`Cannot assign to function '${name}'`);
+        const classDefinition = this.classes.get(normalizedName);
+        if (classDefinition?.name === name) throw new Error(`Cannot assign to class '${name}'`);
       }
       executeStatements(statements) {
         let result = null;
@@ -2279,12 +2848,80 @@
       executeBlock(block) {
         return this.executeStatements(block.body);
       }
+      executeSetComprehension(node) {
+        const bounds = node.conditions.find(condition => condition.type === 'ChainComparison' &&
+          condition.operands.length === 3 && condition.operands[1]?.type === 'Variable' &&
+          condition.operands[1].name !== node.resultName && ['<', '<='].includes(condition.operators[0]) &&
+          ['<', '<='].includes(condition.operators[1]));
+        if (!bounds) throw new Error('Set-builder requires finite lower and upper bounds for its generator');
+        const generatorName = bounds.operands[1].name;
+        const lower = requireReal(this.execute(bounds.operands[0]), 'set-builder');
+        const upper = requireReal(this.execute(bounds.operands[2]), 'set-builder');
+        if (!Number.isFinite(lower) || !Number.isFinite(upper)) throw new Error('Set-builder bounds must be finite');
+
+        const membership = node.conditions.find(condition => condition.type === 'BinaryExpression' && condition.op === 'in' &&
+          condition.left.type === 'Variable' && condition.left.name === node.resultName);
+        const resultType = membership ? this.execute(membership.right) : null;
+        if (!resultType?.isMathSetType || !['N', 'WHOLE', 'Z'].includes(resultType.name)) {
+          throw new Error('Finite set-builder results currently require the output to belong to N, WHOLE, or Z');
+        }
+
+        const affine = expression => {
+          if (expression.type === 'NumberLiteral') return { slope: 0, intercept: expression.value };
+          if (expression.type === 'Variable') {
+            if (expression.name === generatorName) return { slope: 1, intercept: 0 };
+            const value = this.env[expression.name];
+            return typeof value === 'number' && Number.isFinite(value) ? { slope: 0, intercept: value } : null;
+          }
+          if (expression.type === 'UnaryExpression' && expression.op === '-') {
+            const value = affine(expression.operand);
+            return value ? { slope: -value.slope, intercept: -value.intercept } : null;
+          }
+          if (expression.type !== 'BinaryExpression') return null;
+          const left = affine(expression.left);
+          const right = affine(expression.right);
+          if (!left || !right) return null;
+          if (expression.op === '+') return { slope: left.slope + right.slope, intercept: left.intercept + right.intercept };
+          if (expression.op === '-') return { slope: left.slope - right.slope, intercept: left.intercept - right.intercept };
+          if (expression.op === '*' && left.slope === 0) return { slope: right.slope * left.intercept, intercept: right.intercept * left.intercept };
+          if (expression.op === '*' && right.slope === 0) return { slope: left.slope * right.intercept, intercept: left.intercept * right.intercept };
+          if (expression.op === '/' && right.slope === 0 && right.intercept !== 0) {
+            return { slope: left.slope / right.intercept, intercept: left.intercept / right.intercept };
+          }
+          return null;
+        };
+        const formula = affine(node.expression);
+        if (!formula || !Number.isFinite(formula.slope) || formula.slope === 0) {
+          throw new Error('Set-builder result must be a nonconstant affine expression of its bounded generator');
+        }
+        const firstResult = formula.slope * lower + formula.intercept;
+        const lastResult = formula.slope * upper + formula.intercept;
+        const firstInteger = Math.ceil(Math.min(firstResult, lastResult));
+        const lastInteger = Math.floor(Math.max(firstResult, lastResult));
+        if (lastInteger - firstInteger > 100000) throw new Error('Set-builder result exceeds 100000 candidate values');
+
+        const values = new Set();
+        const outerEnv = this.env;
+        this.env = Object.create(outerEnv);
+        try {
+          for (let resultValue = firstInteger; resultValue <= lastInteger; resultValue++) {
+            if (!isValueInMathSet(resultValue, resultType.name)) continue;
+            const generatorValue = (resultValue - formula.intercept) / formula.slope;
+            this.env[generatorName] = generatorValue;
+            this.env[node.resultName] = resultValue;
+            if (node.conditions.every(condition => this.isTruthy(this.execute(condition)))) values.add(resultValue);
+          }
+        } finally {
+          this.env = outerEnv;
+        }
+        return { isSet: true, elements: values };
+      }
       isTruthy(value) {
         if (isComplexNumber(value)) return value.real !== 0 || value.imaginary !== 0;
         if (typeof value === 'number') return value !== 0 && !Number.isNaN(value);
         return Boolean(value);
       }
-      callUserFunction(definition, argumentNodes) {
+      callUserFunction(definition, argumentNodes, instance = null) {
         if (argumentNodes.length !== definition.parameters.length) {
           throw new Error(`${definition.name}() expects ${definition.parameters.length} arguments, got ${argumentNodes.length}`);
         }
@@ -2293,6 +2930,7 @@
         const outerLoopDepth = this.loopDepth;
         const outerSwitchDepth = this.switchDepth;
         this.env = Object.create(outerEnv);
+        if (instance) this.env.this = instance;
         this.loopDepth = 0;
         this.switchDepth = 0;
         this.functionDepth += 1;
@@ -2315,8 +2953,39 @@
       execute(node) {
         switch (node.type) {
           case 'NullLiteral': return null;
+          case 'BooleanLiteral': return node.value;
           case 'NumberLiteral': return node.value;
           case 'StringLiteral': return node.value;
+          case 'IntervalExpression': {
+            const lower = requireReal(this.execute(node.start), 'range');
+            const upper = requireReal(this.execute(node.stop), 'range');
+            if (!Number.isFinite(lower) || !Number.isFinite(upper)) throw new Error('range() interval bounds must be finite');
+            return { isMathInterval: true, lower, upper, includeLower: node.includeStart, includeUpper: node.includeStop };
+          }
+          case 'SetComprehensionExpression': return this.executeSetComprehension(node);
+          case 'MathSetType': return { isMathSetType: true, name: node.name };
+          case 'MathIntervalType': return {
+            isMathInterval: true,
+            lower: requireReal(this.execute(node.lower), 'interval'),
+            upper: requireReal(this.execute(node.upper), 'interval'),
+            includeLower: node.includeLower,
+            includeUpper: node.includeUpper
+          };
+          case 'TypedFunctionDeclaration': {
+            const normalizedName = node.name.toLowerCase();
+            if (isReservedName(node.name)) throw new Error(`Cannot define reserved function '${node.name}'`);
+            if (this.functions.has(normalizedName) || this.classes.has(normalizedName) || Object.prototype.hasOwnProperty.call(this.env, node.name)) {
+              throw new Error(`Cannot redefine '${node.name}'`);
+            }
+            const domainType = this.execute(node.domain);
+            const rangeType = this.execute(node.range);
+            const formula = SymbolicEngine.toPrettyMathString(node.expression);
+            const symbolicFunction = new SymbolicFunction(node.expression, 'x', formula);
+            symbolicFunction.domainType = domainType;
+            symbolicFunction.rangeType = rangeType;
+            this.env[node.name] = symbolicFunction;
+            return symbolicFunction;
+          }
           case 'BlockStatement': return this.executeBlock(node);
           case 'Variable':
             if (node.name in this.env) return this.env[node.name];
@@ -2335,14 +3004,98 @@
           }
           case 'FunctionDeclaration': {
             const normalizedName = node.name.toLowerCase();
-            if (RESERVED_NAMES.has(normalizedName)) throw new Error(`Cannot define reserved function '${node.name}'`);
-            if (this.functions.has(normalizedName) || Object.prototype.hasOwnProperty.call(this.env, node.name) ||
+            if (isReservedName(node.name)) throw new Error(`Cannot define reserved function '${node.name}'`);
+            if (this.functions.has(normalizedName) || this.classes.has(normalizedName) || Object.prototype.hasOwnProperty.call(this.env, node.name) ||
                 Object.prototype.hasOwnProperty.call(this.env, `${node.name}_ast`)) {
               throw new Error(`Cannot redefine '${node.name}'`);
             }
             node.parameters.forEach(parameter => this.assertAssignableName(parameter));
             this.functions.set(normalizedName, node);
             return null;
+          }
+          case 'ClassDeclaration': {
+            const normalizedName = node.name.toLowerCase();
+            if (isReservedName(node.name)) throw new Error(`Cannot define reserved class '${node.name}'`);
+            if (this.classes.has(normalizedName) || this.functions.has(normalizedName) ||
+              Object.prototype.hasOwnProperty.call(this.env, node.name)) {
+              throw new Error(`Cannot redefine '${node.name}'`);
+            }
+            this.classes.set(normalizedName, {
+              name: node.name,
+              fields: node.fields,
+              constructors: node.methods.filter(method => method.name.toLowerCase() === 'constructor'),
+              methods: new Map(node.methods
+                .filter(method => method.name.toLowerCase() !== 'constructor')
+                .map(method => [method.name.toLowerCase(), method]))
+            });
+            return null;
+          }
+          case 'NewExpression': {
+            const definition = this.classes.get(node.name.toLowerCase());
+            if (!definition) throw new Error(`Unknown class '${node.name}'`);
+            const instance = { isAxiomObject: true, className: definition.name, fields: Object.create(null) };
+            const outerEnv = this.env;
+            this.env = Object.create(outerEnv);
+            this.env.this = instance;
+            try {
+              definition.fields.forEach(field => {
+                instance.fields[field.name] = this.execute(field.initializer);
+              });
+            } finally {
+              this.env = outerEnv;
+            }
+            if (definition.constructors.length) {
+              const matchingConstructors = definition.constructors.map(method => {
+                const orderedArguments = new Array(method.parameters.length);
+                let nextPosition = 0;
+                for (const argument of node.args) {
+                  if (argument.argName) {
+                    const parameterIndex = method.parameters.findIndex(parameter => parameter.toLowerCase() === argument.argName.toLowerCase());
+                    if (parameterIndex < 0 || orderedArguments[parameterIndex] !== undefined) return null;
+                    orderedArguments[parameterIndex] = argument;
+                  } else {
+                    while (orderedArguments[nextPosition] !== undefined) nextPosition++;
+                    if (nextPosition >= orderedArguments.length) return null;
+                    orderedArguments[nextPosition++] = argument;
+                  }
+                }
+                return Array.from(orderedArguments).every(argument => argument !== undefined)
+                  ? { method, arguments: orderedArguments }
+                  : null;
+              }).filter(Boolean);
+              if (matchingConstructors.length === 0) {
+                const signatures = definition.constructors.map(method => `constructor(${method.parameters.join(', ')})`);
+                throw new Error(`${definition.name} has no matching constructor for ${node.args.length} argument(s); available: ${signatures.join(' or ')}`);
+              }
+              if (matchingConstructors.length > 1) {
+                throw new Error(`${definition.name} constructor call is ambiguous; use named arguments to select an overload`);
+              }
+              const selected = matchingConstructors[0];
+              this.callUserFunction(selected.method, selected.arguments, instance);
+            } else if (node.args.length) throw new Error(`${definition.name} has no constructor and expects no arguments`);
+            return instance;
+          }
+          case 'MemberExpression': {
+            const object = this.execute(node.object);
+            if (!object?.isAxiomObject) throw new Error(`Cannot read property '${node.name}' from a non-object value`);
+            if (!Object.prototype.hasOwnProperty.call(object.fields, node.name)) {
+              throw new Error(`Object '${object.className}' has no field '${node.name}'`);
+            }
+            return object.fields[node.name];
+          }
+          case 'MemberAssignStatement': {
+            const object = this.execute(node.object);
+            if (!object?.isAxiomObject) throw new Error(`Cannot set property '${node.name}' on a non-object value`);
+            object.fields[node.name] = this.execute(node.expr);
+            return object.fields[node.name];
+          }
+          case 'MethodCallExpression': {
+            const object = this.execute(node.object);
+            if (!object?.isAxiomObject) throw new Error(`Cannot call method '${node.name}' on a non-object value`);
+            const definition = this.classes.get(object.className.toLowerCase());
+            const method = definition?.methods.get(node.name.toLowerCase());
+            if (!method) throw new Error(`Class '${object.className}' has no method '${node.name}'`);
+            return this.callUserFunction(method, node.args, object);
           }
           case 'ReturnStatement':
             if (this.functionDepth === 0) throw new Error('return is only valid inside a function');
@@ -2438,6 +3191,39 @@
             for (const it of node.items) elements.add(this.execute(it));
             return { isSet: true, elements };
           }
+          case 'SequenceSetLiteral': {
+            const values = node.items.map(item => this.execute(item));
+            if (values.some(value => typeof value !== 'number' || !Number.isFinite(value))) {
+              throw new Error('Ellipsis sets require finite real numeric values');
+            }
+            const step = values[1] - values[0];
+            if (step === 0 || values.some((value, index) => index > 0 &&
+                Math.abs((value - values[index - 1]) - step) > 1e-10 * Math.max(1, Math.abs(step)))) {
+              throw new Error('Ellipsis sets must begin with an arithmetic sequence');
+            }
+            return { isSet: true, elements: new Set(values), sequence: { start: values[0], step } };
+          }
+          case 'IntervalExpression': {
+            const lower = requireReal(this.execute(node.start), 'range');
+            const upper = requireReal(this.execute(node.stop), 'range');
+            if (!Number.isFinite(lower) || !Number.isFinite(upper) || lower > upper) {
+              throw new Error('range() interval bounds must be finite and ordered');
+            }
+            return { isMathInterval: true, lower, upper, includeLower: node.includeStart, includeUpper: node.includeStop };
+          }
+          case 'SetComprehensionExpression': return this.executeSetComprehension(node);
+          case 'SequenceSetLiteral': {
+            const values = node.items.map(item => this.execute(item));
+            if (values.some(value => typeof value !== 'number' || !Number.isFinite(value))) {
+              throw new Error('Ellipsis sets require finite real numeric values');
+            }
+            const step = values[1] - values[0];
+            if (step === 0 || values.some((value, index) => index > 0 &&
+                Math.abs((value - values[index - 1]) - step) > 1e-10 * Math.max(1, Math.abs(step)))) {
+              throw new Error('Ellipsis sets must begin with an arithmetic sequence');
+            }
+            return { isSet: true, elements: new Set(values), sequence: { start: values[0], step } };
+          }
           case 'RangeExpression': {
             const start = this.execute(node.start);
             const stop = this.execute(node.stop);
@@ -2451,6 +3237,7 @@
           case 'SetOpExpression': {
             const l = this.execute(node.left), r = this.execute(node.right);
             if (!l?.isSet || !r?.isSet) throw new Error("Requires valid sets");
+            if (l.sequence || r.sequence) throw new Error('Set operations on infinite ellipsis sets are not supported');
             const res = new Set();
             if (node.op === 'union') {
               for (const e of l.elements) res.add(e);
@@ -2466,7 +3253,7 @@
             const vals = node.operands.map(n => this.execute(n));
             for (let i = 0; i < node.operators.length; i++) {
               const op = node.operators[i], a = vals[i], b = vals[i + 1];
-              if ((isComplexNumber(a) || isComplexNumber(b)) && !['==', '!='].includes(op)) {
+              if ((isComplexNumber(a) || isComplexNumber(b)) && !['==', '!=', 'in'].includes(op)) {
                 throw new Error('Complex numbers cannot be ordered or tested for set membership');
               }
               let ok = false;
@@ -2476,7 +3263,7 @@
               else if (op === '>=') ok = a >= b;
               else if (op === '==') ok = isComplexNumber(a) || isComplexNumber(b) ? complexEqual(a, b) : a === b;
               else if (op === '!=') ok = isComplexNumber(a) || isComplexNumber(b) ? !complexEqual(a, b) : a !== b;
-              else if (op === 'in') ok = !!b?.isSet && b.elements.has(a);
+              else if (op === 'in') ok = b?.isSet ? isValueInSet(a, b) : isValueInMathType(a, b);
               if (!ok) return 0.0;
             }
             return 1.0;
@@ -2491,7 +3278,7 @@
               return Boolean(left) ? 1.0 : (Boolean(this.execute(node.right)) ? 1.0 : 0.0);
             }
             const l = this.execute(node.left), r = this.execute(node.right);
-            if ((isComplexNumber(l) || isComplexNumber(r)) && ['<', '<=', '>', '>=', 'in'].includes(node.op)) {
+            if ((isComplexNumber(l) || isComplexNumber(r)) && ['<', '<=', '>', '>='].includes(node.op)) {
               throw new Error('Complex numbers cannot be ordered or tested for set membership');
             }
             if (node.op === '<') return l < r ? 1.0 : 0.0;
@@ -2500,7 +3287,7 @@
             if (node.op === '>=') return l >= r ? 1.0 : 0.0;
             if (node.op === '==') return (isComplexNumber(l) || isComplexNumber(r) ? complexEqual(l, r) : l === r) ? 1.0 : 0.0;
             if (node.op === '!=') return (isComplexNumber(l) || isComplexNumber(r) ? !complexEqual(l, r) : l !== r) ? 1.0 : 0.0;
-            if (node.op === 'in') return r?.isSet && r.elements.has(l) ? 1.0 : 0.0;
+            if (node.op === 'in') return (r?.isSet ? isValueInSet(l, r) : isValueInMathType(l, r)) ? 1.0 : 0.0;
             if (node.op === '+') return addMathValues(l, r);
             if (node.op === '-') return subtractMathValues(l, r);
             if (node.op === '*') return multiplyMathValues(l, r);
@@ -2547,6 +3334,69 @@
         const userFunction = this.functions.get(lower);
         if (userFunction) return this.callUserFunction(userFunction, args);
 
+        if (lower === 'plot') {
+          const positionalArgs = args.filter(argument => !argument.argName);
+          const figureArgs = args.filter(argument => argument.argName === 'fig');
+          if (args.some(argument => argument.argName && argument.argName !== 'fig')) {
+            throw new Error('plot() only accepts the named argument fig');
+          }
+          if (figureArgs.length > 1) throw new Error('plot() accepts fig only once');
+          if (positionalArgs.length < 1 || positionalArgs.length > 2) {
+            throw new Error('plot() expects one value or x and y values');
+          }
+
+          const asValues = value => {
+            const values = value?.isSet ? Array.from(value.elements) : Array.isArray(value) ? value : [value];
+            if (!values.length) throw new Error('plot() requires at least one point');
+            return values.map(point => {
+              if (typeof point !== 'number' || !Number.isFinite(point)) {
+                throw new Error('plot() coordinates must be finite real numbers');
+              }
+              return point;
+            });
+          };
+
+          const first = this.execute(positionalArgs[0]);
+          let xValues;
+          let yValues;
+          if (positionalArgs.length === 1 && typeof first === 'number') {
+            xValues = [asValues(first)[0]];
+            yValues = [0];
+          } else if (positionalArgs.length === 1) {
+            yValues = asValues(first);
+            xValues = yValues.map((_, index) => index);
+          } else {
+            const second = this.execute(positionalArgs[1]);
+            xValues = asValues(first);
+            yValues = asValues(second);
+            if (xValues.length !== yValues.length) {
+              throw new Error('plot() x and y values must have the same number of points');
+            }
+          }
+
+          const figureValue = figureArgs.length ? this.execute(figureArgs[0]) : 1;
+          if (!(typeof figureValue === 'string' || (typeof figureValue === 'number' && Number.isFinite(figureValue)))) {
+            throw new Error('plot() fig must be a finite number or string');
+          }
+          this.plots.push({
+            figure: String(figureValue),
+            points: xValues.map((x, index) => ({ x, y: yValues[index] })).sort((left, right) => left.x - right.x)
+          });
+          return null;
+        }
+
+        if (lower === 'type') {
+          if (args.length !== 1) throw new Error('type() expects exactly one argument');
+          const value = this.execute(args[0]);
+          if (value === null) return 'null';
+          if (isComplexNumber(value)) return 'complex';
+          if (value?.isSet) return 'set';
+          if (value?.isAxiomObject) return value.className || 'object';
+          if (value instanceof SymbolicFunction) return 'function';
+          if (Array.isArray(value)) return Object.prototype.hasOwnProperty.call(value, 'variable') ? 'range' : 'array';
+          return typeof value;
+        }
+
         if (lower === 'integrate') {
           const substituteVariable = (node, variableName, replacement) => {
             if (!node || typeof node !== 'object') return node;
@@ -2565,6 +3415,10 @@
               const callable = this.env[node.name];
               if (callable instanceof SymbolicFunction && node.args.length === 1) {
                 return expandSymbolicCalls(substituteVariable(callable.expression, callable.variableName, node.args[0]));
+              }
+              const assignedSignal = this.env[`${node.name}_ast`];
+              if (assignedSignal && node.args.length === 1) {
+                return expandSymbolicCalls(substituteVariable(assignedSignal, 't', node.args[0]));
               }
               return { ...node, args: node.args.map(expandSymbolicCalls) };
             }
@@ -2616,33 +3470,87 @@
             const deltaIndex = deltaIndices[0];
             return [{ sign: term.sign, rootExpression: term.factors[deltaIndex].args[0], factors: term.factors.filter((_, index) => index !== deltaIndex) }];
           });
-          const getImpulseContribution = (impulse, start, stop) => {
-            let root = Number.isFinite(start) && Number.isFinite(stop) ? (start + stop) / 2 : 0;
-            let slope;
-            try {
-              const derivative = SymbolicEngine.diff(impulse.rootExpression, varName);
-              for (let iteration = 0; iteration < 40; iteration++) {
-                const value = requireReal(evaluateWithVariable(varName, root, () => this.execute(impulse.rootExpression)), 'delta');
-                if (Math.abs(value) < 1e-10) break;
-                slope = requireReal(evaluateWithVariable(varName, root, () => this.execute(derivative)), 'delta');
-                if (!Number.isFinite(slope) || Math.abs(slope) < 1e-12) return 0;
-                root -= value / slope;
-                if (!Number.isFinite(root)) return 0;
+          const getImpulseContributions = (impulse, start, stop) => {
+            const roots = [];
+            const addRoot = root => {
+              if (Number.isFinite(root) && !roots.some(existing =>
+                Math.abs(existing - root) <= 1e-7 * Math.max(1, Math.abs(root), Math.abs(existing)))) {
+                roots.push(root);
               }
-              slope = requireReal(evaluateWithVariable(varName, root, () => this.execute(derivative)), 'delta');
+            };
+            const evaluateRootExpression = (root, expression = impulse.rootExpression) =>
+              requireReal(evaluateWithVariable(varName, root, () => this.execute(expression)), 'delta');
+            let derivative;
+            try {
+              derivative = SymbolicEngine.diff(impulse.rootExpression, varName);
+              if (Number.isFinite(start) && Number.isFinite(stop)) {
+                const divisions = 2048;
+                const step = (stop - start) / divisions;
+                let left = start;
+                let leftValue = evaluateRootExpression(left);
+                if (Math.abs(leftValue) < 1e-10) addRoot(left);
+                for (let index = 1; index <= divisions; index++) {
+                  const right = index === divisions ? stop : start + index * step;
+                  const rightValue = evaluateRootExpression(right);
+                  if (Math.abs(rightValue) < 1e-10) addRoot(right);
+                  if (Number.isFinite(leftValue) && Number.isFinite(rightValue) && leftValue * rightValue < 0) {
+                    let low = left;
+                    let high = right;
+                    let lowValue = leftValue;
+                    for (let iteration = 0; iteration < 60; iteration++) {
+                      const middle = (low + high) / 2;
+                      const middleValue = evaluateRootExpression(middle);
+                      if (Math.abs(middleValue) < 1e-12 || high - low < 1e-12 * Math.max(1, Math.abs(middle))) {
+                        low = high = middle;
+                        break;
+                      }
+                      if (lowValue * middleValue < 0) high = middle;
+                      else {
+                        low = middle;
+                        lowValue = middleValue;
+                      }
+                    }
+                    addRoot((low + high) / 2);
+                  }
+                  left = right;
+                  leftValue = rightValue;
+                }
+              } else {
+                let root = 0;
+                for (let iteration = 0; iteration < 40; iteration++) {
+                  const value = evaluateRootExpression(root);
+                  if (Math.abs(value) < 1e-10) break;
+                  const slope = evaluateRootExpression(root, derivative);
+                  if (!Number.isFinite(slope) || Math.abs(slope) < 1e-12) break;
+                  root -= value / slope;
+                  if (!Number.isFinite(root)) break;
+                }
+                if (Math.abs(evaluateRootExpression(root)) < 1e-7 && root >= start && root <= stop) addRoot(root);
+              }
             } catch {
               throw new Error('integrate() supports delta() impulses with differentiable real arguments');
             }
-            const residual = requireReal(evaluateWithVariable(varName, root, () => this.execute(impulse.rootExpression)), 'delta');
-            if (Math.abs(residual) > 1e-7 || !Number.isFinite(slope) || Math.abs(slope) < 1e-12 || root < start || root > stop) return 0;
-            let value = impulse.sign / Math.abs(slope);
-            for (const factor of impulse.factors) {
-              value = multiplyMathValues(value, evaluateWithVariable(varName, root, () => this.execute(factor)));
+            let contribution = 0;
+            for (const root of roots) {
+              let slope;
+              try {
+                const residual = evaluateRootExpression(root);
+                if (Math.abs(residual) > 1e-7) continue;
+                slope = evaluateRootExpression(root, derivative);
+              } catch {
+                throw new Error('integrate() supports delta() impulses with differentiable real arguments');
+              }
+              if (!Number.isFinite(slope) || Math.abs(slope) < 1e-12) continue;
+              let value = impulse.sign / Math.abs(slope);
+              for (const factor of impulse.factors) {
+                value = multiplyMathValues(value, evaluateWithVariable(varName, root, () => this.execute(factor)));
+              }
+              contribution = addMathValues(contribution, value);
             }
-            return value;
+            return contribution;
           };
           const addImpulseContributions = (value, start, stop) => impulseTerms.reduce(
-            (sum, impulse) => addMathValues(sum, getImpulseContribution(impulse, start, stop)),
+            (sum, impulse) => addMathValues(sum, getImpulseContributions(impulse, start, stop)),
             value
           );
           const simpson = (sample, start, stop, steps) => {
@@ -2848,8 +3756,19 @@
         const assignedValue = this.env[name];
         if (assignedValue instanceof SymbolicFunction) {
           if (args.length !== 1) throw new Error(`${name}() expects one input argument`);
-          const inputValue = requireReal(this.execute(args[0]), name);
-          return assignedValue.evaluate(this, inputValue);
+          const inputValue = this.execute(args[0]);
+          if (assignedValue.domainType) {
+            if (!isValueInMathType(inputValue, assignedValue.domainType)) {
+              throw new Error(`${name}() argument is outside its declared domain`);
+            }
+          } else {
+            requireReal(inputValue, name);
+          }
+          const result = assignedValue.evaluate(this, inputValue);
+          if (assignedValue.rangeType && !isValueInMathType(result, assignedValue.rangeType)) {
+            throw new Error(`${name}() result is outside its declared range`);
+          }
+          return result;
         }
 
         const assignedSignal = this.env[`${name}_ast`];
@@ -2861,6 +3780,96 @@
 
         const evaluated = args.map(a => this.execute(a));
         const x = evaluated[0] ?? 0;
+
+        const statisticalFunctions = new Set([
+          'count', 'sum', 'mean', 'average', 'median', 'mode', 'variance', 'populationvariance',
+          'samplevariance', 'stddev', 'standarddeviation', 'samplestddev', 'samplestandarddeviation',
+          'quantile', 'percentile', 'min', 'max'
+        ]);
+        if (statisticalFunctions.has(lower)) {
+          let values;
+          let probability = null;
+          if (lower === 'quantile' || lower === 'percentile') {
+            if (evaluated.length < 2) throw new Error(`${name}() expects data and a probability`);
+            probability = evaluated[evaluated.length - 1];
+            values = collectStatisticsValues(name, evaluated.slice(0, -1));
+            if (typeof probability !== 'number' || !Number.isFinite(probability)) {
+              throw new Error(`${name}() probability must be a finite real number`);
+            }
+            const maximum = lower === 'percentile' ? 100 : 1;
+            if (probability < 0 || probability > maximum) {
+              throw new Error(`${name}() probability must be between 0 and ${maximum}`);
+            }
+            if (lower === 'percentile') probability /= 100;
+          } else {
+            values = collectStatisticsValues(name, evaluated);
+          }
+
+          if (lower === 'count') return values.length;
+          if (lower === 'sum') {
+            let total = 0;
+            let compensation = 0;
+            for (const value of values) {
+              const adjusted = value - compensation;
+              const nextTotal = total + adjusted;
+              compensation = (nextTotal - total) - adjusted;
+              total = nextTotal;
+            }
+            if (!Number.isFinite(total)) throw new Error(`${name}() result is outside the finite numeric range`);
+            return total;
+          }
+          if (lower === 'min' || lower === 'max') {
+            return values.reduce((current, value) => lower === 'min' ? Math.min(current, value) : Math.max(current, value), values[0]);
+          }
+          if (lower === 'mode') {
+            const frequencies = new Map();
+            values.forEach(value => frequencies.set(value, (frequencies.get(value) || 0) + 1));
+            let mode = values[0];
+            let frequency = 0;
+            for (const [value, count] of frequencies) {
+              if (count > frequency || (count === frequency && value < mode)) {
+                mode = value;
+                frequency = count;
+              }
+            }
+            return mode;
+          }
+
+          const sorted = values.slice().sort((left, right) => left - right);
+          if (lower === 'median') {
+            const middle = Math.floor(sorted.length / 2);
+            return sorted.length % 2 ? sorted[middle] : sorted[middle - 1] / 2 + sorted[middle] / 2;
+          }
+          if (lower === 'quantile' || lower === 'percentile') {
+            const position = probability * (sorted.length - 1);
+            const lowerIndex = Math.floor(position);
+            const upperIndex = Math.ceil(position);
+            const fraction = position - lowerIndex;
+            return sorted[lowerIndex] * (1 - fraction) + sorted[upperIndex] * fraction;
+          }
+
+          const scale = values.reduce((largest, value) => Math.max(largest, Math.abs(value)), 0) || 1;
+          let runningMean = 0;
+          let squaredDeviationTotal = 0;
+          values.forEach((value, index) => {
+            const normalizedValue = value / scale;
+            const count = index + 1;
+            const deviation = normalizedValue - runningMean;
+            runningMean += deviation / count;
+            squaredDeviationTotal += deviation * (normalizedValue - runningMean);
+          });
+          if (lower === 'mean' || lower === 'average') return runningMean * scale;
+          const isSample = lower === 'samplevariance' || lower === 'samplestddev' || lower === 'samplestandarddeviation';
+          if (isSample && values.length < 2) throw new Error(`${name}() requires at least two observations`);
+          const divisor = isSample ? values.length - 1 : values.length;
+          const normalizedVariance = Math.max(0, squaredDeviationTotal / divisor);
+          if (lower === 'variance' || lower === 'populationvariance' || lower === 'samplevariance') {
+            const variance = normalizedVariance * scale * scale;
+            if (!Number.isFinite(variance)) throw new Error(`${name}() result is outside the finite numeric range`);
+            return variance;
+          }
+          return Math.sqrt(normalizedVariance) * scale;
+        }
 
         switch (lower) {
           case 'sin': return isComplexNumber(x) ? complexSin(x) : Math.sin(x);
@@ -2941,14 +3950,6 @@
           case 'sign':
           case 'signum':
           case 'sgn': return Math.sign(requireReal(x, lower));
-          case 'min':
-            if (!evaluated.length) throw new Error('min() expects at least one argument');
-            evaluated.forEach(value => requireReal(value, lower));
-            return Math.min(...evaluated);
-          case 'max':
-            if (!evaluated.length) throw new Error('max() expects at least one argument');
-            evaluated.forEach(value => requireReal(value, lower));
-            return Math.max(...evaluated);
           case 'pow': return complexPower(evaluated[0], evaluated[1]);
           case 'hypot':
             evaluated.forEach(value => requireReal(value, lower));
@@ -2961,7 +3962,12 @@
           case 'degrees': return multiplyMathValues(x, 180 / Math.PI);
           case 'rad':
           case 'radians': return multiplyMathValues(x, Math.PI / 180);
-          case 'delta': return 0;
+          case 'delta': {
+            const width = this.deltaWidth;
+            if (!(width > 0 && Number.isFinite(width))) return 0;
+            const scaled = requireReal(x, lower) / width;
+            return Math.exp(-0.5 * scaled * scaled) / (Math.sqrt(2 * Math.PI) * width);
+          }
           default: throw new Error(`Unknown function ${name}()`);
         }
       }
@@ -2975,6 +3981,7 @@
     let timeAxis, freqAxis, dt, df;
     let timeChart, freqChart, fsTimeChart, fsFreqChart;
     let registeredSignals = {};
+    let registeredPlots = [];
 
     const chartViewports = {
       time: { xMin: null, xMax: null, yMin: null, yMax: null, autoY: true },
@@ -3103,48 +4110,90 @@
             }
 
             const mouseXVal = x.getValueForPixel(mouseX);
-            let bestPt = null;
-            let minPixelDistSq = Infinity;
+            const snapXMin = Math.min(x.getValueForPixel(mouseX - 34), x.getValueForPixel(mouseX + 34));
+            const snapXMax = Math.max(x.getValueForPixel(mouseX - 34), x.getValueForPixel(mouseX + 34));
+            let bestSmoothPoint = null;
+            let minSmoothDistSq = Infinity;
+            let bestSnapPoint = null;
+            let minSnapDistSq = Infinity;
 
             chart.data.datasets.forEach(ds => {
-              if (!ds.data || !ds.data.length) return;
+              if (!ds.data || ds.data.length === 0) return;
               const data = ds.data;
+              let interpolatedY;
+              if (data.length === 1) {
+                interpolatedY = data[0].y;
+              } else {
+                let lowerIndex = 0;
+                let upperIndex = data.length - 1;
+                while (upperIndex - lowerIndex > 1) {
+                  const middleIndex = Math.floor((lowerIndex + upperIndex) / 2);
+                  if (data[middleIndex].x <= mouseXVal) lowerIndex = middleIndex;
+                  else upperIndex = middleIndex;
+                }
+                const leftPoint = data[lowerIndex];
+                const rightPoint = data[upperIndex];
+                if (mouseXVal < leftPoint.x || mouseXVal > rightPoint.x) return;
+                const fraction = rightPoint.x === leftPoint.x ? 0 : (mouseXVal - leftPoint.x) / (rightPoint.x - leftPoint.x);
+                interpolatedY = leftPoint.y + (rightPoint.y - leftPoint.y) * fraction;
+              }
+              const smoothX = x.getPixelForValue(mouseXVal);
+              const smoothY = y.getPixelForValue(interpolatedY);
+              const smoothDx = smoothX - mouseX;
+              const smoothDy = smoothY - mouseY;
+              const smoothDistSq = smoothDx * smoothDx + smoothDy * smoothDy;
+              if (smoothDistSq < minSmoothDistSq) {
+                minSmoothDistSq = smoothDistSq;
+                bestSmoothPoint = {
+                  chartId: chart.canvas.id,
+                  name: ds.label || 'Trace',
+                  x: mouseXVal,
+                  y: interpolatedY,
+                  color: ds.borderColor,
+                  isFreq
+                };
+              }
 
-              const step = isFreq ? df : dt;
-              const startX = isFreq ? freqAxis[0] : -tSpan;
-              const centerIdx = Math.max(0, Math.min(data.length - 1, Math.round((mouseXVal - startX) / step)));
-              const searchRadius = 25;
-              const startIdx = Math.max(0, centerIdx - searchRadius);
-              const endIdx = Math.min(data.length - 1, centerIdx + searchRadius);
-
-              for (let i = startIdx; i <= endIdx; i++) {
-                const pt = data[i];
-                const px = x.getPixelForValue(pt.x);
-                const py = y.getPixelForValue(pt.y);
-
+              if (!signalSnapEnabled) return;
+              const snapPoints = ds.snapPoints || [];
+              let snapStart = 0;
+              let snapEnd = snapPoints.length;
+              while (snapStart < snapEnd) {
+                const middleIndex = Math.floor((snapStart + snapEnd) / 2);
+                if (snapPoints[middleIndex].x < snapXMin) snapStart = middleIndex + 1;
+                else snapEnd = middleIndex;
+              }
+              for (let index = snapStart; index < snapPoints.length && snapPoints[index].x <= snapXMax; index++) {
+                const point = snapPoints[index];
+                const px = x.getPixelForValue(point.x);
+                const py = y.getPixelForValue(point.y);
                 const dx = px - mouseX;
                 const dy = py - mouseY;
                 const distSq = dx * dx + dy * dy;
-
-                if (distSq < minPixelDistSq) {
-                  minPixelDistSq = distSq;
-                  bestPt = {
+                if (distSq < minSnapDistSq) {
+                  minSnapDistSq = distSq;
+                  bestSnapPoint = {
                     chartId: chart.canvas.id,
                     name: ds.label || 'Trace',
-                    x: pt.x,
-                    y: pt.y,
+                    x: point.x,
+                    y: point.y,
                     color: ds.borderColor,
-                    isFreq
+                    isFreq,
+                    snapType: point.snapType
                   };
                 }
               }
             });
 
-            if (bestPt && Math.sqrt(minPixelDistSq) < 65) {
-              activeHoverPoint = bestPt;
+            const selectedPoint = signalSnapEnabled && bestSnapPoint && minSnapDistSq <= 34 * 34
+              ? bestSnapPoint
+              : bestSmoothPoint && minSmoothDistSq < 65 * 65 ? bestSmoothPoint : null;
+            if (selectedPoint) {
+              activeHoverPoint = selectedPoint;
+              const snapLabel = selectedPoint.snapType ? ` | ${selectedPoint.snapType}` : '';
               const text = isFreq
-                ? `Cursor: ${bestPt.name} | f = ${bestPt.x.toFixed(3)}Hz | Mag = ${bestPt.y.toFixed(4)}`
-                : `Cursor: ${bestPt.name} | t = ${bestPt.x.toFixed(3)}s | Amp = ${bestPt.y.toFixed(4)}V`;
+                ? `Cursor: ${selectedPoint.name} | f = ${selectedPoint.x.toFixed(3)}Hz | Mag = ${selectedPoint.y.toFixed(4)}${snapLabel}`
+                : `Cursor: ${selectedPoint.name} | t = ${selectedPoint.x.toFixed(3)}s | Amp = ${selectedPoint.y.toFixed(4)}V${snapLabel}`;
               document.getElementById('cursor-pos').innerText = text;
               const fsCp = document.getElementById('fs-cursor-pos');
               if (fsCp) fsCp.innerText = text;
@@ -3223,6 +4272,96 @@
 
     let recomputeVersion = 0;
     let activeFourierJob = null;
+    const terminalHistory = [];
+    const terminalCommandHistory = [];
+    const terminalInterpreter = new Interpreter();
+    let terminalCommandIndex = 0;
+    let latestEditorOutput = 'Ready.';
+
+    function renderTerminalOutput() {
+      const consoleBox = document.getElementById('console');
+      consoleBox.innerText = [...terminalHistory, latestEditorOutput].filter(Boolean).join('\n');
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    function appendTerminalOutput(line) {
+      terminalHistory.push(line);
+      if (terminalHistory.length > 500) terminalHistory.shift();
+      latestEditorOutput = '';
+      renderTerminalOutput();
+    }
+
+    function formatTerminalValue(value) {
+      if (value === null || value === undefined) return value === null ? 'null' : 'undefined';
+      if (isComplexNumber(value)) return value.toString();
+      if (value?.isSet) return `{${Array.from(value.elements).join(', ')}}`;
+      if (Array.isArray(value)) return `[${value.join(', ')}]`;
+      if (value instanceof SymbolicFunction) return value.toString();
+      if (value?.isAxiomObject) return `<${value.className} instance>`;
+      return String(value);
+    }
+
+    function runTerminalCommand(source) {
+      const command = source.trim();
+      if (!command) return;
+      if (/^(cls|clear)$/i.test(command)) {
+        terminalHistory.length = 0;
+        latestEditorOutput = 'Terminal cleared.';
+        renderTerminalOutput();
+        return;
+      }
+
+      terminalCommandHistory.push(command);
+      terminalCommandIndex = terminalCommandHistory.length;
+      appendTerminalOutput(`> ${command}`);
+      try {
+        const statements = parseSource(command);
+        statements.forEach(statement => {
+          if (statement.type === 'AssignStatement') {
+            terminalInterpreter.env[`${statement.name}_ast`] = statement.expr;
+          }
+        });
+        const output = [];
+        for (const statement of statements) {
+          let result;
+          try {
+            result = terminalInterpreter.execute(statement);
+          } catch (error) {
+            throw attachSourceLocation(error, statement.sourceLocation);
+          }
+          if (statement.type === 'AssignStatement') output.push(`${statement.name} = ${formatTerminalValue(result)}`);
+          else if (statement.type === 'PrintStatement') output.push(...terminalInterpreter.logs.splice(0));
+          else if (result !== null && result !== undefined) output.push(formatTerminalValue(result));
+        }
+        if (output.length) appendTerminalOutput(output.join('\n'));
+      } catch (error) {
+        appendTerminalOutput(`Error: ${error.message}`);
+      }
+    }
+
+    document.getElementById('terminal-command-form').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('terminal-command');
+      runTerminalCommand(input.value);
+      input.value = '';
+      input.focus();
+    });
+
+    document.getElementById('terminal-command').addEventListener('keydown', event => {
+      if (event.key === 'ArrowUp' && terminalCommandHistory.length) {
+        event.preventDefault();
+        terminalCommandIndex = Math.max(0, terminalCommandIndex - 1);
+        event.currentTarget.value = terminalCommandHistory[terminalCommandIndex];
+      } else if (event.key === 'ArrowDown' && terminalCommandIndex < terminalCommandHistory.length - 1) {
+        event.preventDefault();
+        terminalCommandIndex++;
+        event.currentTarget.value = terminalCommandHistory[terminalCommandIndex];
+      } else if (event.key === 'ArrowDown' && terminalCommandIndex === terminalCommandHistory.length - 1) {
+        event.preventDefault();
+        terminalCommandIndex = terminalCommandHistory.length;
+        event.currentTarget.value = '';
+      }
+    });
 
     function cancelFourierJob() {
       if (!activeFourierJob) return;
@@ -3304,18 +4443,17 @@
       });
     }
 
-    async function recompute() {
+    async function recompute({ reportErrors = false } = {}) {
       cancelFourierJob();
       const version = ++recomputeVersion;
       updateLineNumbers();
       const code = ed.value;
       const consoleBox = document.getElementById('console');
+      let parsedSuccessfully = false;
 
       try {
-        const lexer = new Lexer(code);
-        const tokens = lexer.tokenize();
-        const parser = new Parser(tokens);
-        const stmts = parser.parseProgram();
+        const stmts = parseSource(code);
+        parsedSuccessfully = true;
 
         const interp = new Interpreter();
 
@@ -3325,16 +4463,23 @@
           }
         });
 
-        for (const s of stmts) interp.execute(s);
+        for (const s of stmts) {
+          try {
+            interp.execute(s);
+          } catch (error) {
+            throw attachSourceLocation(error, s.sourceLocation);
+          }
+        }
 
         let out = "";
         if (interp.logs.length > 0) out += interp.logs.join('\n') + '\n---\n';
         for (const [k, v] of Object.entries(interp.env)) {
           if (['pi', 'tau', 'e', 'c', 't', 'w', 'omega'].includes(k) || k.endsWith('_ast')) continue;
           if (v && v.isSet) out += `${k} = {${Array.from(v.elements).join(', ')}} (Set)\n`;
-          else out += `${k} = ${v}\n`;
+          else out += `${k} = ${formatTerminalValue(v)}\n`;
         }
-        consoleBox.innerText = out || "Executed successfully.";
+        latestEditorOutput = out || "Executed successfully.";
+        renderTerminalOutput();
         consoleBox.style.color = "var(--text-main)";
 
         const divTime = (2 * tSpan / 8).toFixed(1);
@@ -3387,6 +4532,7 @@
           const evalEnv = new Interpreter();
           Object.assign(evalEnv.env, interp.env);
           evalEnv.functions = interp.functions;
+          evalEnv.deltaWidth = 2 * dt;
 
           const probeIndices = [0, Math.floor(N_TIME / 2), N_TIME - 1];
           const hasNumericSamples = probeIndices.some(index => {
@@ -3414,12 +4560,15 @@
           if (nextSignals[result.name]) nextSignals[result.name].yFreq = result.yFreq;
         });
         registeredSignals = nextSignals;
+        registeredPlots = interp.plots;
         updateChannelDropdown();
         renderActiveChannel();
 
       } catch (err) {
         if (version !== recomputeVersion) return;
-        consoleBox.innerText = `Error: ${err.message}`;
+        if (!reportErrors && !parsedSuccessfully) return;
+        latestEditorOutput = `Editor error: ${err.message}`;
+        renderTerminalOutput();
         consoleBox.style.color = "#f43f5e";
       }
     }
@@ -3428,22 +4577,30 @@
       const dropdown = document.getElementById('channel-selector');
       const fsDropdown = document.getElementById('fs-channel-selector');
       const prevVal = dropdown.value;
+      const figureValues = new Set(registeredPlots.map(plot => `plot:${encodeURIComponent(plot.figure)}`));
 
       const buildOptions = (select) => {
-        select.innerHTML = `<option value="ALL">Show All Traces (${Object.keys(registeredSignals).length})</option>`;
+        select.innerHTML = `<option value="ALL">Show All Traces (${Object.keys(registeredSignals).length + registeredPlots.length})</option>`;
         for (const sigName of Object.keys(registeredSignals)) {
           const opt = document.createElement('option');
           opt.value = sigName;
           opt.innerText = `Trace: ${sigName}(t)`;
           select.appendChild(opt);
         }
+        const figures = [...new Set(registeredPlots.map(plot => plot.figure))];
+        figures.forEach(figure => {
+          const option = document.createElement('option');
+          option.value = `plot:${encodeURIComponent(figure)}`;
+          option.innerText = `Figure ${figure}`;
+          select.appendChild(option);
+        });
       };
 
       buildOptions(dropdown);
-      if (registeredSignals[prevVal] || prevVal === 'ALL') dropdown.value = prevVal;
+      dropdown.value = registeredSignals[prevVal] || prevVal === 'ALL' || figureValues.has(prevVal) ? prevVal : 'ALL';
       if (fsDropdown) {
         buildOptions(fsDropdown);
-        if (registeredSignals[prevVal] || prevVal === 'ALL') fsDropdown.value = prevVal;
+        fsDropdown.value = dropdown.value;
       }
     }
 
@@ -3492,9 +4649,10 @@
       const activeSelect = (isFsActive && fsSelect) ? fsSelect : mainSelect;
       if (activeSelect && activeSelect !== mainSelect && mainSelect) mainSelect.value = activeSelect.value;
       const mode = activeSelect ? activeSelect.value : 'ALL';
+      const selectedFigure = mode.startsWith('plot:') ? decodeURIComponent(mode.slice(5)) : null;
       const timeDatasets = [];
       const freqDatasets = [];
-      const keys = mode === 'ALL' ? Object.keys(registeredSignals) : (registeredSignals[mode] ? [mode] : []);
+      const keys = mode === 'ALL' ? Object.keys(registeredSignals) : (selectedFigure === null && registeredSignals[mode] ? [mode] : []);
 
       keys.forEach(key => {
         const sig = registeredSignals[key];
@@ -3505,6 +4663,7 @@
           type: 'line',
           label: sig.name,
           data: timePts,
+          snapPoints: getSignalSnapPoints(timePts),
           borderColor: sig.color.border,
           borderWidth: 1.8,
           pointRadius: 0
@@ -3514,6 +4673,7 @@
           type: 'line',
           label: `|${sig.name}|`,
           data: freqPts,
+          snapPoints: getSignalSnapPoints(freqPts),
           borderColor: sig.color.border,
           backgroundColor: sig.color.bg,
           borderWidth: 1.8,
@@ -3521,6 +4681,30 @@
           pointRadius: 0
         });
       });
+
+      const figurePlotCounts = new Map();
+      registeredPlots
+        .filter(plot => selectedFigure === null ? mode === 'ALL' : plot.figure === selectedFigure)
+        .forEach(plot => {
+          const plotNumber = (figurePlotCounts.get(plot.figure) || 0) + 1;
+          figurePlotCounts.set(plot.figure, plotNumber);
+          const figureHash = Array.from(plot.figure).reduce((hash, character) => (hash * 31 + character.charCodeAt(0)) | 0, 7);
+          const color = CHANNEL_COLORS[Math.abs(figureHash) % CHANNEL_COLORS.length];
+          const data = plot.points;
+          timeDatasets.push({
+            type: 'line',
+            label: `Figure ${plot.figure} · Plot ${plotNumber}`,
+            data,
+            snapPoints: data.map(point => ({ ...point, snapType: 'Point' })),
+            borderColor: color.border,
+            backgroundColor: color.bg,
+            borderWidth: 1.8,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            showLine: data.length > 1,
+            fill: false
+          });
+        });
 
       timeChart.data.datasets = timeDatasets;
       applyViewportToChart(timeChart, chartViewports.time, -tSpan, tSpan, timeDatasets);
@@ -3539,6 +4723,90 @@
         applyViewportToChart(fsFreqChart, chartViewports.freq, freqAxis[0], freqAxis[freqAxis.length - 1], freqDatasets);
         fsFreqChart.update();
       }
+    }
+
+    const touchChartPointers = new Map();
+    let pinchStart = null;
+
+    function startChartPan(chart, isFreq, clientX, clientY) {
+      const rect = chart.canvas.getBoundingClientRect();
+      if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
+      const viewport = isFreq ? chartViewports.freq : chartViewports.time;
+      const baseXMin = isFreq ? freqAxis[0] : -tSpan;
+      const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
+      const xMin = viewport.xMin ?? baseXMin;
+      const xMax = viewport.xMax ?? baseXMax;
+      const yRange = viewport.yMin != null && viewport.yMax != null
+        ? { yMin: viewport.yMin, yMax: viewport.yMax }
+        : computeAutoYRange(chart.data.datasets, xMin, xMax);
+      isPanning = true;
+      panStart = {
+        x: clientX, y: clientY, xMin, xMax,
+        yMin: yRange.yMin, yMax: yRange.yMax,
+        chart, isFreq
+      };
+      chart.canvas.style.cursor = 'grabbing';
+      return true;
+    }
+
+    function updateChartPan(clientX, clientY) {
+      if (!isPanning || !panStart.chart) return;
+      const { chart, x, y, xMin, xMax, yMin, yMax, isFreq } = panStart;
+      const viewport = isFreq ? chartViewports.freq : chartViewports.time;
+      const area = chart.chartArea;
+      if (!area) return;
+      const pixelPerX = (area.right - area.left) / (xMax - xMin);
+      const pixelPerY = (area.bottom - area.top) / (yMax - yMin);
+      const dx = (clientX - x) / pixelPerX;
+      const dy = (clientY - y) / pixelPerY;
+      viewport.xMin = xMin - dx;
+      viewport.xMax = xMax - dx;
+      viewport.yMin = yMin + dy;
+      viewport.yMax = yMax + dy;
+      viewport.autoY = false;
+      renderActiveChannel();
+    }
+
+    function beginChartPinch(chart, isFreq, pointers) {
+      const [first, second] = pointers;
+      const rect = chart.canvas.getBoundingClientRect();
+      const centerX = (first.x + second.x) / 2;
+      const centerY = (first.y + second.y) / 2;
+      const viewport = isFreq ? chartViewports.freq : chartViewports.time;
+      const baseXMin = isFreq ? freqAxis[0] : -tSpan;
+      const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
+      const xMin = viewport.xMin ?? baseXMin;
+      const xMax = viewport.xMax ?? baseXMax;
+      const yRange = viewport.yMin != null && viewport.yMax != null
+        ? { yMin: viewport.yMin, yMax: viewport.yMax }
+        : computeAutoYRange(chart.data.datasets, xMin, xMax);
+      const distance = Math.hypot(second.x - first.x, second.y - first.y);
+      pinchStart = {
+        chart, isFreq, pointerIds: [first.id, second.id], distance,
+        xMin, xMax, yMin: yRange.yMin, yMax: yRange.yMax,
+        anchorX: chart.scales.x.getValueForPixel(centerX - rect.left),
+        anchorY: chart.scales.y.getValueForPixel(centerY - rect.top)
+      };
+    }
+
+    function updateChartPinch() {
+      if (!pinchStart) return;
+      const first = touchChartPointers.get(pinchStart.pointerIds[0]);
+      const second = touchChartPointers.get(pinchStart.pointerIds[1]);
+      if (!first || !second) return;
+      const distance = Math.hypot(second.x - first.x, second.y - first.y);
+      const factor = Math.max(0.1, Math.min(10, distance / Math.max(1, pinchStart.distance)));
+      const viewport = pinchStart.isFreq ? chartViewports.freq : chartViewports.time;
+      const xSpan = (pinchStart.xMax - pinchStart.xMin) / factor;
+      const ySpan = (pinchStart.yMax - pinchStart.yMin) / factor;
+      const xRatio = (pinchStart.anchorX - pinchStart.xMin) / (pinchStart.xMax - pinchStart.xMin);
+      const yRatio = (pinchStart.anchorY - pinchStart.yMin) / (pinchStart.yMax - pinchStart.yMin);
+      viewport.xMin = pinchStart.anchorX - xRatio * xSpan;
+      viewport.xMax = viewport.xMin + xSpan;
+      viewport.yMin = pinchStart.anchorY - yRatio * ySpan;
+      viewport.yMax = viewport.yMin + ySpan;
+      viewport.autoY = false;
+      renderActiveChannel();
     }
 
     function attachChartInteraction(chart, isFreq) {
@@ -3574,32 +4842,22 @@
         }
       }, { passive: false });
 
-      canvas.addEventListener('mousedown', (evt) => {
-        if (evt.button !== 0) return;
-        const rect = canvas.getBoundingClientRect();
-        if (evt.clientX < rect.left || evt.clientX > rect.right || evt.clientY < rect.top || evt.clientY > rect.bottom) return;
-        const vp = isFreq ? chartViewports.freq : chartViewports.time;
-        const baseXMin = isFreq ? freqAxis[0] : -tSpan;
-        const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
-
-        let yMin, yMax;
-        if (vp.yMin != null && vp.yMax != null) {
-          yMin = vp.yMin; yMax = vp.yMax;
-        } else {
-          const datasets = isFreq ? freqChart.data.datasets : timeChart.data.datasets;
-          const r = computeAutoYRange(datasets, vp.xMin ?? baseXMin, vp.xMax ?? baseXMax);
-          yMin = r.yMin; yMax = r.yMax;
+      canvas.addEventListener('pointerdown', (evt) => {
+        if (evt.pointerType === 'mouse') {
+          if (evt.button !== 0) return;
+          startChartPan(chart, isFreq, evt.clientX, evt.clientY);
+          return;
         }
-
-        isPanning = true;
-        panStart = {
-          x: evt.clientX, y: evt.clientY,
-          xMin: vp.xMin != null ? vp.xMin : baseXMin,
-          xMax: vp.xMax != null ? vp.xMax : baseXMax,
-          yMin, yMax,
-          chartKey: isFreq ? 'freq' : 'time', isFreq
-        };
-        canvas.style.cursor = 'grabbing';
+        if (evt.pointerType !== 'touch') return;
+        evt.preventDefault();
+        try { canvas.setPointerCapture?.(evt.pointerId); } catch {}
+        touchChartPointers.set(evt.pointerId, { id: evt.pointerId, x: evt.clientX, y: evt.clientY, chart, isFreq });
+        const pointers = Array.from(touchChartPointers.values()).filter(pointer => pointer.chart === chart);
+        if (pointers.length === 1) startChartPan(chart, isFreq, evt.clientX, evt.clientY);
+        else if (pointers.length === 2) {
+          isPanning = false;
+          beginChartPinch(chart, isFreq, pointers);
+        }
       });
 
       canvas.addEventListener('dblclick', () => {
@@ -3610,29 +4868,29 @@
     }
 
     window.addEventListener('mousemove', (evt) => {
-      if (!isPanning) return;
-      const { x, y, xMin, xMax, yMin, yMax, isFreq } = panStart;
-      const vp = isFreq ? chartViewports.freq : chartViewports.time;
-      const chart = isFreq ? freqChart : timeChart;
-      const { scales: { x: xScale, y: yScale } } = chart;
-      if (!xScale || !yScale) return;
-
-      const pixelPerX = (chart.chartArea.right - chart.chartArea.left) / (xMax - xMin);
-      const pixelPerY = (chart.chartArea.bottom - chart.chartArea.top) / (yMax - yMin);
-
-      const dxPx = evt.clientX - panStart.x;
-      const dyPx = evt.clientY - panStart.y;
-
-      const dxVal = dxPx / pixelPerX;
-      const dyVal = dyPx / pixelPerY;
-
-      vp.xMin = xMin - dxVal;
-      vp.xMax = xMax - dxVal;
-      vp.yMin = yMin + dyVal;
-      vp.yMax = yMax + dyVal;
-      vp.autoY = false;
-      renderActiveChannel();
+      updateChartPan(evt.clientX, evt.clientY);
     });
+
+    window.addEventListener('pointermove', event => {
+      const pointer = touchChartPointers.get(event.pointerId);
+      if (!pointer) return;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      const activePointers = Array.from(touchChartPointers.values()).filter(item => item.chart === pointer.chart);
+      if (activePointers.length >= 2) updateChartPinch();
+      else updateChartPan(event.clientX, event.clientY);
+    });
+
+    const endChartPointer = event => {
+      const pointer = touchChartPointers.get(event.pointerId);
+      if (!pointer) return;
+      touchChartPointers.delete(event.pointerId);
+      if (pinchStart?.pointerIds.includes(event.pointerId)) pinchStart = null;
+      isPanning = false;
+      pointer.chart.canvas.style.cursor = 'crosshair';
+    };
+    window.addEventListener('pointerup', endChartPointer);
+    window.addEventListener('pointercancel', endChartPointer);
 
     window.addEventListener('mouseup', () => {
       if (isPanning) {
@@ -3648,8 +4906,89 @@
     const ed = document.getElementById('editor');
     const popup = document.getElementById('suggest-popup');
     const hoverDoc = document.getElementById('hover-doc-tooltip');
+    const editorHistory = { undo: [], redo: [], current: null, pending: null, lastInputType: '', lastInputAt: 0, applying: false };
     let activeSuggestIdx = 0;
     let currentSuggestions = [];
+    let suggestionRange = null;
+
+    function captureEditorState() {
+      return {
+        value: ed.value,
+        selectionStart: ed.selectionStart,
+        selectionEnd: ed.selectionEnd,
+        fileName: document.getElementById('active-filename').textContent
+      };
+    }
+
+    function updateEditorHistoryButtons() {
+      document.getElementById('undo-button').disabled = editorHistory.undo.length === 0;
+      document.getElementById('redo-button').disabled = editorHistory.redo.length === 0;
+    }
+
+    function resetEditorHistory() {
+      editorHistory.undo.length = 0;
+      editorHistory.redo.length = 0;
+      editorHistory.current = captureEditorState();
+      editorHistory.pending = null;
+      editorHistory.lastInputType = '';
+      updateEditorHistoryButtons();
+    }
+
+    function recordEditorInput(event) {
+      const next = captureEditorState();
+      if (editorHistory.applying) {
+        editorHistory.current = next;
+        return;
+      }
+      if (!editorHistory.current || next.fileName !== editorHistory.current.fileName) {
+        resetEditorHistory();
+        return;
+      }
+      const previous = editorHistory.pending || editorHistory.current;
+      editorHistory.pending = null;
+      if (previous.value === next.value) return;
+      const inputType = event.inputType || '';
+      const canGroup = ['insertText', 'deleteContentBackward', 'deleteContentForward'].includes(inputType) &&
+        inputType === editorHistory.lastInputType && Date.now() - editorHistory.lastInputAt < 900 &&
+        previous.selectionStart === previous.selectionEnd && next.selectionStart === next.selectionEnd;
+      if (!canGroup) editorHistory.undo.push(previous);
+      editorHistory.redo.length = 0;
+      editorHistory.current = next;
+      editorHistory.lastInputType = ['insertText', 'deleteContentBackward', 'deleteContentForward'].includes(inputType) ? inputType : '';
+      editorHistory.lastInputAt = Date.now();
+      updateEditorHistoryButtons();
+    }
+
+    function applyEditorHistory(fromStack, toStack) {
+      const previous = fromStack.pop();
+      if (!previous) return;
+      toStack.push(captureEditorState());
+      editorHistory.applying = true;
+      ed.value = previous.value;
+      ed.setSelectionRange(previous.selectionStart, previous.selectionEnd);
+      editorHistory.current = previous;
+      editorHistory.pending = null;
+      editorHistory.lastInputType = '';
+      ed.dispatchEvent(new Event('input', { bubbles: true }));
+      editorHistory.applying = false;
+      updateEditorHistoryButtons();
+    }
+
+    function undoEditor() { applyEditorHistory(editorHistory.undo, editorHistory.redo); }
+    function redoEditor() { applyEditorHistory(editorHistory.redo, editorHistory.undo); }
+
+    ed.addEventListener('beforeinput', () => { editorHistory.pending = captureEditorState(); });
+    ed.addEventListener('input', recordEditorInput);
+    ed.addEventListener('scroll', () => {
+      document.getElementById('line-numbers').scrollTop = ed.scrollTop;
+    });
+    ed.addEventListener('wheel', (event) => {
+      if (!event.ctrlKey && !event.metaKey) return;
+      event.preventDefault();
+      adjustFontSize(event.deltaY < 0 ? 1 : -1);
+    }, { passive: false });
+    document.getElementById('undo-button').addEventListener('click', undoEditor);
+    document.getElementById('redo-button').addEventListener('click', redoEditor);
 
     ed.addEventListener('mousemove', (e) => {
       const text = ed.value;
@@ -3661,8 +5000,9 @@
       while (right < text.length && /[a-zA-Z_]/.test(text[right])) right++;
       const word = text.slice(left, right);
 
-      if (DOCS[word]) {
-        const d = DOCS[word];
+      const doc = DOCS[word.toLowerCase()];
+      if (doc) {
+        const d = doc;
         hoverDoc.innerHTML = `
           <div class="doc-sig">${d.sig}</div>
           <div class="doc-param">${d.param}</div>
@@ -3712,13 +5052,84 @@
       return pos + Math.min(col, lines[row].length);
     }
 
-    function updateSuggestPopup() {
+    function collectUserSuggestions(source) {
+      const suggestions = new Map();
+      const add = (name, type = 'variable') => {
+        if (typeof name !== 'string' || !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name) || isReservedName(name)) return;
+        const key = name.toLowerCase();
+        if (suggestions.has(key)) return;
+        suggestions.set(key, {
+          name,
+          type,
+          snippet: type === 'function' || type === 'method' ? `${name}()` : name
+        });
+      };
+      const visit = node => {
+        if (!node || typeof node !== 'object') return;
+        if (Array.isArray(node)) {
+          node.forEach(visit);
+          return;
+        }
+        if (node.type === 'AssignStatement') add(node.name);
+        if (node.type === 'SequenceExpression') node.assignments?.forEach(assignment => add(assignment.name));
+        if (node.type === 'FunctionDeclaration') {
+          add(node.name, 'function');
+          node.parameters.forEach(parameter => add(parameter));
+        }
+        if (node.type === 'ClassDeclaration') {
+          add(node.name, 'class');
+          node.fields.forEach(field => add(field.name, 'field'));
+        }
+        if (node.type === 'MemberAssignStatement') add(node.name, 'field');
+        if (node.type === 'ForInStatement') add(node.variable);
+        if (node.type === 'RangeExpression') add(node.variable);
+        Object.values(node).forEach(visit);
+      };
+
+      try {
+        parseSource(source).forEach(visit);
+      } catch {
+        try {
+          const tokens = new Lexer(source).tokenize();
+          tokens.forEach((token, index) => {
+            const next = tokens[index + 1];
+            if (token.type === TT.CLASS && next?.type === TT.IDENTIFIER) add(next.value, 'class');
+            if (token.type === TT.FUNCTION && next?.type === TT.IDENTIFIER) add(next.value, 'function');
+            if (token.type === TT.LET && next?.type === TT.IDENTIFIER) add(next.value);
+            const previous = tokens[index - 1];
+            const startsStatement = !previous || previous.type === TT.SEMICOLON || previous.type === TT.LBRACE ||
+              previous.type === TT.RBRACE || previous.line < token.line;
+            if (startsStatement && token.type === TT.IDENTIFIER && next?.type === TT.ASSIGN) add(token.value);
+          });
+        } catch {}
+      }
+
+      terminalInterpreter.env && Object.keys(terminalInterpreter.env).forEach(name => {
+        if (!name.endsWith('_ast')) add(name);
+      });
+      terminalInterpreter.functions.forEach(definition => add(definition.name, 'function'));
+      terminalInterpreter.classes.forEach(definition => add(definition.name, 'class'));
+      return Array.from(suggestions.values());
+    }
+
+    function updateSuggestPopup(force = false) {
+      const isForced = force === true;
       const pos = ed.selectionStart;
       const val = ed.value;
       const textBefore = val.slice(0, pos);
-      const match = textBefore.match(/([a-zA-Z_][a-zA-Z0-9_]*)$/);
+      let match = textBefore.match(/([a-zA-Z_][a-zA-Z0-9_]*)$/);
+      let suggestionStart = match ? match.index : -1;
 
-      if (!match || match[1].length < 2) {
+      if (!match && isForced) {
+        const lineStart = textBefore.lastIndexOf('\n') + 1;
+        const partial = textBefore.slice(lineStart).match(/([a-zA-Z_][a-zA-Z0-9_]*)[^a-zA-Z0-9_]*$/);
+        if (partial) {
+          match = partial;
+          suggestionStart = lineStart + partial.index;
+        }
+      }
+
+      if (!match || match[1].length < (isForced ? 1 : 2)) {
         hideSuggestions();
         return;
       }
@@ -3730,9 +5141,15 @@
       }
 
       const prefix = match[1].toLowerCase();
-      currentSuggestions = SUGGESTIONS.filter(s => 
-        s.name.toLowerCase().startsWith(prefix) && s.name.toLowerCase() !== prefix
-      ).slice(0, 8);
+      const matchesPrefix = suggestion =>
+        suggestion.name.toLowerCase().startsWith(prefix) && suggestion.name.toLowerCase() !== prefix;
+      const customSuggestions = collectUserSuggestions(val).filter(matchesPrefix);
+      const customNames = new Set(customSuggestions.map(suggestion => suggestion.name.toLowerCase()));
+      const builtInSuggestions = Array.from(suggestionCatalog.values())
+        .filter(matchesPrefix)
+        .filter(suggestion => !customNames.has(suggestion.name.toLowerCase()));
+      currentSuggestions = [...customSuggestions, ...builtInSuggestions];
+      suggestionRange = { start: suggestionStart, end: suggestionStart + match[1].length };
 
       if (currentSuggestions.length === 0) {
         hideSuggestions();
@@ -3775,20 +5192,16 @@
     function hideSuggestions() {
       popup.style.display = 'none';
       currentSuggestions = [];
+      suggestionRange = null;
     }
 
     function applySuggestion(item) {
-      const pos = ed.selectionStart;
       const val = ed.value;
-      const textBefore = val.slice(0, pos);
-      const match = textBefore.match(/([a-zA-Z_][a-zA-Z0-9_]*)$/);
-      if (!match) return;
-
-      const prefixLen = match[1].length;
-      const start = pos - prefixLen;
+      if (!suggestionRange || suggestionRange.end > val.length) return;
+      const { start, end } = suggestionRange;
       const insertText = item.snippet;
 
-      ed.value = val.slice(0, start) + insertText + val.slice(pos);
+      ed.value = val.slice(0, start) + insertText + val.slice(end);
 
       if (insertText.endsWith('()')) {
         ed.selectionStart = ed.selectionEnd = start + insertText.length - 1;
@@ -3803,6 +5216,20 @@
     }
 
     ed.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        updateSuggestPopup(true);
+        recompute({ reportErrors: true });
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && !e.altKey && ['z', 'y'].includes(e.key.toLowerCase())) {
+        e.preventDefault();
+        if (e.key.toLowerCase() === 'y' || e.shiftKey) redoEditor();
+        else undoEditor();
+        return;
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.key === '/') {
         e.preventDefault();
         toggleComment();
@@ -3913,6 +5340,8 @@
         const caret = start + caretOffset;
         ed.setSelectionRange(caret, caret);
         ed.dispatchEvent(new Event('input', { bubbles: true }));
+        updateLineNumbers();
+        requestAnimationFrame(scrollEditorCaretIntoView);
         return;
       }
 
@@ -3981,8 +5410,24 @@
     function toggleTheme() { document.body.classList.toggle('light-theme'); }
     function adjustFontSize(delta) {
       const cur = parseFloat(getComputedStyle(ed).fontSize);
-      ed.style.fontSize = `${cur + delta}px`;
-      document.getElementById('line-numbers').style.fontSize = `${cur + delta}px`;
+      const size = Math.max(9, Math.min(28, cur + delta));
+      ed.style.fontSize = `${size}px`;
+      document.getElementById('line-numbers').style.fontSize = `${size}px`;
+      document.getElementById('editor-font-value').textContent = `${size}px`;
+      try { localStorage.setItem('axiom-ui-editor-font', String(size)); } catch {}
+    }
+    function scrollEditorCaretIntoView() {
+      const lineNumber = ed.value.slice(0, ed.selectionStart).split('\n').length - 1;
+      const styles = getComputedStyle(ed);
+      const lineHeight = parseFloat(styles.lineHeight) || parseFloat(styles.fontSize) * 1.5;
+      const paddingTop = parseFloat(styles.paddingTop) || 0;
+      const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+      const caretTop = lineNumber * lineHeight;
+      const visibleTop = ed.scrollTop;
+      const visibleBottom = visibleTop + ed.clientHeight - paddingTop - paddingBottom;
+      if (caretTop < visibleTop) ed.scrollTop = caretTop;
+      else if (caretTop + lineHeight > visibleBottom) ed.scrollTop = caretTop + lineHeight - ed.clientHeight + paddingTop + paddingBottom;
+      document.getElementById('line-numbers').scrollTop = ed.scrollTop;
     }
     function updateLineNumbers() {
       const c = ed.value.split('\n').length;
@@ -4092,6 +5537,36 @@
       return Math.abs(a - e) < tolerance;
     }
 
+    function assertDerivativeApprox(result, expected, tolerance = 5.1e-5) {
+      const match = String(result).match(/=\s*(-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)(?:\s|$)/i);
+      return !!match && Math.abs(Number(match[1]) - expected) <= tolerance;
+    }
+
+    function generateDerivativeCases() {
+      const definitions = [
+        { name: 'sin', points: [0, Math.PI / 4, -Math.PI / 2], derivative: x => Math.cos(x) },
+        { name: 'cos', points: [0, Math.PI / 4, Math.PI / 2], derivative: x => -Math.sin(x) },
+        { name: 'tan', points: [0, Math.PI / 6, -Math.PI / 4], derivative: x => 1 / Math.cos(x) ** 2 },
+        { name: 'exp', points: [-1, 0, 1], derivative: x => Math.exp(x) },
+        { name: 'ln', points: [0.5, 1, 2], derivative: x => 1 / x },
+        { name: 'sinh', points: [-1, 0, 1], derivative: x => Math.cosh(x) },
+        { name: 'cosh', points: [-1, 0, 1], derivative: x => Math.sinh(x) },
+        { name: 'tanh', points: [-1, 0, 1], derivative: x => 1 - Math.tanh(x) ** 2 },
+        { name: 'sqrt', points: [0.25, 1, 4], derivative: x => 1 / (2 * Math.sqrt(x)) }
+      ];
+      return definitions.flatMap(definition => definition.points.map((point, index) => {
+        const input = Number(point.toPrecision(12)).toString();
+        const expected = definition.derivative(point);
+        return {
+          id: `diff-gen-${definition.name}-${index + 1}`,
+          name: `d/dx ${definition.name}(x) at ${input}`,
+          code: `r = diff(${definition.name}(x), x, at = ${input});`,
+          check: result => assertDerivativeApprox(result.interp.env.r, expected),
+          expect: `≈ ${formatRoundedValue(expected, 4)}`
+        };
+      }));
+    }
+
     function runTestSuite() {
       ERROR_LOG.createdAt = new Date().toISOString();
       ERROR_LOG.summary = { total: 0, passed: 0, failed: 0, errors: 0 };
@@ -4108,13 +5583,7 @@
         // ============ CATEGORY 1: DIFF FUNCTION IMPROVEMENTS ============
         {
           category: "DIFF - Basic Trig Derivatives",
-          cases: [
-            { id: "diff-001", name: "d/dx sin(x)", code: "r = diff(sin(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-4), expect: "cos(0) = 1" },
-            { id: "diff-002", name: "d/dx cos(x)", code: "r = diff(cos(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 0, 1e-4), expect: "-sin(0) = 0" },
-            { id: "diff-003", name: "d/dx tan(x)", code: "r = diff(tan(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-4), expect: "sec^2(0) = 1" },
-            { id: "diff-004", name: "d/dx exp(x)", code: "r = diff(exp(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-4), expect: "exp(0) = 1" },
-            { id: "diff-005", name: "d/dx ln(x)", code: "r = diff(ln(x), x, at = 1);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-4), expect: "1/1 = 1" },
-          ]
+          cases: generateDerivativeCases()
         },
         {
           category: "DIFF - Inverse Trig & Hyperbolic",
@@ -4122,8 +5591,8 @@
             { id: "diff-010", name: "d/dx asin(x) no error", code: "y = diff(asin(x), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error thrown" },
             { id: "diff-011", name: "d/dx acos(x) no error", code: "y = diff(acos(x), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error thrown" },
             { id: "diff-012", name: "d/dx atan(x) no error", code: "y = diff(atan(x), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error thrown" },
-            { id: "diff-013", name: "d/dx sinh(x) = cosh", code: "r = diff(sinh(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-4), expect: "cosh(0) = 1" },
-            { id: "diff-014", name: "d/dx cosh(x) = sinh", code: "r = diff(cosh(x), x, at = 0);", check: (r) => assertApprox(r.interp.env.r, 0, 1e-4), expect: "sinh(0) = 0" },
+            { id: "diff-013", name: "d/dx sinh(x) = cosh", code: "r = diff(sinh(x), x, at = 0);", check: (r) => assertDerivativeApprox(r.interp.env.r, 1), expect: "cosh(0) = 1" },
+            { id: "diff-014", name: "d/dx cosh(x) = sinh", code: "r = diff(cosh(x), x, at = 0);", check: (r) => assertDerivativeApprox(r.interp.env.r, 0), expect: "sinh(0) = 0" },
             { id: "diff-015", name: "d/dx tanh(x) no error", code: "y = diff(tanh(x), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error thrown" },
           ]
         },
@@ -4135,7 +5604,7 @@
             { id: "diff-022", name: "diff of piecewise no error", code: "y = diff( {0: x<0, 1: x>=0}, x );", check: (r) => !!r.interp.env.y, expect: "No differentiation error thrown" },
             { id: "diff-023", name: "diff of floor no error", code: "y = diff(floor(x), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error (returns 0)" },
             { id: "diff-024", name: "diff of min/max no error", code: "y = diff(min(x, x^2), x);", check: (r) => !!r.interp.env.y, expect: "No differentiation error (returns 0)" },
-            { id: "diff-025", name: "diff of sec/csc/cot no error", code: "a = diff(sec(x), x); b = diff(csc(x), x); c = diff(cot(x), x);", check: (r) => !!r.interp.env.a && !!r.interp.env.b && !!r.interp.env.c, expect: "All derivatives computed without error" },
+            { id: "diff-025", name: "diff of sec/csc/cot no error", code: "a = diff(sec(x), x); b = diff(csc(x), x); q = diff(cot(x), x);", check: (r) => !!r.interp.env.a && !!r.interp.env.b && !!r.interp.env.q, expect: "All derivatives computed without error" },
           ]
         },
         // ============ CATEGORY 2: MATH RANGE & CHAIN COMPARISONS ============
@@ -4189,12 +5658,77 @@
           cases: [
             { id: "int-001", name: "integrate sin from 0 to pi", code: "r = integrate(sin(t), t, 0, pi);", check: (r) => assertApprox(r.interp.env.r, 2), expect: "≈ 2.0" },
             { id: "int-002", name: "integrate cos from 0 to pi/2", code: "r = integrate(cos(t), t, 0, pi/2);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "≈ 1.0" },
-            { id: "int-003", name: "symbolic assignment AST persists", code: "z(t) = sin(omega*t); x = z(pi);", check: (r) => typeof r.interp.env.x === 'number', expect: "x is a number" },
+            { id: "int-003", name: "assigned signal AST persists", code: "z = sin(omega*t); x = z(pi);", check: (r) => typeof r.interp.env.x === 'number', expect: "x is a number" },
+            { id: "int-004", name: "integrate delta across both simple roots", code: "r = integrate(delta(t^2 - 1), t, -2, 2);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "1 (two roots, each contributes 1/2)" },
+            { id: "int-005", name: "integrate a weighted delta impulse", code: "r = integrate((t + 2) * delta(t - 1), t, 0, 2);", check: (r) => assertApprox(r.interp.env.r, 3), expect: "3 (weight evaluated at t = 1)" },
+            { id: "int-006", name: "integrate scaled delta argument", code: "r = integrate(delta(2*t - 2), t, 0, 2);", check: (r) => assertApprox(r.interp.env.r, 0.5), expect: "0.5 (Jacobian scaling)" },
+            { id: "int-007", name: "integrate delta inside assigned signal", code: "y = tri(t - 2) * delta(t - 2); r = integrate(y(t), t, -2, 4);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "1 (assigned signal expanded before integration)" },
+          ]
+        },
+        {
+          category: "STATISTICS - Collections and Descriptive Measures",
+          cases: [
+            { id: "stat-001", name: "count set and range observations", code: "r = count({1, 2, 2, 3}) + count(range(0:2, x, 2));", check: (r) => r.interp.env.r === 6, expect: "6 (sets deduplicate; ranges include endpoints)" },
+            { id: "stat-002", name: "sum accepts varargs and sets", code: "r = sum(1, 2, 3) + sum({4, 5});", check: (r) => r.interp.env.r === 15, expect: "15" },
+            { id: "stat-003", name: "mean accepts mixed collection and scalar", code: "r = mean({1, 2}, 3);", check: (r) => r.interp.env.r === 2, expect: "2" },
+            { id: "stat-004", name: "average supports descending ranges", code: "r = average(range(5:1, x, 4));", check: (r) => assertApprox(r.interp.env.r, 3), expect: "3" },
+            { id: "stat-005", name: "median of odd-sized data", code: "r = median(9, 1, 5);", check: (r) => r.interp.env.r === 5, expect: "5" },
+            { id: "stat-006", name: "median averages even middle pair", code: "r = median({10, 1, 2, 9});", check: (r) => r.interp.env.r === 5.5, expect: "5.5" },
+            { id: "stat-007", name: "mode selects smallest value on tie", code: "r = mode(2, 1, 1, 2);", check: (r) => r.interp.env.r === 1, expect: "1" },
+            { id: "stat-008", name: "variance is population variance", code: "r = variance(1, 2, 3);", check: (r) => assertApprox(r.interp.env.r, 2 / 3), expect: "2/3 (divides by n)" },
+            { id: "stat-009", name: "sampleVariance uses n minus one", code: "r = sampleVariance(1, 2, 3);", check: (r) => r.interp.env.r === 1, expect: "1 (divides by n - 1)" },
+            { id: "stat-010", name: "standardDeviation alias", code: "r = standardDeviation(1, 2, 3);", check: (r) => assertApprox(r.interp.env.r, Math.sqrt(2 / 3)), expect: "sqrt(2/3)" },
+            { id: "stat-011", name: "sample standard deviation", code: "r = sampleStdDev(1, 2, 3);", check: (r) => r.interp.env.r === 1, expect: "1" },
+            { id: "stat-012", name: "quantile interpolates between observations", code: "r = quantile({1, 2, 9, 10}, 0.25);", check: (r) => r.interp.env.r === 1.75, expect: "1.75" },
+            { id: "stat-013", name: "percentile accepts range and percent units", code: "r = percentile(range(1:5, x, 4), 25);", check: (r) => r.interp.env.r === 2, expect: "2" },
+            { id: "stat-014", name: "quantile includes upper endpoint", code: "r = quantile({1, 2, 9}, 1);", check: (r) => r.interp.env.r === 9, expect: "9" },
+            { id: "stat-015", name: "min and max accept ranges", code: "r = min(range(5:1, x, 4)) + max(range(5:1, x, 4));", check: (r) => r.interp.env.r === 6, expect: "6" },
+            { id: "stat-016", name: "chained comparison works as statistics gate", code: "r = 0 < 5 < 10 ? mean(range(0:4, x, 4)) : -1;", check: (r) => r.interp.env.r === 2, expect: "2" },
+            { id: "stat-017", name: "sum rejects empty data", code: "r = sum({});", expectError: "at least one observation", expect: "empty data is rejected" },
+            { id: "stat-018", name: "mean rejects complex data", code: "r = mean(i);", expectError: "finite real number", expect: "complex values are rejected" },
+            { id: "stat-019", name: "sample variance requires two observations", code: "r = sampleVariance(1);", expectError: "at least two observations", expect: "sample size must be at least two" },
+            { id: "stat-020", name: "quantile rejects out-of-range probability", code: "r = quantile({1, 2}, 1.1);", expectError: "between 0 and 1", expect: "probability is constrained to [0, 1]" },
+            { id: "stat-021", name: "statistics reject non-finite values", code: "r = mean(inf);", expectError: "finite real number", expect: "infinity is rejected" },
+            { id: "stat-022", name: "median rejects nonnumeric observations", code: "r = median({1, \"x\"});", expectError: "finite real number", expect: "strings are rejected" },
+            { id: "stat-023", name: "statistics reject an unrepresentable variance", code: "r = variance(-10^200, 10^200);", expectError: "outside the finite numeric range", expect: "overflow is reported" },
+            { id: "stat-024", name: "mean remains stable for extreme values", code: "r = mean(-10^200, 10^200);", check: (r) => r.interp.env.r === 0, expect: "0" },
+            { id: "stat-025", name: "standard deviation remains stable for extreme values", code: "r = stddev(-10^200, 10^200);", check: (r) => assertApprox(r.interp.env.r / 1e200, 1), expect: "1e200" },
+            { id: "stat-026", name: "extrema support the maximum range size", code: "r = min(range(0:100000, x, 100000)) + max(range(0:100000, x, 100000));", check: (r) => r.interp.env.r === 100000, expect: "100000" },
           ]
         },
         // ============ CATEGORY 5: STANDARD FUNCTIONS ============
         {
           category: "STDLIB - Standard Library Functions",
+                    category: "TYPE - Runtime Values",
+                    cases: [
+                      { id: "type-001", name: "arithmetic expression returns number", code: "r = type(30 + 2.5);", check: (r) => r.interp.env.r === "number", expect: "number" },
+                      { id: "type-002", name: "variable returns its runtime type", code: "value = 7; r = type(value);", check: (r) => r.interp.env.r === "number", expect: "number" },
+                      { id: "type-003", name: "complex value returns complex", code: "r = type(i);", check: (r) => r.interp.env.r === "complex", expect: "complex" },
+                      { id: "type-004", name: "string returns string", code: "r = type(\"hello\");", check: (r) => r.interp.env.r === "string", expect: "string" },
+                      { id: "type-005", name: "null returns null", code: "r = type(null);", check: (r) => r.interp.env.r === "null", expect: "null" },
+                      { id: "type-006", name: "set returns set", code: "r = type({1, 2});", check: (r) => r.interp.env.r === "set", expect: "set" },
+                      { id: "type-007", name: "range returns range", code: "r = type(range(0:1, x, 2));", check: (r) => r.interp.env.r === "range", expect: "range" },
+                      { id: "type-008", name: "symbolic function returns function", code: "f = diff(x^2, x); r = type(f);", check: (r) => r.interp.env.r === "function", expect: "function" },
+                      { id: "type-009", name: "class instance returns class name", code: "class Point {} p = new Point(); r = type(p);", check: (r) => r.interp.env.r === "Point", expect: "Point" },
+                      { id: "type-010", name: "comparison result returns number", code: "r = type(1 < 2);", check: (r) => r.interp.env.r === "number", expect: "number" },
+                      { id: "type-011", name: "type requires exactly one argument", code: "r = type(1, 2);", expectError: "exactly one argument", expect: "invalid arity is rejected" },
+                      { id: "type-012", name: "type name cannot be reassigned", code: "type = 1;", expectError: "reserved name 'type'", expect: "built-in name is reserved" }
+                    ]
+                  },
+                  {
+                    category: "PLOT - Discrete Values",
+                    cases: [
+                      { id: "plot-001", name: "single number plots as x with zero y", code: "plot(10);", check: (r) => r.interp.plots[0]?.points[0]?.x === 10 && r.interp.plots[0]?.points[0]?.y === 0, expect: "(10, 0)" },
+                      { id: "plot-002", name: "two numbers plot as x and y", code: "plot(10, 3);", check: (r) => r.interp.plots[0]?.points[0]?.x === 10 && r.interp.plots[0]?.points[0]?.y === 3, expect: "(10, 3)" },
+                      { id: "plot-003", name: "single set plots values against indices", code: "plot({4, 7, 9});", check: (r) => JSON.stringify(r.interp.plots[0]?.points) === JSON.stringify([{x: 0, y: 4}, {x: 1, y: 7}, {x: 2, y: 9}]), expect: "three indexed points" },
+                      { id: "plot-004", name: "paired ranges and sets use figure key", code: "xs = range(0:2, x, 2); ys = {1, 4, 9}; plot(xs, ys, fig = 1);", check: (r) => r.interp.plots[0]?.figure === "1" && JSON.stringify(r.interp.plots[0]?.points) === JSON.stringify([{x: 0, y: 1}, {x: 1, y: 4}, {x: 2, y: 9}]), expect: "paired coordinates in Figure 1" },
+                      { id: "plot-005", name: "plots with different figure keys stay distinct", code: "plot(10, 0, fig = 1); plot(10, 3, fig = 2);", check: (r) => r.interp.plots.length === 2 && r.interp.plots[0].figure !== r.interp.plots[1].figure, expect: "two distinct figures" },
+                      { id: "plot-006", name: "mismatched coordinate lengths are rejected", code: "plot({1, 2}, {3});", expectError: "same number of points", expect: "x/y lengths must match" },
+                      { id: "plot-007", name: "non-numeric coordinates are rejected", code: "plot({1, \"x\"});", expectError: "finite real numbers", expect: "coordinates must be finite reals" }
+                    ]
+                  },
+                  {
+                    category: "STDLIB - Standard Library Functions",
           cases: [
             { id: "std-001", name: "sqrt(9) = 3", code: "r = sqrt(9);", check: (r) => r.interp.env.r === 3, expect: "3" },
             { id: "std-002", name: "cbrt(-8) = -2", code: "r = cbrt(-8);", check: (r) => r.interp.env.r === -2, expect: "-2" },
@@ -4204,6 +5738,30 @@
             { id: "std-006", name: "min(3, -1, 2) = -1", code: "r = min(3, -1, 2);", check: (r) => r.interp.env.r === -1, expect: "-1" },
             { id: "std-007", name: "max(3, -1, 2) = 3", code: "r = max(3, -1, 2);", check: (r) => r.interp.env.r === 3, expect: "3" },
             { id: "std-008", name: "round(pi, 2) ≈ 3.14", code: "r = round(pi, 2);", check: (r) => assertApprox(r.interp.env.r, 3.14), expect: "≈ 3.14" },
+          ]
+        },
+        {
+          category: "CLASSES - Constructors and Instance Methods",
+          cases: [
+            { id: "class-001", name: "constructor initializes fields and method reads them", code: "class Point { function constructor(x, y) { this.x = x; this.y = y; } function magnitude() { return sqrt(this.x^2 + this.y^2); } } p = new Point(3, 4); r = p.magnitude();", check: (r) => r.interp.env.r === 5, expect: "5" },
+            { id: "class-002", name: "instances keep independent fields", code: "class Counter { function constructor(start) { this.value = start; } function increment() { this.value = this.value + 1; return this.value; } } a = new Counter(0); b = new Counter(10); r = a.increment() + b.increment() + a.value;", check: (r) => r.interp.env.r === 13, expect: "13" },
+            { id: "class-003", name: "class without constructor allows fields", code: "class Empty {} a = new Empty(); a.value = 7; r = a.value;", check: (r) => r.interp.env.r === 7, expect: "7" },
+            { id: "class-004", name: "constructor keyword lexes as an identifier", code: "r = 1;", check: () => new Lexer('constructor toString valueOf').tokenize().slice(0, 3).every(token => token.type === TT.IDENTIFIER), expect: "constructor and Object prototype names are identifiers" },
+            { id: "class-010", name: "comma-separated null fields are initialized before constructor", code: "class ABC { x = null, o = null; function constructor(o, x) { this.o = 0; this.x = x; } } a = new ABC(9, 4); r = a.x + a.o;", check: (r) => r.interp.env.r === 4, expect: "4 (constructor overrides initialized fields)" },
+            { id: "class-011", name: "field defaults are evaluated independently per instance", code: "class Meter { value = 0, limit = 3 + 2; function increment() { this.value = this.value + 1; return this.value; } } a = new Meter(); b = new Meter(); r = a.increment() + b.value + a.limit;", check: (r) => r.interp.env.r === 6, expect: "6 (each instance starts with its own fields)" },
+            { id: "class-005", name: "unknown class is rejected", code: "p = new Missing();", expectError: "Unknown class", expect: "unknown class is rejected" },
+            { id: "class-006", name: "constructor arity is checked", code: "class Pair { function constructor(x, y) {} } p = new Pair(1);", expectError: "no matching constructor for 1 argument", expect: "constructor argument count is checked" },
+            { id: "class-007", name: "missing field is rejected", code: "class Empty {} p = new Empty(); r = p.value;", expectError: "has no field 'value'", expect: "undefined fields are rejected" },
+            { id: "class-008", name: "missing method is rejected", code: "class Empty {} p = new Empty(); r = p.run();", expectError: "has no method 'run'", expect: "undefined methods are rejected" },
+            { id: "class-009", name: "class names cannot be reassigned", code: "class Point {} Point = 1;", expectError: "Cannot assign to class 'Point'", expect: "class bindings are immutable" },
+            { id: "class-012", name: "constructor overloads match argument count", code: "class Choice { value = null; function constructor() { this.value = 1; } function constructor(v) { this.value = v; } } a = new Choice(); b = new Choice(7); r = a.value * 10 + b.value;", check: (r) => r.interp.env.r === 17, expect: "17 (zero- and one-argument constructors selected)" },
+            { id: "class-013", name: "unsupported constructor arity lists available overloads", code: "class Choice { function constructor() {} function constructor(v) {} } a = new Choice(1, 2);", expectError: "constructor() or constructor(v)", expect: "supported constructor signatures are reported" },
+            { id: "class-014", name: "duplicate constructor signature is rejected", code: "class Choice { function constructor(x) {} function constructor(x) {} } a = new Choice(1);", expectError: "duplicate constructor signature (x)", expect: "duplicate signatures are rejected" },
+            { id: "class-015", name: "constructor overloads can use several parameters", code: "class Vector { x = 0, y = 0; function constructor(x) { this.x = x; } function constructor(x, y) { this.x = x; this.y = y; } } a = new Vector(3); b = new Vector(3, 4); r = a.x + a.y + b.x + b.y;", check: (r) => r.interp.env.r === 10, expect: "10" },
+            { id: "class-016", name: "Point print method and trailing field comma", code: "class Point { x = null, y = null, function constructor(x, y) { this.x = x; this.y = y; } function print() { print(\"x:\", this.x, \"y:\", this.y); } } point = new Point(10, 20); point.print(); r = point.x;", check: (r) => r.interp.env.r === 10 && r.interp.logs[0] === "x: 10 y: 20", expect: "Point fields and print method work" },
+            { id: "class-017", name: "named arguments select same-arity constructor", code: "class Point { x = 0, y = 0; function constructor(x) { this.x = x; } function constructor(y) { this.y = y; } } a = new Point(x = 7); b = new Point(y = 9); r = a.x + b.y;", check: (r) => r.interp.env.r === 16, expect: "16" },
+            { id: "class-018", name: "positional same-arity constructor call is explicit ambiguity", code: "class Point { function constructor(x) {} function constructor(y) {} } p = new Point(1);", expectError: "constructor call is ambiguous", expect: "named arguments are required to disambiguate" },
+            { id: "class-019", name: "Point example with same-arity overloads and print method", code: "class Point { x = null, y = null, function constructor(x, y) { this.x = x; this.y = y; } function constructor(x) { this.x = x; } function constructor(y) { this.y = y; } function print() { print(\"x:\", this.x, \"y:\", this.y); } } point = new Point(10, 20); point.print(); r = point.x + point.y;", check: (r) => r.interp.env.r === 30 && r.interp.logs[0] === "x: 10 y: 20", expect: "30 with printed point fields" },
           ]
         },
         // ============ CATEGORY 6: SIGNAL FUNCTIONS ============
@@ -4243,9 +5801,23 @@
         reportLines.push(`━━━ ${group.category} ━━━`);
         for (const tc of group.cases) {
           try {
-            const result = executeCode(tc.code);
-            const passed = tc.check(result);
-            const actual = result.interp.env.r ?? result.interp.env.y ?? result.lastResult;
+            let result = null;
+            let passed;
+            let actual;
+            if (tc.expectError) {
+              try {
+                executeCode(tc.code);
+                passed = false;
+                actual = 'No error was thrown';
+              } catch (error) {
+                passed = error.message.includes(tc.expectError);
+                actual = error.message;
+              }
+            } else {
+              result = executeCode(tc.code);
+              passed = tc.check(result);
+              actual = result.interp.env.r ?? result.interp.env.y ?? result.lastResult;
+            }
             logTestResult(group.category, tc.id, tc.name, tc.code, passed, actual, tc.expect, null);
             const icon = passed ? "✓" : "✗";
             const color = passed ? "" : " [FAIL]";
@@ -4295,36 +5867,52 @@
 
     /* ---- DRAG SPLITTERS ---- */
     let activeSplitter = null;
+    let activeSplitterPointerId = null;
 
     function initSplitters() {
       const hsplitter = document.getElementById('hsplitter');
       const vsplitter = document.getElementById('vsplitter');
+      const explorerSplitter = document.getElementById('explorer-splitter');
+      const explorerPanel = document.getElementById('project-explorer');
       const workspace = document.getElementById('workspace');
       const editorContainer = document.getElementById('editor-container');
       const signalsDock = document.getElementById('signals-dock');
 
-      hsplitter.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
-        e.preventDefault();
-        activeSplitter = 'v';
-        document.body.classList.add('dragging-splitter-v');
-      });
+      try {
+        const savedWidth = Number(localStorage.getItem('axiom-ui-explorer-width'));
+        if (Number.isFinite(savedWidth) && savedWidth >= 150 && savedWidth <= 420) {
+          document.documentElement.style.setProperty('--explorer-width', `${savedWidth}px`);
+        }
+      } catch {}
 
-      vsplitter.addEventListener('mousedown', (e) => {
-        if (e.button !== 0) return;
+      const beginSplitterDrag = (e, orientation) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
         e.preventDefault();
-        activeSplitter = 'h';
-        document.body.classList.add('dragging-splitter-h');
-      });
+        activeSplitter = orientation;
+        activeSplitterPointerId = e.pointerId;
+        e.currentTarget.setPointerCapture?.(e.pointerId);
+        document.body.classList.add(orientation === 'h' ? 'dragging-splitter-h' : 'dragging-splitter-v');
+      };
+      explorerSplitter.addEventListener('pointerdown', e => beginSplitterDrag(e, 'explorer'));
+      hsplitter.addEventListener('pointerdown', e => beginSplitterDrag(e, 'v'));
+      vsplitter.addEventListener('pointerdown', e => beginSplitterDrag(e, 'h'));
 
-      window.addEventListener('mousemove', (e) => {
+      window.addEventListener('pointermove', (e) => {
+        if (e.pointerId !== activeSplitterPointerId) return;
         if (!activeSplitter) return;
-        if (activeSplitter === 'v') {
+        if (activeSplitter === 'explorer') {
+          const rect = workspace.getBoundingClientRect();
+          const availableWidth = rect.width - signalsDock.getBoundingClientRect().width - 278;
+          const maxWidth = Math.max(150, Math.min(420, availableWidth));
+          const width = Math.max(150, Math.min(maxWidth, e.clientX - rect.left));
+          document.documentElement.style.setProperty('--explorer-width', `${width}px`);
+          try { localStorage.setItem('axiom-ui-explorer-width', String(Math.round(width))); } catch {}
+        } else if (activeSplitter === 'v') {
           const rect = workspace.getBoundingClientRect();
           const newSignalsWidthPx = rect.right - e.clientX;
           const workspaceWidthPx = rect.width;
           const minSignalsPx = 260;
-          const maxSignalsPx = workspaceWidthPx - 300;
+          const maxSignalsPx = Math.max(minSignalsPx, workspaceWidthPx - explorerPanel.getBoundingClientRect().width - 308);
           const clamped = Math.max(minSignalsPx, Math.min(maxSignalsPx, newSignalsWidthPx));
           const pct = (clamped / workspaceWidthPx) * 100;
           document.documentElement.style.setProperty('--signals-width', pct + '%');
@@ -4351,15 +5939,19 @@
         [timeChart, freqChart, fsTimeChart, fsFreqChart].forEach(c => { if (c) c.resize(); });
       });
 
-      window.addEventListener('mouseup', () => {
-        if (activeSplitter === 'v') {
+      const endSplitterDrag = (e) => {
+        if (e.pointerId !== activeSplitterPointerId) return;
+        if (activeSplitter === 'v' || activeSplitter === 'explorer') {
           document.body.classList.remove('dragging-splitter-v');
         } else if (activeSplitter === 'h') {
           document.body.classList.remove('dragging-splitter-h');
         }
         activeSplitter = null;
+        activeSplitterPointerId = null;
         [timeChart, freqChart, fsTimeChart, fsFreqChart].forEach(c => { if (c) c.resize(); });
-      });
+      };
+      window.addEventListener('pointerup', endSplitterDrag);
+      window.addEventListener('pointercancel', endSplitterDrag);
     }
 
     function updateFsTimeSpan() {
@@ -4387,8 +5979,8 @@
       ed.value = `# 1. Mathematical Derivative - now supports 30+ functions without error!
 a = diff(asin(x), x, at = 0);
 b = diff(abs(x), x);
-c = diff(floor(x), x);
-print("asin'(0):", a, "  abs':", b, "  floor':", c);
+d_floor = diff(floor(x), x);
+print("asin'(0):", a, "  abs':", b, "  floor':", d_floor);
 
 # 2. Chain comparison WITH INLINE ASSIGNMENT: 0 < x = 10 < 20
 #    (assigns x=10 AND verifies range in one expression)
