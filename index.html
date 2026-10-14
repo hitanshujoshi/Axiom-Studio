@@ -204,7 +204,7 @@
     .explorer-row.is-dragging { opacity: .45; }
     .explorer-row svg { width: 14px; height: 14px; flex: 0 0 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
     .explorer-row-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-    .explorer-row.is-dirty .explorer-row-name::after { content: " •"; color: var(--accent); }
+    .explorer-row.is-dirty .explorer-row-name::after { content: " *"; color: var(--accent); }
     #explorer-context-menu { position: fixed; z-index: 12000; min-width: 176px; padding: 4px; border: 1px solid var(--border); background: var(--bg-sidebar); box-shadow: 0 8px 24px rgba(0, 0, 0, .42); }
     #explorer-context-menu[hidden] { display: none; }
     #explorer-context-menu button { width: 100%; min-height: 30px; padding: 5px 9px; border: 0; background: transparent; color: var(--text-main); font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
@@ -245,7 +245,7 @@
       color: var(--text-main);
       border-top: 2px solid var(--accent);
     }
-    .file-tab.is-dirty .file-tab-name::after { content: " •"; color: var(--accent); }
+    .file-tab.is-dirty .file-tab-select::after { content: " *"; color: var(--accent); }
     .file-tab-select {
       min-width: 0;
       flex: 1;
@@ -273,6 +273,7 @@
     }
     .file-tab-close:hover, .new-tab-button:hover { background: var(--border); color: var(--text-main); }
     .new-tab-button { font-size: 18px; }
+    .workspace-save-status { flex: 0 0 auto; align-self: center; margin: 0 8px; color: var(--text-muted); font-size: 10px; white-space: nowrap; }
     .symbol-bar {
       background: var(--bg-sidebar);
       padding: 4px 10px;
@@ -596,6 +597,63 @@
     #fullscreen-modal.active { display: flex; }
     .modal-grid { flex: 1; display: grid; grid-template-rows: 1fr 1fr; gap: 12px; margin-top: 10px; }
     .modal-box { background: #101216; border: 1px solid var(--border); border-radius: 6px; padding: 8px; position: relative; }
+    .badge-count { display: inline-flex; min-width: 18px; height: 16px; padding: 0 5px; justify-content: center; align-items: center; border-radius: 8px; background: var(--accent); color: #0e1114; font-size: 10px; font-weight: 800; }
+    .btn-status-info { background: #2c4d6b; border-color: #2c4d6b; color: #cfe8ff; }
+    .btn-status-info:hover { background: #345a7d; border-color: #406e98; }
+    #plot-windows-layer { position: fixed; inset: 0; pointer-events: none; z-index: 450; }
+    #plot-windows-layer .plot-window { pointer-events: auto; }
+    body.plot-windows-hidden #plot-windows-layer { visibility: hidden; opacity: 0; }
+    .plot-window {
+      position: absolute;
+      min-width: 220px; min-height: 160px;
+      width: 440px; height: 280px;
+      background: var(--bg-sidebar);
+      border: 1px solid #2d343c;
+      border-radius: 6px;
+      box-shadow: 0 18px 44px rgba(0,0,0,0.46), 0 2px 4px rgba(0,0,0,0.35);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .plot-window.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 20px 54px rgba(64, 122, 172, 0.35), 0 2px 4px rgba(0,0,0,0.35); }
+    .plot-window.minimized { height: 33px !important; min-height: 33px; }
+    .plot-window.collapsed .plot-window-body { display: none; }
+    .plot-window.maximized { position: fixed; inset: 8px !important; width: auto !important; height: auto !important; min-width: 0; min-height: 0; z-index: 900 !important; }
+    .plot-window.maximized .plot-window-resize { display: none; }
+    .plot-window-header {
+      height: 30px;
+      padding: 0 4px 0 10px;
+      display: flex; align-items: center; justify-content: space-between;
+      background: linear-gradient(180deg, #2a3038, #23282e);
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: #d7dde5;
+      cursor: grab;
+      user-select: none;
+    }
+    .plot-window-header:active { cursor: grabbing; }
+    .plot-window-title { font-weight: 700; letter-spacing: 0.02em; color: var(--accent); }
+    .plot-window-controls { display: flex; gap: 2px; align-items: center; }
+    .pw-btn {
+      min-width: 24px; width: 24px; height: 22px; padding: 0 3px; border: 0; background: transparent; color: #9ca3ad;
+      border-radius: 3px; cursor: pointer; font-size: 10px; line-height: 1;
+    }
+    .pw-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .pw-minimize:hover { color: #8ad2ff; }
+    .pw-toggle:hover { color: #c7f5b5; }
+    .pw-close:hover { color: #ff928f; }
+    .plot-window-body {
+      flex: 1 1 auto; position: relative; background: var(--bg-panel); padding: 4px;
+    }
+    .plot-window-body > canvas { position: absolute; inset: 4px; }
+    .plot-window-resize {
+      position: absolute; right: 0; bottom: 0; width: 16px; height: 16px;
+      cursor: nwse-resize;
+      background: linear-gradient(135deg, transparent 50%, var(--accent) 50%);
+      opacity: 0.5;
+    }
+    .plot-window-resize:hover { opacity: 1; }
+    body.pw-dragging, body.pw-dragging * { user-select: none !important; cursor: grabbing !important; }
+    body.pw-resizing, body.pw-resizing * { user-select: none !important; cursor: nwse-resize !important; }
     #signals-dock[hidden] { display: none; }
     .signals-collapsed #signals-dock { display: none; }
     .signals-collapsed #editor-container { border-right: 0; }
@@ -741,16 +799,17 @@
 
   <header class="app-header">
     <div class="header-left">
-      <div class="logo"><span>⚡</span> Axiom Studio</div>
+      <div class="logo"><svg class="icon-svg logo-mark" aria-hidden="true" viewBox="0 0 24 24"><path d="M13 2 5 13h6l-1 9 9-12h-6z"/></svg> Axiom Studio</div>
       <div class="file-actions" aria-label="File actions">
         <button class="btn icon-btn" id="explorer-toggle" type="button" aria-label="Toggle file explorer" title="Toggle file explorer"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16M13 8h5M13 12h5M13 16h5"/></svg></button>
-        <button class="btn" id="new-file" title="New file">＋<span class="action-label"> New</span></button>
-        <button class="btn" id="open-file" title="Open file">↥<span class="action-label"> Open</span></button>
-        <button class="btn" id="find-file" title="Find in editor (Ctrl+F)">⌕<span class="action-label"> Find</span></button>
-        <button class="btn" id="rename-file" title="Rename file">✎<span class="action-label"> Rename</span></button>
-        <button class="btn" onclick="saveFile()" aria-label="Save file" title="Save file"><span aria-hidden="true">↓</span><span class="btn-save-label"> Save</span></button>
+        <button class="btn" id="new-file" title="New file"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span class="action-label"> New</span></button>
+        <button class="btn" id="open-file" title="Open file"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h7l2 2h9v11H3zM3 10h18"/></svg><span class="action-label"> Open</span></button>
+        <button class="btn" id="find-file" title="Find in editor (Ctrl+F)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg><span class="action-label"> Find</span></button>
+        <button class="btn" id="rename-file" title="Rename file"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m4 16.5-.8 4.3 4.3-.8L20 7.5 16.5 4zM14.8 5.7l3.5 3.5"/></svg><span class="action-label"> Rename</span></button>
+        <button class="btn" id="save-file-button" onclick="saveFile()" aria-label="Save file" title="Save to the same file after the first save"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 3h13l3 3v15H4zM8 3v6h8V3M8 21v-8h8v8"/></svg><span class="btn-save-label"> Save</span></button>
         <button class="btn btn-status-success" onclick="runTestSuite()" aria-label="Run test suite" title="Run validation tests"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5.5 9.2A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.8L14 9V3M8 15h8"/></svg><span class="action-label"> Test</span></button>
         <button class="btn btn-status-danger" onclick="downloadErrorLog()" aria-label="Download error log" title="Download structured error log"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 4H5v17h14V4h-3M9 3h6v4H9zM8 12h8M8 16h8"/></svg><span class="action-label"> Log</span></button>
+        <button class="btn btn-status-info" id="figures-toggle" onclick="PlotWindowManager.toggleAllVisible()" aria-pressed="true" title="Show/hide all floating figure windows"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18v12H3zM2 4h20v16H2zM7 9v6M17 9v6"/></svg><span class="action-label"> Figures</span> <span id="figures-count-badge" class="badge-count">0</span></button>
       </div>
       <input id="file-picker" type="file" accept=".axiom,.txt,.math,text/plain" hidden>
     </div>
@@ -782,7 +841,7 @@
           <div class="setting-row">
             <span class="setting-label">Editor font</span>
             <div class="setting-control">
-              <button class="btn icon-btn" data-font-target="editor" data-font-step="-1" aria-label="Decrease editor font size">A−</button>
+              <button class="btn icon-btn" data-font-target="editor" data-font-step="-1" aria-label="Decrease editor font size">A&#8722;</button>
               <span class="setting-value" id="editor-font-value">14 px</span>
               <button class="btn icon-btn" data-font-target="editor" data-font-step="1" aria-label="Increase editor font size">A+</button>
             </div>
@@ -790,7 +849,7 @@
           <div class="setting-row">
             <span class="setting-label">Terminal font</span>
             <div class="setting-control">
-              <button class="btn icon-btn" data-font-target="terminal" data-font-step="-1" aria-label="Decrease terminal font size">A−</button>
+              <button class="btn icon-btn" data-font-target="terminal" data-font-step="-1" aria-label="Decrease terminal font size">A&#8722;</button>
               <span class="setting-value" id="terminal-font-value">12 px</span>
               <button class="btn icon-btn" data-font-target="terminal" data-font-step="1" aria-label="Increase terminal font size">A+</button>
             </div>
@@ -818,11 +877,14 @@
       <div class="editor-tabs">
         <div class="editor-tab-strip" id="editor-tabs" role="tablist" aria-label="Open files"></div>
         <button type="button" class="new-tab-button" id="new-tab" aria-label="New tab" title="New tab">+</button>
+        <span id="workspace-save-status" class="workspace-save-status" aria-live="polite">Autosaved in this browser</span>
         <span id="active-filename" hidden>workbench.axiom</span>
       </div>
 
       <div class="symbol-bar">
         <button class="sym-btn" onclick="insertText('diff()')">diff()</button>
+        <button class="sym-btn" onclick="insertText('formula()')">formula()</button>
+        <button class="sym-btn" onclick="insertText('|x|')">|x|</button>
         <button class="sym-btn" onclick="insertText('integrate()')">integrate()</button>
         <button class="sym-btn" onclick="insertText('union ')">union</button>
         <button class="sym-btn" onclick="insertText('intersect ')">intersect</button>
@@ -831,8 +893,8 @@
         <button class="sym-btn" onclick="insertText('pi')">pi</button>
         <button class="sym-btn" onclick="insertText('omega')">omega</button>
         <button class="sym-btn" onclick="insertText('tau')">tau</button>
-        <button class="sym-btn" onclick="insertText('<=')">≤</button>
-        <button class="sym-btn" onclick="insertText('>=')">≥</button>
+        <button class="sym-btn" onclick="insertText('<=')">&le;</button>
+        <button class="sym-btn" onclick="insertText('>=')">&ge;</button>
         <button class="sym-btn" onclick="insertText('rect(t)')">rect</button>
         <button class="sym-btn" onclick="insertText('sinc(t)')">sinc</button>
         <button class="sym-btn" onclick="insertText('u(t)')">u(t)</button>
@@ -844,9 +906,9 @@
       <div id="editor-find" hidden>
         <input id="find-input" type="search" placeholder="Find" aria-label="Find in editor">
         <span id="find-count" aria-live="polite"></span>
-        <button class="btn icon-btn" id="find-previous" aria-label="Previous match" title="Previous match">↑</button>
-        <button class="btn icon-btn" id="find-next" aria-label="Next match" title="Next match">↓</button>
-        <button class="btn icon-btn" id="find-close" aria-label="Close find" title="Close find">×</button>
+        <button class="btn icon-btn" id="find-previous" aria-label="Previous match" title="Previous match">&#8593;</button>
+        <button class="btn icon-btn" id="find-next" aria-label="Next match" title="Next match">&#8595;</button>
+        <button class="btn icon-btn" id="find-close" aria-label="Close find" title="Close find">&times;</button>
       </div>
 
       <div class="code-wrapper">
@@ -864,7 +926,7 @@
         </div>
         <div id="console">Ready.</div>
         <form id="terminal-command-form" autocomplete="off">
-          <label for="terminal-command" aria-hidden="true">›</label>
+          <label for="terminal-command" aria-hidden="true">&rsaquo;</label>
           <input id="terminal-command" type="text" spellcheck="false" aria-label="Terminal command" placeholder="Enter an expression or command (CLS clears output)">
         </form>
       </div>
@@ -879,7 +941,7 @@
           <select id="channel-selector" class="channel-dropdown" onchange="renderActiveChannel()">
             <option value="ALL">Show All Traces</option>
           </select>
-          <span>Span ±T:</span>
+          <span>Span &plusmn;T:</span>
           <input type="number" id="time-span-input" class="range-input" value="10" min="1" max="100" onchange="updateTimeSpan()">
           <span style="border-left:1px solid var(--border);margin:0 4px;height:18px;"></span>
           <details class="zoom-controls-menu" id="zoom-controls-menu">
@@ -898,14 +960,14 @@
           </details>
         </div>
         <div class="setting-control" id="signals-toggle-wrap">
-          <button class="btn icon-btn" id="signals-toggle" aria-label="Hide signal panel" aria-pressed="false" title="Hide signal panel">◧</button>
+          <button class="btn icon-btn" id="signals-toggle" aria-label="Hide signal panel" aria-pressed="false" title="Hide signal panel"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 12s3.2-6 9-6 9 6 9 6-3.2 6-9 6-9-6-9-6z"/><circle cx="12" cy="12" r="2.5"/></svg></button>
           <button class="btn btn-primary icon-btn" aria-label="Open fullscreen signal view" title="Open fullscreen signal view" onclick="toggleFullScreen(true)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
         </div>
       </div>
 
       <div class="ruler-readout-bar">
         <span id="cursor-pos">Cursor: Hover over curve for exact trace point</span>
-        <span id="grid-scale-readout">Ruler: 2.5 s/div · Drag to pan · Wheel=X-zoom · Ctrl+Wheel=Y-zoom</span>
+        <span id="grid-scale-readout">Ruler: 2.5 s/div | Drag to pan | Wheel = X zoom | Ctrl+Wheel = Y zoom</span>
       </div>
 
       <div class="mobile-chart-tabs" role="group" aria-label="Signal plot type">
@@ -944,7 +1006,7 @@
           <select id="fs-channel-selector" class="channel-dropdown" onchange="renderActiveChannel()">
             <option value="ALL">Show All Traces</option>
           </select>
-          <span>Span ±T:</span>
+          <span>Span &plusmn;T:</span>
           <input type="number" id="fs-time-span-input" class="range-input" value="10" min="1" max="100" onchange="updateFsTimeSpan()">
           <span style="border-left:1px solid var(--border);margin:0 4px;height:18px;"></span>
           <button class="btn icon-btn" title="Zoom X-axis in" aria-label="Zoom X-axis in" onclick="zoomChartX(1.25)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M10.5 7v7M7 10.5h7M15.5 15.5 21 21"/></svg></button>
@@ -956,7 +1018,7 @@
       </div>
       <div class="ruler-readout-bar" style="border-radius:4px;">
         <span id="fs-cursor-pos">Cursor: Hover over curve for exact trace point</span>
-        <span>Drag chart to pan · Wheel = X-zoom · Ctrl+Wheel = Y-zoom · DblClick = Reset</span>
+        <span>Drag chart to pan | Wheel = X zoom | Ctrl+Wheel = Y zoom | Double-click = Reset</span>
       </div>
     </div>
     <div class="modal-grid">
@@ -969,7 +1031,7 @@
     <section class="reserved-dialog">
       <header class="reserved-dialog-header">
         <strong id="reserved-title">Reserved names</strong>
-        <button type="button" class="btn icon-btn" id="reserved-close" aria-label="Close reserved names">×</button>
+        <button type="button" class="btn icon-btn" id="reserved-close" aria-label="Close reserved names">&times;</button>
       </header>
       <input id="reserved-search" type="search" placeholder="Filter constants, functions, keywords" aria-label="Filter reserved names">
       <div id="reserved-list"></div>
@@ -989,10 +1051,16 @@
        ========================================================================== */
     const DOCS = {
       'diff': {
-        sig: 'diff(expr, target, at = null)',
-        param: 'expr: formula | target: variable or compound (e.g., t or (t^2)/2) | at: point or null',
-        desc: 'Computes analytical derivative. If target is compound, applies Leibniz rule. Fully folds constants.',
+        sig: 'diff(expr, target [, at])',
+        param: 'expr: formula | target: variable or compound (e.g., t or (t^2)/2) | at: optional evaluation point',
+        desc: 'Computes an analytical derivative. With at, evaluates at that point; without at, returns a symbolic function.',
         example: 'diff(x^7 + cos((t^2)/2), (t^2)/2, at = 2)'
+      },
+      'formula': {
+        sig: 'formula(expr)',
+        param: 'expr: expression, symbolic value, or derivative',
+        desc: 'Returns [formula AST, evaluated value]. Supported built-ins expand to their definitions; elementary calls remain structured AST nodes for further processing.',
+        example: 'coefficient = formula(fs(wave(t), t, tau, 1)); print(coefficient[0])'
       },
       'integrate': {
         sig: 'integrate(expr, var, from, to)',
@@ -1030,7 +1098,7 @@
       'log': { sig: 'log(x[, base])', param: 'x: positive real | optional base: positive real, not 1', desc: 'Logarithm; natural when base is omitted.', example: 'log(100, 10)' },
       'log10': { sig: 'log10(x)', param: 'x: positive real', desc: 'Base-10 logarithm.', example: 'log10(100)' },
       'log2': { sig: 'log2(x)', param: 'x: positive real', desc: 'Base-2 logarithm.', example: 'log2(8)' },
-      'abs': { sig: 'abs(x)', param: 'x: real number', desc: 'Absolute value.', example: 'abs(-5)' },
+      'abs': { sig: '|x| or abs(x)', param: 'x: real or complex value', desc: 'Absolute value (modulus) returns a non-negative magnitude. In assignment form, |x| = a stores the solutions in x as an array: [-a, a] when a > 0, [0] when a = 0, and [] when a < 0.', example: '|x| = 5; print(x[0], x[1]); # -5, 5' },
       'sqrt': { sig: 'sqrt(x)', param: 'x: positive real', desc: 'Square root of a number.', example: 'sqrt(4)' },
       'cbrt': { sig: 'cbrt(x)', param: 'x: real number', desc: 'Real cube root.', example: 'cbrt(-8)' },
       'floor': { sig: 'floor(x)', param: 'x: real number', desc: 'Largest integer less than or equal to x.', example: 'floor(2.8)' },
@@ -1091,9 +1159,9 @@
       'let': { sig: 'let name = expression', param: 'new mutable variable', desc: 'Declares and assigns a variable.', example: 'let total = 0;' },
       'print': { sig: 'print(value, ...)', param: 'zero or more values', desc: 'Writes values to the terminal output.', example: 'print("sum:", 2 + 3);' },
       'in': { sig: 'value in set', param: 'value and finite set', desc: 'Tests whether a value belongs to a set; returns 1 or 0.', example: '2 in {1, 2, 3}' },
-      'belongsto': { sig: 'value belongsto set', param: 'alias for in', desc: 'Tests set membership; the symbol ∈ is also accepted.', example: '2 ∈ {1, 2, 3}' },
-      'forall': { sig: 'forall(variable, finiteSet, condition)', param: 'variable: identifier bound to each set element | condition: expression returning truthy or false', desc: 'Returns 1 when every element satisfies the condition; the symbol ∀ is an alias. Empty finite sets satisfy forall vacuously.', example: 'forall(x, {1, 2, 3}, x > 0)' },
-      '∀': { sig: '∀(variable, finiteSet, condition)', param: 'finite set and a condition evaluated once per element', desc: 'Universal quantifier alias for forall().', example: '∀(x, {1, 2, 3}, 0 < x < 4)' },
+      'belongsto': { sig: 'value belongsto set', param: 'alias for in', desc: 'Tests whether a value belongs to a set. The ASCII word in is an equivalent operator.', example: '2 belongsto {1, 2, 3}' },
+      'forall': { sig: 'forall(variable, finiteSet, condition)', param: 'variable: identifier bound to each set element | condition: expression returning true or false', desc: 'Returns 1 when every element satisfies the condition, otherwise 0. An empty set satisfies forall because there is no counterexample.', example: 'forall(x, {1, 2, 3}, x > 0)' },
+      '\u2200': { sig: 'forall(variable, finiteSet, condition)', param: 'finite set and a condition evaluated once per element', desc: 'Universal quantifier symbol; equivalent to forall().', example: 'forall(x, {1, 2, 3}, 0 < x < 4)' },
       'mod': { sig: 'left mod right', param: 'real operands', desc: 'Returns the remainder after division.', example: '10 mod 3' },
       'null': { sig: 'null', param: 'empty value', desc: 'Represents no value; none is an alias.', example: 'x = null;' },
       'none': { sig: 'none', param: 'empty value', desc: 'Alias for null.', example: 'x = none;' },
@@ -1160,29 +1228,29 @@
       'omega': {
         sig: 'omega',
         param: 'angular frequency constant',
-        desc: 'Angular frequency symbol ω (initialized to default 1.0 or user-assigned).',
+        desc: 'Angular frequency constant, initialized to 1.0 and available for signal expressions.',
         example: 'x = sin(omega * t);'
       },
       'pi': {
         sig: 'pi',
         param: 'mathematical constant',
-        desc: 'Archimedes constant π ≈ 3.1415926535...',
+        desc: 'Circle constant, approximately 3.1415926535.',
         example: 'x = cos(2 * pi * t);'
       },
       'e': {
         sig: 'e',
         param: 'mathematical constant',
-        desc: 'Euler\'s number e ≈ 2.7182818284...',
+        desc: 'Euler\'s number, approximately 2.7182818284; the base of the natural logarithm.',
         example: 'exp(1) == e'
       },
       'phi': {
-        sig: 'phi (φ)',
+        sig: 'phi',
         param: 'mathematical constant',
-        desc: 'Golden ratio φ = (1 + sqrt(5)) / 2.',
+        desc: 'Golden ratio, (1 + sqrt(5)) / 2, approximately 1.61803.',
         example: 'phi^2 == phi + 1'
       },
       'inf': {
-        sig: 'inf (∞)',
+        sig: 'inf (infinity)',
         param: 'positive infinity',
         desc: 'IEEE positive infinity, useful for limits and comparisons.',
         example: 'inf > 1e100'
@@ -1211,7 +1279,7 @@
        2. AUTO-SUGGESTION CATALOG
        ========================================================================== */
     const SUGGESTIONS = [
-      { name: 'diff', type: 'calculus', snippet: 'diff(, t, at = null)' },
+      { name: 'diff', type: 'calculus', snippet: 'diff(, t)' },
       { name: 'integrate', type: 'calculus', snippet: 'integrate(, t, 0, pi)' },
         { name: 'plot', type: 'plot', snippet: 'plot()' },
       { name: 'ft', type: 'transform', snippet: 'ft(, t, omega)' },
@@ -1311,7 +1379,7 @@
       { name: 'or', type: 'operator', snippet: 'or ' },
       { name: 'not', type: 'operator', snippet: 'not ' },
       { name: 'forall', type: 'logic', snippet: 'forall(x, {1, 2, 3}, x > 0)' },
-      { name: '∀', type: 'logic', snippet: '∀(x, {1, 2, 3}, x > 0)' },
+      { name: '\u2200', type: 'logic', snippet: 'forall(x, {1, 2, 3}, x > 0)' },
       { name: 'let', type: 'keyword', snippet: 'let ' },
       { name: 'print', type: 'keyword', snippet: 'print()' },
       { name: 'omega', type: 'constant', snippet: 'omega' },
@@ -1319,43 +1387,281 @@
       { name: 'tau', type: 'constant', snippet: 'tau' },
       { name: 'e', type: 'constant', snippet: 'e' },
       { name: 'phi', type: 'constant', snippet: 'phi' },
-      { name: 'inf', type: 'constant', snippet: 'inf' }
+      { name: 'inf', type: 'constant', snippet: 'inf' },
+      { name: 'fn', type: 'keyword', snippet: 'fn name(x) {\n  \n}' },
+      { name: 'belongsto', type: 'operator', snippet: 'belongsto ' },
+      { name: 'N', type: 'type', snippet: 'N' },
+      { name: 'Z', type: 'type', snippet: 'Z' },
+      { name: 'WHOLE', type: 'type', snippet: 'WHOLE' },
+      { name: 'Q', type: 'type', snippet: 'Q' },
+      { name: 'R', type: 'type', snippet: 'R' },
+      { name: 'REAL', type: 'type', snippet: 'REAL' },
+      { name: 'COMPLEX', type: 'type', snippet: 'COMPLEX' },
+      { name: '+R', type: 'type', snippet: '+R' },
+      { name: '-R', type: 'type', snippet: '-R' },
+      { name: 'NATURAL', type: 'type', snippet: 'NATURAL' },
+      { name: 'INTEGER', type: 'type', snippet: 'INTEGER' },
+      { name: 'RATIONAL', type: 'type', snippet: 'RATIONAL' },
+      { name: 'OPEN', type: 'constant', snippet: 'OPEN' },
+      { name: 'CLOSED', type: 'constant', snippet: 'CLOSED' },
+      { name: 'otherwise', type: 'keyword', snippet: 'otherwise' }
     ];
 
     const RESERVED_NAME_GROUPS = [
       {
         title: 'Immutable constants',
-        names: ['pi', 'tau', 'e', 'phi', 'inf', 'c', 'i']
+        names: ['pi', 'tau', 'e', 'phi', 'inf', 'c', 'i', 'OPEN', 'CLOSED', 'EXCLUSIVE', 'INCLUSIVE', '\u2200', '\u2203', 'FORALL', 'EXISTS']
+      },
+      {
+        title: 'Predefined values',
+        names: ['omega']
       },
       {
         title: 'Built-in functions',
-        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'average', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'count', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'forall', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'mean', 'median', 'min', 'mode', 'percentile', 'plot', 'populationVariance', 'pow', 'pulse', 'quantile', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sampleStandardDeviation', 'sampleStdDev', 'sampleVariance', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'standardDeviation', 'stddev', 'step', 'sum', 'tan', 'tanh', 'tri', 'trunc', 'type', 'u', 'variance']
+        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'average', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'count', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'forall', 'formula', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'mean', 'median', 'min', 'mode', 'percentile', 'plot', 'populationVariance', 'pow', 'pulse', 'quantile', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sampleStandardDeviation', 'sampleStdDev', 'sampleVariance', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'standardDeviation', 'stddev', 'step', 'sum', 'tan', 'tanh', 'tri', 'trunc', 'type', 'u', 'variance']
       },
       {
         title: 'Mathematical types',
-        names: ['+R', '-R', 'COMPLEX', 'N', 'Q', 'R', 'WHOLE', 'Z', '∀']
+        names: ['+R', '-R', 'COMPLEX', 'NATURAL', 'N', 'WHOLE', 'INTEGER', 'Z', 'RATIONAL', 'Q', 'REAL', 'R', '\u2200', 'FORALL']
       },
       {
         title: 'Language keywords and operators',
-        names: ['and', 'belongsto', 'break', 'case', 'class', 'constructor', 'continue', 'default', 'diff', 'else', 'for', 'fn', 'function', 'if', 'in', 'intersect', 'let', 'mod', 'new', 'none', 'not', 'null', 'or', 'otherwise', 'print', 'return', 'switch', 'this', 'union', 'while']
+        names: ['and', 'belongsto', 'break', 'case', 'class', 'constructor', 'continue', 'default', 'diff', 'else', 'false', 'for', 'fn', 'function', 'given', 'if', 'in', 'intersect', 'let', 'mod', 'new', 'none', 'not', 'null', 'or', 'otherwise', 'print', 'return', 'switch', 'this', 'true', 'union', 'while', 'where', 'forall', 'exists']
       }
     ];
-    const MATH_SET_TYPE_NAMES = new Set(['N', 'WHOLE', 'Z', 'Q', 'R', 'COMPLEX']);
+    const RESERVED_HELP = {
+      pi: 'The circle constant, approximately 3.14159. Use it for angles and periodic signals.',
+      tau: 'One full turn in radians, equal to 2*pi (approximately 6.28318).',
+      e: 'Euler\'s number, approximately 2.71828; the base of the natural logarithm.',
+      phi: 'The golden ratio, (1 + sqrt(5))/2, approximately 1.61803.',
+      inf: 'Positive infinity. Use it as an improper integration bound or in limit comparisons.',
+      c: 'The speed of light constant used by the signal tools.',
+      i: 'The imaginary unit, satisfying i^2 = -1.',
+      true: 'Boolean literal representing a condition that is satisfied.',
+      false: 'Boolean literal representing a condition that is not satisfied.',
+      open: 'Boolean interval-bound flag meaning the endpoint is excluded.',
+      closed: 'Boolean interval-bound flag meaning the endpoint is included.',
+      exclusive: 'Alias for OPEN: an interval endpoint is excluded.',
+      inclusive: 'Alias for CLOSED: an interval endpoint is included.',
+      forall: 'Returns 1 when every element of a finite set satisfies the condition; otherwise returns 0.',
+      exists: 'Reserved word associated with existential quantification. The predefined uppercase constant EXISTS currently evaluates to true.',
+      n: 'The natural numbers: positive integers 1, 2, 3, ...',
+      natural: 'The natural numbers: positive integers 1, 2, 3, ...',
+      whole: 'The whole numbers: non-negative integers 0, 1, 2, ...',
+      z: 'The integers: ..., -2, -1, 0, 1, 2, ...',
+      integer: 'Alias for Z, the set of all integers.',
+      q: 'The rational numbers, values expressible as a ratio of integers.',
+      rational: 'Alias for Q, the set of rational numbers.',
+      r: 'The real numbers, including rational and irrational values.',
+      real: 'Alias for R, the set of real numbers.',
+      complex: 'The complex numbers, values of the form a + b*i.',
+      '+r': 'The positive real numbers, values greater than zero.',
+      '-r': 'The negative real numbers, values less than zero.',
+      'class': 'Declares a class with per-instance fields and methods. Use new ClassName(...) to create an instance.',
+      'constructor': 'Initializes a new class instance after its fields are created. Constructor overloads must have distinct argument counts.',
+      'new': 'Creates an instance of a declared class and calls the matching constructor.',
+      'this': 'Refers to the current class instance inside a constructor or method.',
+      'function': 'Declares a named function or, inside a class, an instance method.',
+      'fn': 'Short alias for function; declares a named function.',
+      'if': 'Runs a block only when its condition is true or non-zero.',
+      'else': 'Runs the alternative block when the preceding if condition is false.',
+      'while': 'Repeats a block while its condition remains true or non-zero.',
+      'for': 'Repeats a block using a counter, or visits each value in a range or set.',
+      'switch': 'Selects a case whose value equals the switch expression; default handles unmatched values.',
+      'case': 'Starts one value-matching branch inside a switch statement.',
+      'default': 'Starts the switch branch used when no case value matches.',
+      'return': 'Ends the current function or method and supplies its result.',
+      'break': 'Exits the nearest loop or switch statement.',
+      'continue': 'Skips the rest of the current loop pass and starts the next pass.',
+      'let': 'Declares or assigns a mutable variable.',
+      'print': 'Writes one or more values to the output panel.',
+      'null': 'Represents an empty or absent value. Assigning it to a variable creates a symbolic variable.',
+      'none': 'Alias for null.',
+      'otherwise': 'Fallback condition for the final branch of a piecewise expression.',
+      'and': 'Logical AND. The result is true only when both conditions are true.',
+      'or': 'Logical OR. The result is true when either condition is true.',
+      'not': 'Logical negation; turns a true condition into false and a false condition into true.',
+      'in': 'Tests whether a value is a member of a set or range.',
+      'belongsto': 'Membership operator; tests whether the left value belongs to the set on the right.',
+      'union': 'Combines two finite sets and removes duplicate elements.',
+      'intersect': 'Returns the elements that appear in both finite sets.',
+      'mod': 'Returns the remainder after dividing the left operand by the right operand.',
+      'where': 'Reserved for conditions in mathematical notation. It is not currently parsed as a standalone operator.',
+      'given': 'Reserved for assumptions in mathematical notation. It is not currently parsed as a standalone operator.',
+      'formula': 'Returns [expression AST, evaluated or symbolic value]. Supported built-ins expand to their formula definitions, and index 0 can be reused by symbolic operations.',
+      'integrate': 'Numerically evaluates a definite integral. Infinite bounds require a convergent integral; a unit step over the whole real line diverges.',
+      'diff': 'Differentiates an expression with respect to a variable. Use at = value to evaluate the derivative at a point.',
+      'arg': 'Returns the phase angle of a complex value in radians.',
+      'conj': 'Returns the complex conjugate, changing the sign of the imaginary part.',
+      'real': 'Returns the real component of a complex value.',
+      'imag': 'Returns the imaginary component of a complex value.',
+      'deg': 'Converts an angle from radians to degrees.',
+      'degrees': 'Alias for deg; converts radians to degrees.',
+      'rad': 'Converts an angle from degrees to radians.',
+      'radians': 'Alias for rad; converts degrees to radians.',
+      'acosh': 'Inverse hyperbolic cosine.',
+      'asinh': 'Inverse hyperbolic sine.',
+      'atanh': 'Inverse hyperbolic tangent.',
+      'acot': 'Inverse cotangent; returns an angle in radians.',
+      'acsc': 'Inverse cosecant; returns an angle in radians.',
+      'asec': 'Inverse secant; returns an angle in radians.',
+      'variance': 'Measures population spread as the mean squared distance from the mean.',
+      'samplevariance': 'Measures sample spread using n - 1 in the denominator; requires at least two values.',
+      'stddev': 'Returns the population standard deviation, the square root of population variance.',
+      'samplestddev': 'Returns sample standard deviation using n - 1 in the denominator.',
+      'count': 'Counts the observations in the supplied values, set, or range.',
+      'sum': 'Adds all observations in the supplied values, set, or range.',
+      'mean': 'Returns the arithmetic average of the supplied observations.',
+      'median': 'Returns the middle sorted observation, averaging the two middle values when needed.',
+      'mode': 'Returns the most frequent observation; ties are resolved using the smallest value.',
+      'quantile': 'Returns the linearly interpolated quantile for a probability from 0 to 1.',
+      'percentile': 'Returns the linearly interpolated percentile for a value from 0 to 100.',
+      'range': 'Builds evenly spaced values from the start through the end, including both endpoints.',
+      'type': 'Returns the runtime type name of a value, such as number, formula, function, set, or object.',
+      'delta': 'Models a Dirac impulse. integrate() handles its impulse contribution analytically.',
+      'u': 'Heaviside unit step: 0 for t < 0 and 1 for t >= 0.',
+      'step': 'Alias for u(t), the Heaviside unit step: 0 for t < 0 and 1 for t >= 0.',
+      'heaviside': 'Alias for the Heaviside unit step: 0 below zero and 1 at or above zero.',
+      'ramp': 'Unit ramp: max(t, 0), the integral of the unit step up to an additive constant.',
+      'rect': 'Unit rectangular pulse, equal to 1 for |t| <= 0.5 and 0 elsewhere.',
+      'tri': 'Unit triangular pulse, equal to 1 - |t| for |t| <= 1 and 0 elsewhere.',
+      'sinc': 'Normalized cardinal sine sin(pi*x)/(pi*x), with sinc(0) = 1.',
+      'sawtooth': 'Periodic rising waveform from -1 to 1; an optional period controls its cycle length.',
+      'square': 'Periodic two-level waveform; an optional duty fraction controls the high portion of each cycle.',
+      'pulse': 'Centered rectangular pulse with an optional width.',
+      'signum': 'Returns -1 for negative inputs, 0 for zero, and 1 for positive inputs.',
+      'sgn': 'Alias for sign(x); returns -1, 0, or 1 according to the sign of x.',
+      'ft': 'Computes the continuous Fourier transform using exp(-i*omega*t) as its kernel.',
+      'fouriertransform': 'Alias for FT; computes the continuous Fourier transform.',
+      'fs': 'Computes one complex Fourier-series coefficient over a period.',
+      'fourierseries': 'Alias for FS; computes a complex Fourier-series coefficient.'
+    };
+    RESERVED_NAME_GROUPS.forEach(group => {
+      const groupType = group.title === 'Built-in functions' ? 'function'
+        : group.title === 'Mathematical types' ? 'type'
+        : ['Immutable constants', 'Predefined values'].includes(group.title) ? 'constant' : 'keyword';
+      group.names.forEach(name => {
+        const key = name.toLowerCase();
+        if (DOCS[key]) return;
+        const suggestion = SUGGESTIONS.find(item => item.name.toLowerCase() === key);
+        const description = RESERVED_HELP[key] || (groupType === 'function'
+          ? `${name}() applies the ${name} mathematical operation to its argument${name.endsWith('s') ? 's' : ''}. See the signature for the accepted inputs.`
+          : groupType === 'type'
+            ? `${name} identifies a mathematical set or domain and can be used in membership and type checks.`
+            : groupType === 'constant'
+              ? `${name} is a predefined immutable value supplied by the language.`
+              : `${name} is a language keyword or operator that controls expression evaluation or program flow.`);
+        DOCS[key] = {
+          sig: groupType === 'function' ? (suggestion?.snippet || `${name}(...)`) : (suggestion?.snippet || name),
+          param: groupType === 'function' ? 'See the signature for required and optional arguments.' : `Category: ${group.title}.`,
+          desc: description,
+          example: suggestion?.snippet || name
+        };
+      });
+    });
+    const MATH_TYPE_HELP = {
+      N: 'Positive integers: 1, 2, 3, ...',
+      NATURAL: 'Alias for N, the positive integers.',
+      WHOLE: 'Non-negative integers: 0, 1, 2, ...',
+      Z: 'All integers: ..., -2, -1, 0, 1, 2, ...',
+      INTEGER: 'Alias for Z, the set of all integers.',
+      Q: 'Rational numbers that can be written as a ratio of integers.',
+      RATIONAL: 'Alias for Q, the rational numbers.',
+      R: 'All real numbers, including rational and irrational values.',
+      REAL: 'Alias for R, the set of real numbers.',
+      COMPLEX: 'Complex values of the form a + b*i, including real numbers.'
+    };
+    Object.entries(MATH_TYPE_HELP).forEach(([name, desc]) => {
+      const symbol = ({ N: '\u2115', NATURAL: '\u2115', WHOLE: '\u{1D54E}', Z: '\u2124', INTEGER: '\u2124', Q: '\u211A', RATIONAL: '\u211A', R: '\u211D', REAL: '\u211D', COMPLEX: '\u2102' })[name];
+      DOCS[name] = { sig: `${name} (${symbol})`, param: 'Use with membership tests or as a declared function domain or range.', desc, example: `value in ${name}` };
+    });
+    DOCS.FORALL = { sig: 'FORALL', param: 'immutable boolean constant', desc: 'Boolean value true. Use forall(variable, set, condition) to test a condition across every set element.', example: 'if (FORALL) { print("all true"); }' };
+    DOCS.EXISTS = { sig: 'EXISTS', param: 'immutable boolean constant', desc: 'Boolean value true. The lowercase exists word is reserved for existential-quantifier notation.', example: 'if (EXISTS) { print("at least one"); }' };
+    const MATH_SET_TYPE_NAMES = new Set(['N', 'NATURAL', 'WHOLE', 'Z', 'INTEGER', 'Q', 'RATIONAL', 'R', 'REAL', 'COMPLEX', '+R', '-R']);
+    const SINGLE_LETTER_IMMUTABLES = new Set(['e', 'i', 'c']);
     const RESERVED_NAMES = new Set(RESERVED_NAME_GROUPS
-      .filter(group => !['Mathematical types', 'Immutable constants'].includes(group.title))
+      .filter(group => !['Mathematical types', 'Immutable constants', 'Predefined values'].includes(group.title))
       .flatMap(group => group.names.map(name => name.toLowerCase())));
     const CASE_SENSITIVE_RESERVED_NAMES = new Set([
       ...RESERVED_NAME_GROUPS.filter(group => ['Mathematical types', 'Immutable constants'].includes(group.title)).flatMap(group => group.names),
       'pi', 'tau', 'e', 'phi', 'inf', 'c', 'i'
     ]);
     function isReservedName(name) {
-      return RESERVED_NAMES.has(name.toLowerCase()) || CASE_SENSITIVE_RESERVED_NAMES.has(name);
+      if (typeof name === 'string' && name.length === 1) {
+        const ch = name.charCodeAt(0);
+        const isLower = ch >= 97 && ch <= 122;
+        if (isLower && !SINGLE_LETTER_IMMUTABLES.has(name)) return false;
+      }
+      return RESERVED_NAMES.has(name?.toLowerCase?.()) || CASE_SENSITIVE_RESERVED_NAMES.has(name);
+    }
+
+    class MathSet {
+      constructor(name, checkFn, meta = {}) {
+        this.isMathSetType = true;
+        this.name = name;
+        this.checkFn = checkFn;
+        Object.assign(this, meta);
+      }
+      contains(value) { return !!this.checkFn(value); }
+      toString() {
+        if (this.symbol) return this.symbol;
+        return this.name;
+      }
+    }
+
+    function buildStandardMathSets() {
+      const isFiniteReal = v => typeof v === 'number' && Number.isFinite(v);
+      const isIntegerVal = v => isFiniteReal(v) && Number.isInteger(v);
+      return {
+        'N': new MathSet('N', v => isIntegerVal(v) && v >= 1, { symbol: '\u2115', description: 'Natural numbers (1, 2, 3, ...)' }),
+        'NATURAL': new MathSet('NATURAL', v => isIntegerVal(v) && v >= 1, { symbol: '\u2115', aliasOf: 'N', description: 'Natural numbers (1, 2, 3, ...) [alias for N]' }),
+        'WHOLE': new MathSet('WHOLE', v => isIntegerVal(v) && v >= 0, { symbol: '\u{1D54E}', description: 'Whole numbers (0, 1, 2, ...)' }),
+        'Z': new MathSet('Z', isIntegerVal, { symbol: '\u2124', description: 'Integers ..., -2, -1, 0, 1, 2, ...' }),
+        'INTEGER': new MathSet('INTEGER', isIntegerVal, { symbol: '\u2124', aliasOf: 'Z', description: 'Integers [alias for Z]' }),
+        'Q': new MathSet('Q', isFiniteReal, { symbol: '\u211A', description: 'Rational numbers (expressible as a/b)' }),
+        'RATIONAL': new MathSet('RATIONAL', isFiniteReal, { symbol: '\u211A', aliasOf: 'Q', description: 'Rationals [alias for Q]' }),
+        'R': new MathSet('R', isFiniteReal, { symbol: '\u211D', description: 'Real numbers' }),
+        'REAL': new MathSet('REAL', isFiniteReal, { symbol: '\u211D', aliasOf: 'R', description: 'Reals [alias for R]' }),
+        'COMPLEX': new MathSet('COMPLEX', v => isFiniteReal(v) || (v && typeof v === 'object' && v.real != null && v.imaginary != null), { symbol: '\u2102', description: 'Complex numbers a + b\u00B7i' }),
+        '+R': new MathSet('+R', v => isFiniteReal(v) && v > 0, { symbol: '\u211D\u207A', description: 'Positive reals (0, +\u221E)' }),
+        '-R': new MathSet('-R', v => isFiniteReal(v) && v < 0, { symbol: '\u211D\u207B', description: 'Negative reals (-\u221E, 0)' }),
+        'OPEN': false,
+        'CLOSED': true,
+        'EXCLUSIVE': false,
+        'INCLUSIVE': true,
+        'FORALL': true,
+        '\u2200': true,
+        'EXISTS': true,
+        '\u2203': true
+      };
+    }
+    function valueBelongsToSet(value, setValue) {
+      if (setValue && setValue instanceof MathSet) return setValue.contains(value);
+      if (setValue && setValue.isMathSetType === true && typeof setValue.contains === 'function') return setValue.contains(value);
+      if (Array.isArray(setValue)) {
+        return setValue.some(el => deepEqual(el, value));
+      }
+      if (setValue && setValue.values && typeof setValue.values.includes === 'function') {
+        return setValue.values.includes(value) || setValue.values.some(v => deepEqual(v, value));
+      }
+      if (setValue && typeof setValue.contains === 'function') return !!setValue.contains(value);
+      return false;
+    }
+    function deepEqual(a, b) {
+      if (Object.is(a, b)) return true;
+      if (a && b && typeof a === 'object' && typeof b === 'object') {
+        if (a.real != null && a.imaginary != null && b.real != null && b.imaginary != null) {
+          return a.real === b.real && a.imaginary === b.imaginary;
+        }
+        try { return JSON.stringify(a) === JSON.stringify(b); } catch (e) {}
+      }
+      return false;
     }
     const suggestionCatalog = new Map(SUGGESTIONS.map(item => [item.name.toLowerCase(), item]));
     RESERVED_NAME_GROUPS.forEach(group => {
       const type = group.title === 'Built-in functions'
         ? 'function'
-        : group.title === 'Immutable constants' ? 'constant'
+        : ['Immutable constants', 'Predefined values'].includes(group.title) ? 'constant'
         : group.title === 'Mathematical types' ? 'type' : 'keyword';
       group.names.forEach(name => {
         if (!suggestionCatalog.has(name.toLowerCase())) {
@@ -1448,7 +1754,7 @@
             ctx.stroke();
 
             const unit = pt.isFreq ? 'Hz, Mag' : 's, V';
-                        const text = `${pt.name}: (${pt.x.toFixed(3)}${pt.isFreq ? 'Hz' : 's'}, ${pt.y.toFixed(3)}${pt.isFreq ? '' : 'V'})${pt.snapType ? ` · ${pt.snapType}` : ''}`;
+            const text = `${pt.name}: (${pt.x.toFixed(3)}${pt.isFreq ? 'Hz' : 's'}, ${pt.y.toFixed(3)}${pt.isFreq ? '' : 'V'})${pt.snapType ? ` | ${pt.snapType}` : ''}`;
             ctx.font = 'bold 11px Consolas, monospace';
             const textWidth = ctx.measureText(text).width;
             const badgeW = textWidth + 14;
@@ -1542,7 +1848,7 @@
       ARROW: 'ARROW', ELLIPSIS: 'ELLIPSIS', TRUE: 'TRUE', FALSE: 'FALSE', LBRACKET: '[', RBRACKET: ']',
       IDENTIFIER: 'IDENTIFIER', NUMBER: 'NUMBER', STRING: 'STRING',
       PLUS: '+', MINUS: '-', MUL: '*', DIV: '/', MOD: '%', POW: '^',
-      ASSIGN: '=', COLON: ':', QUESTION: '?', SEMICOLON: ';', COMMA: ',', DOT: '.',
+      ASSIGN: '=', COLON: ':', QUESTION: '?', SEMICOLON: ';', COMMA: ',', DOT: '.', BAR: '|',
       LPAREN: '(', RPAREN: ')', LBRACE: '{', RBRACE: '}',
       EQ: '==', NEQ: '!=', LT: '<', GT: '>', LTE: '<=', GTE: '>=', EOF: 'EOF'
     };
@@ -1571,10 +1877,11 @@
             pushToken({ type: TT.ELLIPSIS, value: '...' });
             continue;
           }
-          if (this.c === '∀') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'forall' }); continue; }
+          if (this.c === '\u2200') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'forall' }); continue; }
+          if (this.c === '\u2203') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: '\u2203' }); continue; }
           if (this.c === '"' || this.c === "'") { pushToken(this.readString()); continue; }
           if (/\d/.test(this.c) || (this.c === '.' && /\d/.test(this.peek() || ''))) { pushToken(this.readNumber()); continue; }
-          if (/[a-zA-Z_πωτℝℤℕδΔΩΦφΠΤℯ]/.test(this.c)) { pushToken(this.readId()); continue; }
+          if (/[a-zA-Z_\u03C0\u03C9\u03C4\u03B4\u0394\u03A9\u03A6\u03C6\u03A0\u03A4\u212F]/.test(this.c)) { pushToken(this.readId()); continue; }
 
           const c = this.c;
           if ((c === '+' || c === '-') && this.peek() === c) {
@@ -1592,18 +1899,18 @@
           if (c === '&' && this.peek() === '&') { this.advance(); this.advance(); pushToken({ type: TT.AND, value: 'and' }); continue; }
           if (c === '|' && this.peek() === '|') { this.advance(); this.advance(); pushToken({ type: TT.OR, value: 'or' }); continue; }
           if (c === '=' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.EQ, value: '==' }); continue; }
-          if (c === '!' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
+          if (c === '\u2260') { this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
           if (c === '!') { this.advance(); pushToken({ type: TT.NOT, value: 'not' }); continue; }
-          if (c === '<' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
-          if (c === '>' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
-          if (c === '≤') { this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
-          if (c === '≥') { this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
-          if (c === '≠') { this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
-          if (c === '∈') { this.advance(); pushToken({ type: TT.BELONGS_TO, value: 'belongsTo' }); continue; }
-          if (c === '×' || c === '·') { this.advance(); pushToken({ type: TT.MUL, value: '*' }); continue; }
-          if (c === '÷') { this.advance(); pushToken({ type: TT.DIV, value: '/' }); continue; }
-          if (c === '−') { this.advance(); pushToken({ type: TT.MINUS, value: '-' }); continue; }
-          if (c === '∞') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'inf' }); continue; }
+          if (c === '\u2264') { this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
+          if (c === '\u2265') { this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
+          if (c === '\u2264') { this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
+          if (c === '\u2265') { this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
+          if (c === '\u2260') { this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
+          if (c === '\u2208') { this.advance(); pushToken({ type: TT.BELONGS_TO, value: 'belongsTo' }); continue; }
+          if (c === '\u00D7' || c === '\u00B7') { this.advance(); pushToken({ type: TT.MUL, value: '*' }); continue; }
+          if (c === '\u00F7') { this.advance(); pushToken({ type: TT.DIV, value: '/' }); continue; }
+          if (c === '\u2212') { this.advance(); pushToken({ type: TT.MINUS, value: '-' }); continue; }
+          if (c === '\u221E') { this.advance(); pushToken({ type: TT.IDENTIFIER, value: 'inf' }); continue; }
           if (c === '*' && this.peek() === '*') { this.advance(); this.advance(); pushToken({ type: TT.POW, value: '^' }); continue; }
 
           const singles = {
@@ -1611,7 +1918,7 @@
             '=': TT.ASSIGN, ':': TT.COLON, '?': TT.QUESTION, ';': TT.SEMICOLON, ',': TT.COMMA, '.': TT.DOT,
             '[': TT.LBRACKET, ']': TT.RBRACKET,
             '(': TT.LPAREN, ')': TT.RPAREN, '{': TT.LBRACE, '}': TT.RBRACE,
-            '<': TT.LT, '>': TT.GT
+            '<': TT.LT, '>': TT.GT, '|': TT.BAR
           };
           if (singles[c]) {
             pushToken({ type: singles[c], value: c });
@@ -1649,12 +1956,12 @@
       }
       readId() {
         let r = '';
-        while (this.c !== null && /[a-zA-Z0-9_πωτℝℤℕδΔΩΦφΠΤℯ]/.test(this.c)) { r += this.c; this.advance(); }
-        if (['π', 'Π'].includes(r)) return { type: TT.IDENTIFIER, value: 'pi' };
-        if (['ω', 'Ω'].includes(r)) return { type: TT.IDENTIFIER, value: 'omega' };
-        if (['τ', 'Τ'].includes(r)) return { type: TT.IDENTIFIER, value: 'tau' };
-        if (['φ', 'Φ'].includes(r)) return { type: TT.IDENTIFIER, value: 'phi' };
-        if (r === 'ℯ') return { type: TT.IDENTIFIER, value: 'e' };
+        while (this.c !== null && /[a-zA-Z0-9_\u03C0\u03C9\u03C4\u03B4\u0394\u03A9\u03A6\u03C6\u03A0\u03A4\u212F]/.test(this.c)) { r += this.c; this.advance(); }
+        if (['\u03C0', '\u03A0'].includes(r)) return { type: TT.IDENTIFIER, value: 'pi' };
+        if (['\u03C9', '\u03A9'].includes(r)) return { type: TT.IDENTIFIER, value: 'omega' };
+        if (['\u03C4', '\u03A4'].includes(r)) return { type: TT.IDENTIFIER, value: 'tau' };
+        if (['\u03C6', '\u03A6'].includes(r)) return { type: TT.IDENTIFIER, value: 'phi' };
+        if (r === '\u212F') return { type: TT.IDENTIFIER, value: 'e' };
         const lower = r.toLowerCase();
         if (lower === 'null' || lower === 'none') return { type: TT.NULL, value: null };
         if (lower === 'true') return { type: TT.TRUE, value: true };
@@ -1752,7 +2059,15 @@
           const expr = this.parseExpression();
           return { type: 'AssignStatement', name: id, expr };
         }
-        return this.parseExpression();
+        const expression = this.parseExpression();
+        if (this.match(TT.ASSIGN)) {
+          const value = this.parseExpression();
+          if (expression.type === 'AbsoluteValueExpression' && expression.expression.type === 'Variable') {
+            return { type: 'AbsoluteValueAssignment', name: expression.expression.name, value };
+          }
+          throw new Error('Assignment target must be a variable; |variable| = value solves for both signed values');
+        }
+        return expression;
       }
       parseTypedFunctionDeclaration() {
         const name = this.expect(TT.IDENTIFIER, 'typed function requires a name').value;
@@ -2057,6 +2372,12 @@
       }
       parsePrimary() {
         const tok = this.peek();
+        if (tok.type === TT.BAR) {
+          this.advance();
+          const expression = this.parseExpression();
+          this.expect(TT.BAR, 'Expected closing | after absolute-value expression');
+          return this.parsePostfix({ type: 'AbsoluteValueExpression', expression });
+        }
         if (tok.type === TT.NULL) { this.advance(); return { type: 'NullLiteral', value: null }; }
         if (tok.type === TT.TRUE || tok.type === TT.FALSE) { this.advance(); return { type: 'BooleanLiteral', value: tok.type === TT.TRUE }; }
         if (tok.type === TT.NUMBER) { this.advance(); return { type: 'NumberLiteral', value: tok.value }; }
@@ -2146,15 +2467,14 @@
               if (!this.match(TT.COMMA)) throw new Error('range() expects range(start:stop, variable, steps)');
               if (this.peek().type === TT.LBRACE) {
                 const flags = this.parsePrimary();
-                if (flags.type !== 'SetLiteral' || flags.items.length !== 2 ||
-                    flags.items.some(item => item.type !== 'BooleanLiteral')) {
-                  throw new Error('range() interval flags must be {startClosed, endClosed}, for example {true, false}');
+                if (flags.type !== 'SetLiteral' || flags.items.length !== 2) {
+                  throw new Error('range() interval flags must be {startClosed, endClosed}, for example {true, false} or {CLOSED, OPEN}');
                 }
                 this.expect(TT.RPAREN, 'Expected ) after range interval flags');
                 return {
                   type: 'IntervalExpression', start, stop,
-                  includeStart: flags.items[0].value,
-                  includeStop: flags.items[1].value
+                  includeStart: flags.items[0],
+                  includeStop: flags.items[1]
                 };
               }
               const variable = this.advance();
@@ -2193,7 +2513,14 @@
         return this.parseExpression();
       }
       parsePostfix(expression) {
-        while (this.match(TT.DOT)) {
+        while (true) {
+          if (this.match(TT.LBRACKET)) {
+            const index = this.parseExpression();
+            this.expect(TT.RBRACKET, 'Expected ] after index');
+            expression = { type: 'IndexExpression', object: expression, index };
+            continue;
+          }
+          if (!this.match(TT.DOT)) break;
           const name = this.peek().type === TT.PRINT
             ? this.advance().value
             : this.expect(TT.IDENTIFIER, 'Expected a property or method name after .').value;
@@ -2253,6 +2580,7 @@
         if (!a || !b || a.type !== b.type) return false;
         if (a.type === 'NumberLiteral') return Math.abs(a.value - b.value) < 1e-9;
         if (a.type === 'Variable') return a.name === b.name;
+        if (a.type === 'AbsoluteValueExpression') return this.areNodesIdentical(a.expression, b.expression);
         if (a.type === 'FunctionCall') {
           return a.name.toLowerCase() === b.name.toLowerCase() && 
                  a.args.length === b.args.length && 
@@ -2271,6 +2599,8 @@
           switch (node.type) {
             case 'NumberLiteral': return this.num(0);
             case 'Variable': return this.num(node.name === varName ? 1 : 0);
+            case 'AbsoluteValueExpression':
+              return this.bin(this.fn('sign', [node.expression]), '*', this.diff(node.expression, varName));
             case 'UnaryExpression':
               if (node.op === '-') return this.bin(this.num(-1), '*', this.diff(node.operand, varName));
               return this.diff(node.operand, varName);
@@ -2333,6 +2663,7 @@
                   if (expression.type === 'Variable') return expression.name === targetName && expression.name !== boundName;
                   if (expression.type === 'BinaryExpression') return hasFreeVariable(expression.left, targetName, boundName) || hasFreeVariable(expression.right, targetName, boundName);
                   if (expression.type === 'UnaryExpression') return hasFreeVariable(expression.operand, targetName, boundName);
+                  if (expression.type === 'AbsoluteValueExpression') return hasFreeVariable(expression.expression, targetName, boundName);
                   if (expression.type === 'TernaryExpression') return hasFreeVariable(expression.cond, targetName, boundName) || hasFreeVariable(expression.trueBranch, targetName, boundName) || hasFreeVariable(expression.falseBranch, targetName, boundName);
                   if (expression.type === 'FunctionCall') return expression.args.some(argument => hasFreeVariable(argument, targetName, boundName));
                   if (expression.type === 'ChainComparison') return expression.operands.some(operand => hasFreeVariable(operand, targetName, boundName));
@@ -2449,6 +2780,12 @@
           return { type: 'UnaryExpression', op: node.op, operand: op };
         }
 
+        if (node.type === 'AbsoluteValueExpression') {
+          const expression = this.simplify(node.expression);
+          if (expression.type === 'NumberLiteral') return this.num(Math.abs(expression.value));
+          return { type: 'AbsoluteValueExpression', expression };
+        }
+
         if (node.type === 'FunctionCall') {
           return this.fn(node.name, node.args.map(a => this.simplify(a)));
         }
@@ -2519,6 +2856,7 @@
         switch (node.type) {
           case 'NumberLiteral': return Number(node.value.toFixed(4)).toString();
           case 'Variable': return node.name;
+          case 'AbsoluteValueExpression': return `|${this.toPrettyMathString(node.expression, 0)}|`;
           case 'SequenceExpression': {
             const asgnStrs = (node.assignments || []).map(a =>
               `${a.name} = ${this.toPrettyMathString(a.value, 0)}`
@@ -2532,8 +2870,11 @@
             const f = this.toPrettyMathString(node.falseBranch, 0);
             return `(${c} ? ${t} : ${f})`;
           }
-          case 'UnaryExpression': return `-${this.toPrettyMathString(node.operand, 4)}`;
+          case 'UnaryExpression': return node.op === 'not'
+            ? `not ${this.toPrettyMathString(node.operand, 4)}`
+            : `-${this.toPrettyMathString(node.operand, 4)}`;
           case 'FunctionCall': return `${node.name}(${node.args.map(a => this.toPrettyMathString(a, 0)).join(', ')})`;
+          case 'IndexExpression': return `${this.toPrettyMathString(node.object, 4)}[${this.toPrettyMathString(node.index, 0)}]`;
           case 'BinaryExpression': {
             const myPrec = prec[node.op] || 0;
 
@@ -2604,6 +2945,14 @@
       toString() { return this.formula; }
     }
 
+    class FormulaValue {
+      constructor(expression) {
+        this.expression = expression;
+        this.isFormulaValue = true;
+      }
+      toString() { return SymbolicEngine.toPrettyMathString(this.expression); }
+    }
+
     function formatRealNumber(value) {
       if (Object.is(value, -0) || Math.abs(value) < 1e-14) value = 0;
       return Number.isFinite(value) ? Number(value.toPrecision(10)).toString() : String(value);
@@ -2640,11 +2989,19 @@
     }
 
     function isValueInMathType(value, type) {
+      if (type && typeof type.contains === 'function') return !!type.contains(value);
       if (type?.isMathSetType) return isValueInMathSet(value, type.name);
       if (!type?.isMathInterval || typeof value !== 'number' || !Number.isFinite(value)) return false;
       const aboveLower = type.includeLower ? value >= type.lower : value > type.lower;
       const belowUpper = type.includeUpper ? value <= type.upper : value < type.upper;
       return aboveLower && belowUpper;
+    }
+    function testMembership(value, container) {
+      if (Array.isArray(container)) return container.some(el => deepEqual(el, value));
+      if (container && typeof container.contains === 'function') return !!container.contains(value);
+      if (container?.isSet) return isValueInSet(value, container);
+      if (container?.isMathSetType || container?.isMathInterval) return isValueInMathType(value, container);
+      return false;
     }
 
     function isValueInSet(value, set) {
@@ -2656,8 +3013,8 @@
       return index >= 0 && Math.abs(index - Math.round(index)) <= 1e-10 * Math.max(1, Math.abs(index));
     }
 
-    function formatSetValue(value) {
-      const values = Array.from(value.elements).map(item => isComplexNumber(item) ? item.toString() : String(item));
+    function formatSetValue(value, seen = new WeakSet()) {
+      const values = Array.from(value.elements).map(item => formatTerminalValue(item, seen));
       return `{${values.join(', ')}${value.sequence ? `${values.length ? ', ' : ''}...` : ''}}`;
     }
 
@@ -2673,24 +3030,48 @@
     }
 
     function addMathValues(left, right) {
+      if (left?.isFormulaValue || right?.isFormulaValue) {
+        return new FormulaValue(SymbolicEngine.bin(
+          left?.isFormulaValue ? left.expression : SymbolicEngine.num(left), '+',
+          right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)
+        ));
+      }
       if (!isComplexNumber(left) && !isComplexNumber(right)) return left + right;
       const a = asComplex(left), b = asComplex(right);
       return makeComplex(a.real + b.real, a.imaginary + b.imaginary);
     }
 
     function subtractMathValues(left, right) {
+      if (left?.isFormulaValue || right?.isFormulaValue) {
+        return new FormulaValue(SymbolicEngine.bin(
+          left?.isFormulaValue ? left.expression : SymbolicEngine.num(left), '-',
+          right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)
+        ));
+      }
       if (!isComplexNumber(left) && !isComplexNumber(right)) return left - right;
       const a = asComplex(left), b = asComplex(right);
       return makeComplex(a.real - b.real, a.imaginary - b.imaginary);
     }
 
     function multiplyMathValues(left, right) {
+      if (left?.isFormulaValue || right?.isFormulaValue) {
+        return new FormulaValue(SymbolicEngine.bin(
+          left?.isFormulaValue ? left.expression : SymbolicEngine.num(left), '*',
+          right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)
+        ));
+      }
       if (!isComplexNumber(left) && !isComplexNumber(right)) return left * right;
       const a = asComplex(left), b = asComplex(right);
       return makeComplex(a.real * b.real - a.imaginary * b.imaginary, a.real * b.imaginary + a.imaginary * b.real);
     }
 
     function divideMathValues(left, right) {
+      if (left?.isFormulaValue || right?.isFormulaValue) {
+        return new FormulaValue(SymbolicEngine.bin(
+          left?.isFormulaValue ? left.expression : SymbolicEngine.num(left), '/',
+          right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)
+        ));
+      }
       if (!isComplexNumber(left) && !isComplexNumber(right)) return left / right;
       const a = asComplex(left), b = asComplex(right);
       const denominator = b.real * b.real + b.imaginary * b.imaginary;
@@ -2802,7 +3183,8 @@
 
     class Interpreter {
       constructor() {
-        this.env = {
+        const stdSets = buildStandardMathSets();
+        this.env = Object.assign(stdSets, {
           'pi': Math.PI,
           'omega': 1.0,
           'w': 1.0,
@@ -2812,16 +3194,8 @@
           'inf': Infinity,
           'c': 2.99792e8,
           't': 0,
-          'i': new ComplexNumber(0, 1),
-          'N': { isMathSetType: true, name: 'N' },
-          'WHOLE': { isMathSetType: true, name: 'WHOLE' },
-          'Z': { isMathSetType: true, name: 'Z' },
-          'Q': { isMathSetType: true, name: 'Q' },
-          'R': { isMathSetType: true, name: 'R' },
-          'COMPLEX': { isMathSetType: true, name: 'COMPLEX' },
-          '+R': { isMathSetType: true, name: '+R' },
-          '-R': { isMathSetType: true, name: '-R' }
-        };
+          'i': new ComplexNumber(0, 1)
+        });
         this.logs = [];
         this.plots = [];
         this.functions = new Map();
@@ -2859,7 +3233,8 @@
         const upper = requireReal(this.execute(bounds.operands[2]), 'set-builder');
         if (!Number.isFinite(lower) || !Number.isFinite(upper)) throw new Error('Set-builder bounds must be finite');
 
-        const membership = node.conditions.find(condition => condition.type === 'BinaryExpression' && condition.op === 'in' &&
+        const membership = node.conditions.find(condition => condition.type === 'BinaryExpression' &&
+          (condition.op === 'in' || condition.op === 'belongsto') &&
           condition.left.type === 'Variable' && condition.left.name === node.resultName);
         const resultType = membership ? this.execute(membership.right) : null;
         if (!resultType?.isMathSetType || !['N', 'WHOLE', 'Z'].includes(resultType.name)) {
@@ -2921,11 +3296,51 @@
         if (typeof value === 'number') return value !== 0 && !Number.isNaN(value);
         return Boolean(value);
       }
+      evaluateTypeSpec(spec, value) {
+        if (!spec) return true;
+        if (spec.type === 'MathSetType') {
+          const setValue = this.env[spec.name];
+          return valueBelongsToSet(value, setValue);
+        }
+        if (spec.type === 'MathIntervalType') {
+          let l, u;
+          try {
+            const prev = this.env;
+            l = this.execute(spec.lower);
+            u = this.execute(spec.upper);
+          } catch (e) {
+            return false;
+          }
+          const isReal = (v) => typeof v === 'number' || isComplexNumber(v);
+          if (!isReal(value) || !isReal(l) || !isReal(u)) return false;
+          const vn = isComplexNumber(value) ? value.real : value;
+          const ln = isComplexNumber(l) ? (l.real === -Infinity || l.real === Infinity ? l.real : l.real) : l;
+          const un = isComplexNumber(u) ? (u.real === -Infinity || u.real === Infinity ? u.real : u.real) : u;
+          const aboveL = spec.includeLower ? vn >= ln : vn > ln;
+          const belowU = spec.includeUpper ? vn <= un : vn < un;
+          return aboveL && belowU;
+        }
+        return false;
+      }
       callUserFunction(definition, argumentNodes, instance = null) {
         if (argumentNodes.length !== definition.parameters.length) {
           throw new Error(`${definition.name}() expects ${definition.parameters.length} arguments, got ${argumentNodes.length}`);
         }
         const argumentsEvaluated = argumentNodes.map(argument => this.execute(argument));
+        if (definition.isTyped && definition.domain) {
+          for (let idx = 0; idx < argumentsEvaluated.length; idx++) {
+            if (!this.evaluateTypeSpec(definition.domain, argumentsEvaluated[idx])) {
+              const paramName = definition.parameters[idx] || String(idx);
+              const valueStr = typeof argumentsEvaluated[idx] === 'object' && argumentsEvaluated[idx] !== null
+                ? argumentsEvaluated[idx].toString?.() ?? String(argumentsEvaluated[idx])
+                : String(argumentsEvaluated[idx]);
+              const domStr = definition.domain.type === 'MathSetType'
+                ? definition.domain.name
+                : `${definition.domain.includeLower ? '[' : '('}?, ${definition.domain.includeUpper ? ']' : ')'}?`;
+              throw new Error(`Argument ${paramName} = ${valueStr} does not belong to domain ${domStr}`);
+            }
+          }
+        }
         const outerEnv = this.env;
         const outerLoopDepth = this.loopDepth;
         const outerSwitchDepth = this.switchDepth;
@@ -2939,10 +3354,20 @@
           this.env[parameter] = argumentsEvaluated[index];
         });
         try {
-          const result = this.executeBlock(definition.body);
-          if (result instanceof ReturnSignal) return result.value;
-          if (result instanceof BreakSignal || result instanceof ContinueSignal) throw new Error('Loop control escaped a function body');
-          return null;
+          const execResult = this.executeBlock(definition.body);
+          let result = null;
+          if (execResult instanceof ReturnSignal) result = execResult.value;
+          else if (execResult instanceof BreakSignal || execResult instanceof ContinueSignal) throw new Error('Loop control escaped a function body');
+          if (definition.isTyped && definition.range && result !== null && result !== undefined) {
+            if (!this.evaluateTypeSpec(definition.range, result)) {
+              const resStr = typeof result === 'object' && result !== null ? (result.toString?.() ?? String(result)) : String(result);
+              const rngStr = definition.range.type === 'MathSetType'
+                ? definition.range.name
+                : `${definition.range.includeLower ? '[' : '('}?, ${definition.range.includeUpper ? ']' : ')'}?`;
+              throw new Error(`Return value ${resStr} does not belong to codomain ${rngStr}`);
+            }
+          }
+          return result;
         } finally {
           this.env = outerEnv;
           this.loopDepth = outerLoopDepth;
@@ -2956,11 +3381,26 @@
           case 'BooleanLiteral': return node.value;
           case 'NumberLiteral': return node.value;
           case 'StringLiteral': return node.value;
+          case 'AbsoluteValueExpression': {
+            const value = this.execute(node.expression);
+            if (value?.isFormulaValue) return new FormulaValue({ type: 'AbsoluteValueExpression', expression: value.expression });
+            return isComplexNumber(value) ? Math.hypot(value.real, value.imaginary) : Math.abs(value);
+          }
           case 'IntervalExpression': {
             const lower = requireReal(this.execute(node.start), 'range');
             const upper = requireReal(this.execute(node.stop), 'range');
-            if (!Number.isFinite(lower) || !Number.isFinite(upper)) throw new Error('range() interval bounds must be finite');
-            return { isMathInterval: true, lower, upper, includeLower: node.includeStart, includeUpper: node.includeStop };
+            if (lower > upper) throw new Error('range() interval bounds must be ordered (lower <= upper)');
+            const includeStartRaw = typeof node.includeStart === 'boolean'
+              ? node.includeStart
+              : node.includeStart?.type === 'BooleanLiteral'
+                ? node.includeStart.value
+                : this.isTruthy(this.execute(node.includeStart));
+            const includeStopRaw = typeof node.includeStop === 'boolean'
+              ? node.includeStop
+              : node.includeStop?.type === 'BooleanLiteral'
+                ? node.includeStop.value
+                : this.isTruthy(this.execute(node.includeStop));
+            return { isMathInterval: true, lower, upper, includeLower: includeStartRaw, includeUpper: includeStopRaw };
           }
           case 'SetComprehensionExpression': return this.executeSetComprehension(node);
           case 'MathSetType': return { isMathSetType: true, name: node.name };
@@ -2993,8 +3433,24 @@
           case 'AssignStatement': {
             this.assertAssignableName(node.name);
             const val = this.execute(node.expr);
-            this.env[node.name] = val;
+            this.env[node.name] = node.expr.type === 'NullLiteral'
+              ? new FormulaValue(SymbolicEngine.symVar(node.name))
+              : val;
             return val;
+          }
+          case 'AbsoluteValueAssignment': {
+            this.assertAssignableName(node.name);
+            const value = this.execute(node.value);
+            let solutions;
+            if (value?.isFormulaValue) {
+              solutions = [multiplyMathValues(-1, value), value];
+            } else {
+              const target = requireReal(value, '|x| assignment');
+              if (!Number.isFinite(target)) throw new Error('|x| assignment requires a finite value');
+              solutions = target < 0 ? [] : target === 0 ? [0] : [-target, target];
+            }
+            this.env[node.name] = solutions;
+            return solutions;
           }
           case 'UpdateStatement': {
             this.assertAssignableName(node.name);
@@ -3002,12 +3458,51 @@
             this.env[node.name] = currentValue + node.delta;
             return currentValue;
           }
-          case 'FunctionDeclaration': {
+          case 'FunctionDeclaration':
+          case 'TypedFunctionDeclaration': {
+            const isTyped = node.type === 'TypedFunctionDeclaration';
             const normalizedName = node.name.toLowerCase();
             if (isReservedName(node.name)) throw new Error(`Cannot define reserved function '${node.name}'`);
             if (this.functions.has(normalizedName) || this.classes.has(normalizedName) || Object.prototype.hasOwnProperty.call(this.env, node.name) ||
                 Object.prototype.hasOwnProperty.call(this.env, `${node.name}_ast`)) {
               throw new Error(`Cannot redefine '${node.name}'`);
+            }
+            if (isTyped) {
+              const paramNames = new Set();
+              const seenOrdered = [];
+              const visitor = (ast) => {
+                if (!ast || typeof ast !== 'object') return;
+                if (ast.type === 'Variable' && typeof ast.name === 'string') {
+                  if (!paramNames.has(ast.name) && !(ast.name in this.env) && !isReservedName(ast.name)) {
+                    paramNames.add(ast.name);
+                    seenOrdered.push(ast.name);
+                  }
+                }
+                for (const key of Object.keys(ast)) {
+                  if (key === 'parent') continue;
+                  const v = ast[key];
+                  if (Array.isArray(v)) v.forEach(visitor);
+                  else if (v && typeof v === 'object') visitor(v);
+                }
+              };
+              visitor(node.expression);
+              const parameters = seenOrdered.length > 0 ? seenOrdered : ['x'];
+              parameters.forEach(parameter => this.assertAssignableName(parameter));
+              const fnNode = {
+                type: 'FunctionDeclaration',
+                name: node.name,
+                parameters,
+                body: {
+                  type: 'BlockStatement',
+                  body: [{ type: 'ReturnStatement', value: node.expression }]
+                },
+                isTyped: true,
+                domain: node.domain,
+                range: node.range
+              };
+              this.functions.set(normalizedName, fnNode);
+              this.env[`${node.name}_ast`] = node.expression;
+              return null;
             }
             node.parameters.forEach(parameter => this.assertAssignableName(parameter));
             this.functions.set(normalizedName, node);
@@ -3082,6 +3577,16 @@
               throw new Error(`Object '${object.className}' has no field '${node.name}'`);
             }
             return object.fields[node.name];
+          }
+          case 'IndexExpression': {
+            const object = this.execute(node.object);
+            const index = requireReal(this.execute(node.index), 'index');
+            if (!Number.isInteger(index) || index < 0) throw new Error('Array index must be a non-negative integer');
+            if (!Array.isArray(object) || index >= object.length) throw new Error('Index is outside the array bounds');
+            const value = object[index];
+            return value && typeof value === 'object' && value.type
+              ? new FormulaValue(value)
+              : value;
           }
           case 'MemberAssignStatement': {
             const object = this.execute(node.object);
@@ -3179,7 +3684,7 @@
           }
           case 'PrintStatement': {
             const ev = node.args.map(a => this.execute(a));
-            this.logs.push(ev.map(value => isComplexNumber(value) ? value.toString() : value).join(' '));
+            this.logs.push(ev.map(value => formatTerminalValue(value)).join(' '));
             return null;
           }
           case 'TernaryExpression': {
@@ -3206,24 +3711,12 @@
           case 'IntervalExpression': {
             const lower = requireReal(this.execute(node.start), 'range');
             const upper = requireReal(this.execute(node.stop), 'range');
-            if (!Number.isFinite(lower) || !Number.isFinite(upper) || lower > upper) {
-              throw new Error('range() interval bounds must be finite and ordered');
-            }
-            return { isMathInterval: true, lower, upper, includeLower: node.includeStart, includeUpper: node.includeStop };
+            if (lower > upper) throw new Error('range() interval bounds must be ordered (lower <= upper)');
+            const includeStartRaw = typeof node.includeStart === 'boolean' ? node.includeStart : this.isTruthy(this.execute(node.includeStart));
+            const includeStopRaw = typeof node.includeStop === 'boolean' ? node.includeStop : this.isTruthy(this.execute(node.includeStop));
+            return { isMathInterval: true, lower, upper, includeLower: includeStartRaw, includeUpper: includeStopRaw };
           }
           case 'SetComprehensionExpression': return this.executeSetComprehension(node);
-          case 'SequenceSetLiteral': {
-            const values = node.items.map(item => this.execute(item));
-            if (values.some(value => typeof value !== 'number' || !Number.isFinite(value))) {
-              throw new Error('Ellipsis sets require finite real numeric values');
-            }
-            const step = values[1] - values[0];
-            if (step === 0 || values.some((value, index) => index > 0 &&
-                Math.abs((value - values[index - 1]) - step) > 1e-10 * Math.max(1, Math.abs(step)))) {
-              throw new Error('Ellipsis sets must begin with an arithmetic sequence');
-            }
-            return { isSet: true, elements: new Set(values), sequence: { start: values[0], step } };
-          }
           case 'RangeExpression': {
             const start = this.execute(node.start);
             const stop = this.execute(node.stop);
@@ -3263,7 +3756,7 @@
               else if (op === '>=') ok = a >= b;
               else if (op === '==') ok = isComplexNumber(a) || isComplexNumber(b) ? complexEqual(a, b) : a === b;
               else if (op === '!=') ok = isComplexNumber(a) || isComplexNumber(b) ? !complexEqual(a, b) : a !== b;
-              else if (op === 'in') ok = b?.isSet ? isValueInSet(a, b) : isValueInMathType(a, b);
+              else if (op === 'in' || op === 'belongsto') ok = testMembership(a, b);
               if (!ok) return 0.0;
             }
             return 1.0;
@@ -3271,13 +3764,34 @@
           case 'BinaryExpression': {
             if (node.op === 'and') {
               const left = this.execute(node.left);
+              if (left?.isFormulaValue) {
+                const right = this.execute(node.right);
+                return new FormulaValue(SymbolicEngine.bin(left.expression,
+                  'and', right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)));
+              }
               return Boolean(left) ? (Boolean(this.execute(node.right)) ? 1.0 : 0.0) : 0.0;
             }
             if (node.op === 'or') {
               const left = this.execute(node.left);
+              if (left?.isFormulaValue) {
+                const right = this.execute(node.right);
+                return new FormulaValue(SymbolicEngine.bin(left.expression,
+                  'or', right?.isFormulaValue ? right.expression : SymbolicEngine.num(right)));
+              }
               return Boolean(left) ? 1.0 : (Boolean(this.execute(node.right)) ? 1.0 : 0.0);
             }
             const l = this.execute(node.left), r = this.execute(node.right);
+            if ((l?.isFormulaValue || r?.isFormulaValue) && ['<', '<=', '>', '>=', '==', '!='].includes(node.op)) {
+              return new FormulaValue(SymbolicEngine.bin(
+                l?.isFormulaValue ? l.expression : node.left, node.op,
+                r?.isFormulaValue ? r.expression : node.right
+              ));
+            }
+            if ((l?.isFormulaValue || r?.isFormulaValue) && ['+', '-', '*', '/', '^', '%'].includes(node.op)) {
+              const left = l?.isFormulaValue ? l.expression : node.left;
+              const right = r?.isFormulaValue ? r.expression : node.right;
+              return new FormulaValue(SymbolicEngine.bin(left, node.op, right));
+            }
             if ((isComplexNumber(l) || isComplexNumber(r)) && ['<', '<=', '>', '>='].includes(node.op)) {
               throw new Error('Complex numbers cannot be ordered or tested for set membership');
             }
@@ -3287,7 +3801,7 @@
             if (node.op === '>=') return l >= r ? 1.0 : 0.0;
             if (node.op === '==') return (isComplexNumber(l) || isComplexNumber(r) ? complexEqual(l, r) : l === r) ? 1.0 : 0.0;
             if (node.op === '!=') return (isComplexNumber(l) || isComplexNumber(r) ? !complexEqual(l, r) : l !== r) ? 1.0 : 0.0;
-            if (node.op === 'in') return (r?.isSet ? isValueInSet(l, r) : isValueInMathType(l, r)) ? 1.0 : 0.0;
+            if (node.op === 'in' || node.op === 'belongsto') return testMembership(l, r) ? 1.0 : 0.0;
             if (node.op === '+') return addMathValues(l, r);
             if (node.op === '-') return subtractMathValues(l, r);
             if (node.op === '*') return multiplyMathValues(l, r);
@@ -3301,6 +3815,7 @@
           }
           case 'UnaryExpression': {
             const value = this.execute(node.operand);
+            if (value?.isFormulaValue) return new FormulaValue({ type: 'UnaryExpression', op: node.op, operand: value.expression });
             if (node.op === 'not') return Boolean(value) ? 0.0 : 1.0;
             return isComplexNumber(value) ? makeComplex(-value.real, -value.imaginary) : -value;
           }
@@ -3320,19 +3835,188 @@
       executeFunction(name, args) {
         const lower = name.toLowerCase();
         const evaluateWithVariable = (varName, value, callback) => {
-          const hadOwnValue = Object.prototype.hasOwnProperty.call(this.env, varName);
-          const oldValue = this.env[varName];
-          this.env[varName] = value;
+          const outerEnv = this.env;
+          const boundEnv = Object.create(outerEnv);
+          Object.defineProperty(boundEnv, varName, {
+            value,
+            writable: true,
+            enumerable: true,
+            configurable: true
+          });
+          this.env = boundEnv;
           try {
             return callback();
           } finally {
-            if (hadOwnValue) this.env[varName] = oldValue;
-            else delete this.env[varName];
+            this.env = outerEnv;
           }
         };
 
+        if (lower === 'formula') {
+          if (args.length !== 1) throw new Error('formula() expects exactly one argument');
+          let value;
+          try { value = this.execute(args[0]); }
+          catch { value = new FormulaValue(args[0]); }
+          const substituteVariables = (node, substitutions) => {
+            if (!node || typeof node !== 'object') return node;
+            if (Array.isArray(node)) return node.map(child => substituteVariables(child, substitutions));
+            if (node.type === 'Variable' && Object.prototype.hasOwnProperty.call(substitutions, node.name)) {
+              return substitutions[node.name];
+            }
+            const copy = { ...node };
+            Object.entries(node).forEach(([key, child]) => {
+              if (child && typeof child === 'object') copy[key] = substituteVariables(child, substitutions);
+            });
+            return copy;
+          };
+          const formulaExpression = node => {
+            if (!node || typeof node !== 'object') return node;
+            if (Array.isArray(node)) return node.map(formulaExpression);
+            if (node.type === 'FunctionCall') {
+              const lowerName = node.name.toLowerCase();
+              const parameters = node.args.map(formulaExpression);
+              const [x, y] = parameters;
+              const unary = expression => ({ type: 'UnaryExpression', op: '-', operand: expression });
+              const power = (base, exponent) => SymbolicEngine.bin(base, '^', exponent);
+              const call = (functionName, callArgs) => SymbolicEngine.fn(functionName, callArgs);
+
+              if (lowerName === 'diff' && node.args.length >= 2) {
+                const target = node.args[1];
+                const variableName = target.type === 'Variable' ? target.name : 't';
+                return SymbolicEngine.simplify(SymbolicEngine.diff(node.args[0], variableName));
+              }
+              if (lowerName === 'ft' || lowerName === 'fouriertransform') {
+                const [signal, variable, frequency, suppliedStart, suppliedEnd] = parameters;
+                if (!variable || variable.type !== 'Variable' || !frequency) return { ...node, args: parameters };
+                const start = suppliedStart || unary(SymbolicEngine.symVar('inf'));
+                const end = suppliedEnd || SymbolicEngine.symVar('inf');
+                const exponent = unary(SymbolicEngine.bin(SymbolicEngine.bin(SymbolicEngine.symVar('i'), '*', frequency), '*', variable));
+                return call('integrate', [SymbolicEngine.bin(signal, '*', call('exp', [exponent])), variable, start, end]);
+              }
+              if (lowerName === 'fs' || lowerName === 'fourierseries') {
+                const [signal, variable, period, harmonic, suppliedStart] = parameters;
+                if (!variable || variable.type !== 'Variable' || !period || !harmonic) return { ...node, args: parameters };
+                const start = suppliedStart || SymbolicEngine.num(0);
+                const angularFrequency = SymbolicEngine.bin(
+                  SymbolicEngine.bin(SymbolicEngine.bin(SymbolicEngine.num(2), '*', SymbolicEngine.symVar('pi')), '*', harmonic),
+                  '/', period
+                );
+                const exponent = unary(SymbolicEngine.bin(SymbolicEngine.bin(SymbolicEngine.symVar('i'), '*', angularFrequency), '*', variable));
+                const integral = call('integrate', [SymbolicEngine.bin(signal, '*', call('exp', [exponent])), variable, start, SymbolicEngine.bin(start, '+', period)]);
+                return SymbolicEngine.simplify(SymbolicEngine.bin(integral, '/', period));
+              }
+
+              const assignedSignal = this.env[`${node.name}_ast`];
+              if (assignedSignal && parameters.length === 1) return formulaExpression(substituteVariables(assignedSignal, { t: parameters[0] }));
+              const symbolicFunction = this.env[node.name];
+              if (symbolicFunction instanceof SymbolicFunction && parameters.length === 1) {
+                return formulaExpression(substituteVariables(symbolicFunction.expression, { [symbolicFunction.variableName]: parameters[0] }));
+              }
+              const userFunction = this.functions.get(lowerName);
+              const returnStatement = userFunction?.body?.body?.length === 1 ? userFunction.body.body[0] : null;
+              if (returnStatement?.type === 'ReturnStatement' && parameters.length === userFunction.parameters.length) {
+                const substitutions = Object.fromEntries(userFunction.parameters.map((parameter, index) => [parameter, parameters[index]]));
+                return formulaExpression(substituteVariables(returnStatement.value, substitutions));
+              }
+
+              if (lowerName === 'abs' && x) return { type: 'AbsoluteValueExpression', expression: x };
+              if (lowerName === 'exp' && x) return power(SymbolicEngine.symVar('e'), x);
+              if (lowerName === 'sqrt' && x) return power(x, SymbolicEngine.num(0.5));
+              if (lowerName === 'cbrt' && x) return power(x, SymbolicEngine.num(1 / 3));
+              if (lowerName === 'pow' && x && y) return power(x, y);
+              if (lowerName === 'log10' && x) return SymbolicEngine.bin(call('ln', [x]), '/', call('ln', [SymbolicEngine.num(10)]));
+              if (lowerName === 'log2' && x) return SymbolicEngine.bin(call('ln', [x]), '/', call('ln', [SymbolicEngine.num(2)]));
+              if (lowerName === 'log' && x) return y ? SymbolicEngine.bin(call('ln', [x]), '/', call('ln', [y])) : call('ln', [x]);
+              if (lowerName === 'degrees' || lowerName === 'deg') return SymbolicEngine.bin(x, '*', SymbolicEngine.bin(SymbolicEngine.num(180), '/', SymbolicEngine.symVar('pi')));
+              if (lowerName === 'radians' || lowerName === 'rad') return SymbolicEngine.bin(SymbolicEngine.bin(x, '*', SymbolicEngine.symVar('pi')), '/', SymbolicEngine.num(180));
+              if (lowerName === 'average') return call('mean', parameters);
+              if (lowerName === 'populationvariance') return call('variance', parameters);
+              if (lowerName === 'standarddeviation' || lowerName === 'stddev') return call('sqrt', [call('variance', parameters)]);
+              if (lowerName === 'samplestddev' || lowerName === 'samplestandarddeviation') return call('sqrt', [call('sampleVariance', parameters)]);
+              if (lowerName === 'heaviside' || lowerName === 'step') return call('u', parameters);
+              if (lowerName === 'sgn' || lowerName === 'signum') return call('sign', parameters);
+              if (lowerName === 'sinc' && x) {
+                const scaled = SymbolicEngine.bin(SymbolicEngine.symVar('pi'), '*', x);
+                return SymbolicEngine.bin(call('sin', [scaled]), '/', scaled);
+              }
+              if (lowerName === 'ramp' && x) return call('max', [x, SymbolicEngine.num(0)]);
+              if (lowerName === 'tri' && x) return call('max', [SymbolicEngine.bin(SymbolicEngine.num(1), '-', call('abs', [x])), SymbolicEngine.num(0)]);
+              if (lowerName === 'pulse' && x) return call('rect', [SymbolicEngine.bin(x, '/', y || SymbolicEngine.num(1))]);
+              if (lowerName === 'u' && x) return {
+                type: 'TernaryExpression',
+                cond: SymbolicEngine.bin(x, '>=', SymbolicEngine.num(0)),
+                trueBranch: SymbolicEngine.num(1),
+                falseBranch: SymbolicEngine.num(0)
+              };
+              if (lowerName === 'rect' && x) return {
+                type: 'TernaryExpression',
+                cond: SymbolicEngine.bin(call('abs', [x]), '<=', SymbolicEngine.num(0.5)),
+                trueBranch: SymbolicEngine.num(1),
+                falseBranch: SymbolicEngine.num(0)
+              };
+              if (lowerName === 'sawtooth' && x) {
+                const period = y || SymbolicEngine.bin(SymbolicEngine.num(2), '*', SymbolicEngine.symVar('pi'));
+                const phase = SymbolicEngine.bin(
+                  SymbolicEngine.bin(
+                    SymbolicEngine.bin(SymbolicEngine.bin(x, '/', period), '%', SymbolicEngine.num(1)),
+                    '+',
+                    SymbolicEngine.num(1)
+                  ),
+                  '%',
+                  SymbolicEngine.num(1)
+                );
+                return SymbolicEngine.bin(SymbolicEngine.bin(SymbolicEngine.num(2), '*', phase), '-', SymbolicEngine.num(1));
+              }
+              if (lowerName === 'square' && x) {
+                const duty = y || SymbolicEngine.num(0.5);
+                const phase = SymbolicEngine.bin(
+                  SymbolicEngine.bin(
+                    SymbolicEngine.bin(SymbolicEngine.bin(x, '/', SymbolicEngine.bin(SymbolicEngine.num(2), '*', SymbolicEngine.symVar('pi'))), '%', SymbolicEngine.num(1)),
+                    '+',
+                    SymbolicEngine.num(1)
+                  ),
+                  '%',
+                  SymbolicEngine.num(1)
+                );
+                return {
+                  type: 'TernaryExpression',
+                  cond: SymbolicEngine.bin(phase, '<', duty),
+                  trueBranch: SymbolicEngine.num(1),
+                  falseBranch: SymbolicEngine.num(-1)
+                };
+              }
+              if (lowerName === 'clamp' && parameters.length === 3) return call('min', [call('max', [x, y]), parameters[2]]);
+              if (lowerName === 'hypot' && parameters.length) {
+                const sumOfSquares = parameters.map(value => power(value, SymbolicEngine.num(2)))
+                  .reduce((sum, value) => sum ? SymbolicEngine.bin(sum, '+', value) : value, null);
+                return call('sqrt', [sumOfSquares]);
+              }
+              return { ...node, args: parameters };
+            }
+            if (node.type === 'AbsoluteValueExpression') return { ...node, expression: formulaExpression(node.expression) };
+            if (node.type === 'BinaryExpression') return { ...node, left: formulaExpression(node.left), right: formulaExpression(node.right) };
+            if (node.type === 'UnaryExpression') return { ...node, operand: formulaExpression(node.operand) };
+            if (node.type === 'TernaryExpression') return { ...node, cond: formulaExpression(node.cond), trueBranch: formulaExpression(node.trueBranch), falseBranch: formulaExpression(node.falseBranch) };
+            return node;
+          };
+          const rawExpression = value instanceof SymbolicFunction
+            ? value.expression
+            : value?.isFormulaValue
+              ? value.expression
+              : args[0];
+          let expression = formulaExpression(rawExpression);
+          expression = SymbolicEngine.simplify(expression);
+          return [expression, value];
+        }
+
         const userFunction = this.functions.get(lower);
-        if (userFunction) return this.callUserFunction(userFunction, args);
+        if (userFunction) {
+          const values = args.map(argument => this.execute(argument));
+          if (values.some(value => value?.isFormulaValue)) {
+            return new FormulaValue({ type: 'FunctionCall', name, args: values.map(value =>
+              value?.isFormulaValue ? value.expression : SymbolicEngine.num(value)) });
+          }
+          return this.callUserFunction(userFunction, values);
+        }
 
         if (lower === 'plot') {
           const positionalArgs = args.filter(argument => !argument.argName);
@@ -3385,6 +4069,21 @@
           return null;
         }
 
+        if (lower === 'forall') {
+          if (args.length !== 3) throw new Error('forall() expects a variable, a finite set or range, and a condition');
+          if (args[0]?.type !== 'Variable') throw new Error('forall() first argument must be a variable name');
+          const collection = this.execute(args[1]);
+          const values = collection?.isSet
+            ? Array.from(collection.elements)
+            : Array.isArray(collection) ? collection : null;
+          if (!values) throw new Error('forall() expects a finite set or range as its second argument');
+          for (const value of values) {
+            const condition = evaluateWithVariable(args[0].name, value, () => this.execute(args[2]));
+            if (!this.isTruthy(condition)) return 0.0;
+          }
+          return 1.0;
+        }
+
         if (lower === 'type') {
           if (args.length !== 1) throw new Error('type() expects exactly one argument');
           const value = this.execute(args[0]);
@@ -3393,6 +4092,7 @@
           if (value?.isSet) return 'set';
           if (value?.isAxiomObject) return value.className || 'object';
           if (value instanceof SymbolicFunction) return 'function';
+          if (value?.isFormulaValue) return 'formula';
           if (Array.isArray(value)) return Object.prototype.hasOwnProperty.call(value, 'variable') ? 'range' : 'array';
           return typeof value;
         }
@@ -3574,11 +4274,21 @@
             const steps = 4000;
             const epsilon = 1e-5;
             const magnitude = value => isComplexNumber(value) ? Math.hypot(value.real, value.imaginary) : Math.abs(value);
+            const divergentTails = [];
             const requireDecayingTail = (innerPoint, outerPoint) => {
-              const innerMagnitude = magnitude(evaluateAt(innerPoint));
-              const outerMagnitude = magnitude(evaluateAt(outerPoint));
+              const innerValue = evaluateAt(innerPoint);
+              const outerValue = evaluateAt(outerPoint);
+              const innerMagnitude = magnitude(innerValue);
+              const outerMagnitude = magnitude(outerValue);
               if (!Number.isFinite(innerMagnitude) || !Number.isFinite(outerMagnitude) ||
                   (outerMagnitude > 1e-10 && (innerMagnitude <= 1e-10 || outerMagnitude >= innerMagnitude * 0.85))) {
+                const sameRealTail = typeof innerValue === 'number' && typeof outerValue === 'number' &&
+                  Math.abs(innerValue - outerValue) <= 1e-10 * Math.max(1, Math.abs(innerValue), Math.abs(outerValue)) &&
+                  Math.abs(outerValue) > 1e-10;
+                if (sameRealTail) {
+                  divergentTails.push(Math.sign(outerValue));
+                  return;
+                }
                 throw new Error('integrate() infinite bounds require a decaying integrand; include a signal such as x(t)');
               }
             };
@@ -3589,7 +4299,11 @@
               return simpson(sample, start, stop, steps);
             };
 
-            if (lower === -Infinity && upper === Infinity) {
+            if (divergentTails.length) {
+              result = divergentTails.every(sign => sign === divergentTails[0])
+                ? (divergentTails[0] > 0 ? Infinity : -Infinity)
+                : NaN;
+            } else if (lower === -Infinity && upper === Infinity) {
               result = integrateMapped(
                 u => Math.tan(Math.PI * (u - 0.5)),
                 u => Math.PI / Math.pow(Math.cos(Math.PI * (u - 0.5)), 2),
@@ -3628,14 +4342,22 @@
 
           const substituteKnownVars = (node) => {
             if (!node) return node;
-            if (node.type === 'Variable' && node.name !== varName && this.env[node.name + '_ast']) {
-              return this.env[node.name + '_ast'];
+            if (node.type === 'IndexExpression') {
+              const indexed = this.execute(node);
+              if (indexed?.isFormulaValue) return substituteKnownVars(indexed.expression);
+            }
+            if (node.type === 'Variable' && node.name !== varName) {
+              if (this.env[node.name]?.isFormulaValue) return this.env[node.name].expression;
+              if (this.env[node.name + '_ast']) return this.env[node.name + '_ast'];
             }
             if (node.type === 'BinaryExpression') {
               return { ...node, left: substituteKnownVars(node.left), right: substituteKnownVars(node.right) };
             }
             if (node.type === 'UnaryExpression') {
               return { ...node, operand: substituteKnownVars(node.operand) };
+            }
+            if (node.type === 'AbsoluteValueExpression') {
+              return { ...node, expression: substituteKnownVars(node.expression) };
             }
             if (node.type === 'FunctionCall') {
               return { ...node, args: node.args.map(substituteKnownVars) };
@@ -3779,6 +4501,10 @@
         }
 
         const evaluated = args.map(a => this.execute(a));
+        if (evaluated.some(value => value?.isFormulaValue)) {
+          return new FormulaValue({ type: 'FunctionCall', name, args: evaluated.map(value =>
+            value?.isFormulaValue ? value.expression : SymbolicEngine.num(value)) });
+        }
         const x = evaluated[0] ?? 0;
 
         const statisticalFunctions = new Set([
@@ -4230,7 +4956,309 @@
       attachChartInteraction(freqChart, true);
       attachChartInteraction(fsTimeChart, false);
       attachChartInteraction(fsFreqChart, true);
+      PlotWindowManager.attachGlobalHandlers();
     }
+
+    const PlotWindowManager = {
+      windows: new Map(),
+      zBase: 460,
+      zCounter: 460,
+      allHidden: false,
+      _nextOffset: { x: 60, y: 60 },
+
+      attachGlobalHandlers() {
+        window.addEventListener('mousemove', (e) => {
+          if (this.dragState) this._applyDrag(e);
+          if (this.resizeState) this._applyResize(e);
+          if (this.panState) this._applyPan(e);
+        });
+        window.addEventListener('mouseup', () => {
+          this.dragState = null;
+          this.resizeState = null;
+          this.panState = null;
+          document.body.classList.remove('pw-dragging', 'pw-resizing', 'pw-panning');
+        });
+      },
+
+      updateBadge() {
+        const badge = document.getElementById('figures-count-badge');
+        if (badge) badge.textContent = this.windows.size;
+        const btn = document.getElementById('figures-toggle');
+        if (btn) btn.setAttribute('aria-pressed', !this.allHidden);
+      },
+
+      toggleAllVisible() {
+        this.allHidden = !this.allHidden;
+        document.body.classList.toggle('plot-windows-hidden', this.allHidden);
+        this.updateBadge();
+      },
+
+      closeAll() {
+        [...this.windows.keys()].forEach(id => this.close(id));
+      },
+
+      renderPlots(plots) {
+        const seen = new Set();
+        (plots || []).forEach((plot, i) => {
+          const figureKey = String(plot.figure || ('Figure_' + (i + 1)));
+          seen.add(figureKey);
+          this.upsert(figureKey, plot.points);
+        });
+        [...this.windows.keys()].forEach(k => {
+          if (!seen.has(k)) {
+            const w = this.windows.get(k);
+            if (w && w.autoOwned) this.close(k);
+          }
+        });
+        this.updateBadge();
+      },
+
+      upsert(figureName, sortedPoints) {
+        let entry = this.windows.get(figureName);
+        if (!entry) entry = this._createWindow(figureName);
+        entry.points = sortedPoints.slice();
+        this._renderChart(entry);
+        return entry;
+      },
+
+      _buildChartConfig() {
+        return {
+          type: 'scatter',
+          data: { datasets: [] },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true, mode: 'nearest', intersect: false }
+            },
+            scales: {
+              x: { type: 'linear', position: 'bottom', title: { display: true, text: 'X', color: '#7a8390' }, grid: { color: 'rgba(130,140,150,0.12)' }, ticks: { color: '#7a8390', font: { size: 9 } } },
+              y: { title: { display: true, text: 'Y', color: '#7a8390' }, grid: { color: 'rgba(130,140,150,0.12)' }, ticks: { color: '#7a8390', font: { size: 9 } } }
+            }
+          }
+        };
+      },
+
+      _renderChart(entry) {
+        const dataset = {
+          type: 'line',
+          label: 'Figure ' + entry.figure,
+          data: entry.points.map(p => ({ x: p.x, y: p.y })),
+          borderColor: '#61afef',
+          backgroundColor: 'rgba(97,175,239,0.1)',
+          fill: true,
+          tension: 0.15,
+          pointRadius: entry.points.length <= 30 ? 2.2 : 0,
+          pointHoverRadius: 4,
+          borderWidth: 1.5
+        };
+        if (!entry.chart) {
+          entry.chart = new Chart(entry.canvas, this._buildChartConfig());
+        }
+        entry.chart.data.datasets = [dataset];
+        const xs = entry.points.map(point => point.x);
+        const ys = entry.points.map(point => point.y);
+        let xMin = xs.length ? Math.min(...xs) : 0;
+        let xMax = xs.length ? Math.max(...xs) : 1;
+        let yMin = ys.length ? Math.min(...ys) : 0;
+        let yMax = ys.length ? Math.max(...ys) : 1;
+        const xPad = xMax === xMin ? 0.5 : (xMax - xMin) * 0.05;
+        const yPad = yMax === yMin ? Math.max(0.5, Math.abs(yMin) * 0.05) : (yMax - yMin) * 0.1;
+        entry.baseBounds = { xMin: xMin - xPad, xMax: xMax + xPad, yMin: yMin - yPad, yMax: yMax + yPad };
+        const bounds = entry.viewport || entry.baseBounds;
+        entry.chart.options.scales.x.min = bounds.xMin;
+        entry.chart.options.scales.x.max = bounds.xMax;
+        entry.chart.options.scales.y.min = bounds.yMin;
+        entry.chart.options.scales.y.max = bounds.yMax;
+        entry.chart.update('none');
+      },
+
+      _createWindow(figureName) {
+        const layer = document.getElementById('plot-windows-layer');
+        const template = document.getElementById('plot-window-template');
+        const node = template.content.firstElementChild.cloneNode(true);
+        node.setAttribute('data-figure', figureName);
+        node.querySelector('.plot-window-title').textContent = 'Figure ' + figureName;
+        node.style.left = this._nextOffset.x + 'px';
+        node.style.top = this._nextOffset.y + 'px';
+        const vw = Math.max(480, window.innerWidth || 1280);
+        const vh = Math.max(360, window.innerHeight || 800);
+        this._nextOffset.x = (this._nextOffset.x + 32) % Math.max(60, vw - 520);
+        this._nextOffset.y = (this._nextOffset.y + 32) % Math.max(60, vh - 360);
+        layer.appendChild(node);
+        const canvas = node.querySelector('canvas.plot-canvas');
+        const header = node.querySelector('[data-drag-handle]');
+        const resizer = node.querySelector('[data-resize-handle]');
+        const btnMin = node.querySelector('.pw-minimize');
+        const btnToggle = node.querySelector('.pw-toggle');
+        const btnMaximize = node.querySelector('.pw-maximize');
+        const btnClose = node.querySelector('.pw-close');
+        const entry = {
+          id: figureName,
+          figure: figureName,
+          el: node, canvas, chart: null,
+          points: [], minimized: false, collapsed: false, maximized: false, restoreRect: null,
+          viewport: null, baseBounds: null,
+          autoOwned: true
+        };
+        node.style.zIndex = ++this.zCounter;
+        header.addEventListener('mousedown', (e) => {
+          if (e.target.closest('.pw-btn')) return;
+          this._bringToFront(entry);
+          if (entry.minimized) return;
+          const rect = node.getBoundingClientRect();
+          this.dragState = { entry, offX: e.clientX - rect.left, offY: e.clientY - rect.top };
+          document.body.classList.add('pw-dragging');
+          e.preventDefault();
+        });
+        header.addEventListener('dblclick', (e) => {
+          if (e.target.closest('.pw-btn')) return;
+          this.toggleCollapse(entry);
+        });
+        resizer.addEventListener('mousedown', (e) => {
+          this._bringToFront(entry);
+          if (entry.minimized || entry.collapsed) return;
+          const rect = node.getBoundingClientRect();
+          this.resizeState = { entry, offX: rect.right - e.clientX, offY: rect.bottom - e.clientY };
+          document.body.classList.add('pw-resizing');
+          e.preventDefault();
+        });
+        btnMin.addEventListener('click', () => this.toggleMinimize(entry));
+        btnToggle.addEventListener('click', () => this.toggleCollapse(entry));
+        btnMaximize.addEventListener('click', () => this.toggleMaximize(entry));
+        node.querySelector('.pw-zoom-x-in').addEventListener('click', () => this.zoom(entry, 'x', 1.25));
+        node.querySelector('.pw-zoom-x-out').addEventListener('click', () => this.zoom(entry, 'x', 0.8));
+        node.querySelector('.pw-zoom-y-in').addEventListener('click', () => this.zoom(entry, 'y', 1.25));
+        node.querySelector('.pw-zoom-y-out').addEventListener('click', () => this.zoom(entry, 'y', 0.8));
+        node.querySelector('.pw-reset').addEventListener('click', () => this.resetZoom(entry));
+        btnClose.addEventListener('click', () => this.close(figureName));
+        canvas.addEventListener('wheel', event => {
+          event.preventDefault();
+          this.zoom(entry, event.ctrlKey || event.metaKey ? 'y' : 'x', event.deltaY < 0 ? 1.15 : 0.87);
+        }, { passive: false });
+        canvas.addEventListener('mousedown', event => {
+          if (event.button !== 0 || entry.minimized || entry.collapsed) return;
+          this._bringToFront(entry);
+          this.panState = { entry, x: event.clientX, y: event.clientY, bounds: { ...(entry.viewport || entry.baseBounds) } };
+          document.body.classList.add('pw-panning');
+          event.preventDefault();
+        });
+        this.windows.set(figureName, entry);
+        this.updateBadge();
+        return entry;
+      },
+
+      _applyDrag(e) {
+        const { entry, offX, offY } = this.dragState;
+        const layer = document.getElementById('plot-windows-layer');
+        const layerRect = layer.getBoundingClientRect();
+        entry.el.style.left = Math.max(0, Math.min(layerRect.width - 120, e.clientX - layerRect.left - offX)) + 'px';
+        entry.el.style.top = Math.max(0, Math.min(layerRect.height - 40, e.clientY - layerRect.top - offY)) + 'px';
+      },
+
+      _applyResize(e) {
+        const { entry, offX, offY } = this.resizeState;
+        const layer = document.getElementById('plot-windows-layer');
+        const layerRect = layer.getBoundingClientRect();
+        const rect = entry.el.getBoundingClientRect();
+        const newW = Math.max(220, e.clientX - layerRect.left - (rect.left - layerRect.left) + offX);
+        const newH = Math.max(160, e.clientY - layerRect.top - (rect.top - layerRect.top) + offY);
+        entry.el.style.width = Math.round(newW) + 'px';
+        entry.el.style.height = Math.round(newH) + 'px';
+        if (entry.chart) entry.chart.resize();
+      },
+
+      _applyPan(e) {
+        const { entry, x, y, bounds } = this.panState;
+        const rect = entry.canvas.getBoundingClientRect();
+        const xShift = ((e.clientX - x) / Math.max(1, rect.width)) * (bounds.xMax - bounds.xMin);
+        const yShift = ((e.clientY - y) / Math.max(1, rect.height)) * (bounds.yMax - bounds.yMin);
+        entry.viewport = {
+          xMin: bounds.xMin - xShift,
+          xMax: bounds.xMax - xShift,
+          yMin: bounds.yMin + yShift,
+          yMax: bounds.yMax + yShift
+        };
+        this._renderChart(entry);
+      },
+
+      zoom(entry, axis, factor) {
+        if (!entry.baseBounds) return;
+        const bounds = entry.viewport || entry.baseBounds;
+        const minKey = axis === 'x' ? 'xMin' : 'yMin';
+        const maxKey = axis === 'x' ? 'xMax' : 'yMax';
+        const center = (bounds[minKey] + bounds[maxKey]) / 2;
+        const half = (bounds[maxKey] - bounds[minKey]) / (2 * factor);
+        entry.viewport = { ...bounds, [minKey]: center - half, [maxKey]: center + half };
+        this._renderChart(entry);
+      },
+
+      resetZoom(entry) {
+        entry.viewport = null;
+        this._renderChart(entry);
+      },
+
+      toggleMaximize(entry) {
+        if (entry.maximized) {
+          entry.maximized = false;
+          entry.el.classList.remove('maximized');
+          if (entry.restoreRect) {
+            entry.el.style.left = entry.restoreRect.left;
+            entry.el.style.top = entry.restoreRect.top;
+            entry.el.style.width = entry.restoreRect.width;
+            entry.el.style.height = entry.restoreRect.height;
+          }
+          entry.restoreRect = null;
+          entry.el.querySelector('.pw-maximize').title = 'Maximize';
+        } else {
+          const rect = entry.el.getBoundingClientRect();
+          entry.restoreRect = {
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`
+          };
+          entry.maximized = true;
+          entry.el.classList.add('maximized');
+          entry.el.querySelector('.pw-maximize').title = 'Restore window';
+        }
+        this._bringToFront(entry);
+        if (entry.chart) requestAnimationFrame(() => entry.chart.resize());
+      },
+
+      _bringToFront(entry) {
+        [...this.windows.values()].forEach(w => w.el.classList.remove('active'));
+        entry.el.classList.add('active');
+        entry.el.style.zIndex = ++this.zCounter;
+      },
+
+      toggleCollapse(entry) {
+        entry.collapsed = !entry.collapsed;
+        entry.el.classList.toggle('collapsed', entry.collapsed);
+        if (entry.chart) requestAnimationFrame(() => entry.chart.resize());
+      },
+
+      toggleMinimize(entry) {
+        entry.minimized = !entry.minimized;
+        entry.el.classList.toggle('minimized', entry.minimized);
+        if (entry.chart && !entry.minimized) requestAnimationFrame(() => entry.chart.resize());
+      },
+
+      close(figureName) {
+        const entry = this.windows.get(figureName);
+        if (!entry) return;
+        if (entry.chart) entry.chart.destroy();
+        entry.el.remove();
+        this.windows.delete(figureName);
+        this.updateBadge();
+      }
+    };
+
+    window.addEventListener('resize', () => {
+      PlotWindowManager.windows.forEach(w => { if (w.chart && !w.minimized && !w.collapsed) w.chart.resize(); });
+    });
 
     function dependsOnTime(node, assignments = null, visited = new Set(), boundName = null) {
       if (!node) return false;
@@ -4252,6 +5280,7 @@
       }
       if (node.type === 'BinaryExpression') return dependsOnTime(node.left, assignments, visited, boundName) || dependsOnTime(node.right, assignments, visited, boundName);
       if (node.type === 'UnaryExpression') return dependsOnTime(node.operand, assignments, visited, boundName);
+      if (node.type === 'AbsoluteValueExpression') return dependsOnTime(node.expression, assignments, visited, boundName);
       if (node.type === 'TernaryExpression') return dependsOnTime(node.cond, assignments, visited, boundName) || dependsOnTime(node.trueBranch, assignments, visited, boundName) || dependsOnTime(node.falseBranch, assignments, visited, boundName);
       if (node.type === 'ChainComparison') return node.operands.some(op => dependsOnTime(op, assignments, visited, boundName));
       if (node.type === 'SetLiteral') return node.items.some(it => dependsOnTime(it, assignments, visited, boundName));
@@ -4291,13 +5320,51 @@
       renderTerminalOutput();
     }
 
-    function formatTerminalValue(value) {
+    function formatTerminalValue(value, seen = new WeakSet()) {
       if (value === null || value === undefined) return value === null ? 'null' : 'undefined';
       if (isComplexNumber(value)) return value.toString();
-      if (value?.isSet) return `{${Array.from(value.elements).join(', ')}}`;
-      if (Array.isArray(value)) return `[${value.join(', ')}]`;
+      if (value?.isSet) {
+        if (seen.has(value)) return '[Circular]';
+        seen.add(value);
+        const formatted = formatSetValue(value, seen);
+        seen.delete(value);
+        return formatted;
+      }
+      if (value?.isMathSetType) return value.toString?.() || value.symbol || value.name;
+      if (value?.isFormulaValue) return value.toString();
       if (value instanceof SymbolicFunction) return value.toString();
-      if (value?.isAxiomObject) return `<${value.className} instance>`;
+      if (value?.isMathInterval) {
+        const lower = value.includeLower ? '[' : '(';
+        const upper = value.includeUpper ? ']' : ')';
+        return `${lower}${formatTerminalValue(value.lower)}, ${formatTerminalValue(value.upper)}${upper}`;
+      }
+      if (Array.isArray(value)) {
+        if (seen.has(value)) return '[Circular]';
+        seen.add(value);
+        const formatted = `[${value.map(item => formatTerminalValue(item, seen)).join(', ')}]`;
+        seen.delete(value);
+        return formatted;
+      }
+      if (value && typeof value === 'object' && typeof value.type === 'string') {
+        return SymbolicEngine.toPrettyMathString(value);
+      }
+      if (value?.isAxiomObject) {
+        if (seen.has(value)) return '[Circular]';
+        seen.add(value);
+        const fields = Object.entries(value.fields || {}).map(([name, field]) => `${name}: ${formatTerminalValue(field, seen)}`);
+        seen.delete(value);
+        return fields.length ? `${value.className} {${fields.join(', ')}}` : `${value.className} {}`;
+      }
+      if (typeof value === 'object') {
+        if (seen.has(value)) return '[Circular]';
+        seen.add(value);
+        const entries = Object.entries(value);
+        const formatted = entries.length
+          ? `{${entries.map(([key, item]) => `${key}: ${formatTerminalValue(item, seen)}`).join(', ')}}`
+          : '{}';
+        seen.delete(value);
+        return formatted;
+      }
       return String(value);
     }
 
@@ -4475,8 +5542,7 @@
         if (interp.logs.length > 0) out += interp.logs.join('\n') + '\n---\n';
         for (const [k, v] of Object.entries(interp.env)) {
           if (['pi', 'tau', 'e', 'c', 't', 'w', 'omega'].includes(k) || k.endsWith('_ast')) continue;
-          if (v && v.isSet) out += `${k} = {${Array.from(v.elements).join(', ')}} (Set)\n`;
-          else out += `${k} = ${formatTerminalValue(v)}\n`;
+          out += `${k} = ${formatTerminalValue(v)}${v?.isSet ? ' (Set)' : ''}\n`;
         }
         latestEditorOutput = out || "Executed successfully.";
         renderTerminalOutput();
@@ -4570,6 +5636,10 @@
         latestEditorOutput = `Editor error: ${err.message}`;
         renderTerminalOutput();
         consoleBox.style.color = "#f43f5e";
+      } finally {
+        if (version === recomputeVersion) {
+          try { PlotWindowManager.renderPlots(registeredPlots || []); } catch (e) {}
+        }
       }
     }
 
@@ -4577,27 +5647,19 @@
       const dropdown = document.getElementById('channel-selector');
       const fsDropdown = document.getElementById('fs-channel-selector');
       const prevVal = dropdown.value;
-      const figureValues = new Set(registeredPlots.map(plot => `plot:${encodeURIComponent(plot.figure)}`));
 
       const buildOptions = (select) => {
-        select.innerHTML = `<option value="ALL">Show All Traces (${Object.keys(registeredSignals).length + registeredPlots.length})</option>`;
+        select.innerHTML = `<option value="ALL">Show All Traces (${Object.keys(registeredSignals).length})</option>`;
         for (const sigName of Object.keys(registeredSignals)) {
           const opt = document.createElement('option');
           opt.value = sigName;
           opt.innerText = `Trace: ${sigName}(t)`;
           select.appendChild(opt);
         }
-        const figures = [...new Set(registeredPlots.map(plot => plot.figure))];
-        figures.forEach(figure => {
-          const option = document.createElement('option');
-          option.value = `plot:${encodeURIComponent(figure)}`;
-          option.innerText = `Figure ${figure}`;
-          select.appendChild(option);
-        });
       };
 
       buildOptions(dropdown);
-      dropdown.value = registeredSignals[prevVal] || prevVal === 'ALL' || figureValues.has(prevVal) ? prevVal : 'ALL';
+      dropdown.value = registeredSignals[prevVal] || prevVal === 'ALL' ? prevVal : 'ALL';
       if (fsDropdown) {
         buildOptions(fsDropdown);
         fsDropdown.value = dropdown.value;
@@ -4649,10 +5711,9 @@
       const activeSelect = (isFsActive && fsSelect) ? fsSelect : mainSelect;
       if (activeSelect && activeSelect !== mainSelect && mainSelect) mainSelect.value = activeSelect.value;
       const mode = activeSelect ? activeSelect.value : 'ALL';
-      const selectedFigure = mode.startsWith('plot:') ? decodeURIComponent(mode.slice(5)) : null;
       const timeDatasets = [];
       const freqDatasets = [];
-      const keys = mode === 'ALL' ? Object.keys(registeredSignals) : (selectedFigure === null && registeredSignals[mode] ? [mode] : []);
+      const keys = mode === 'ALL' ? Object.keys(registeredSignals) : (registeredSignals[mode] ? [mode] : []);
 
       keys.forEach(key => {
         const sig = registeredSignals[key];
@@ -4681,30 +5742,6 @@
           pointRadius: 0
         });
       });
-
-      const figurePlotCounts = new Map();
-      registeredPlots
-        .filter(plot => selectedFigure === null ? mode === 'ALL' : plot.figure === selectedFigure)
-        .forEach(plot => {
-          const plotNumber = (figurePlotCounts.get(plot.figure) || 0) + 1;
-          figurePlotCounts.set(plot.figure, plotNumber);
-          const figureHash = Array.from(plot.figure).reduce((hash, character) => (hash * 31 + character.charCodeAt(0)) | 0, 7);
-          const color = CHANNEL_COLORS[Math.abs(figureHash) % CHANNEL_COLORS.length];
-          const data = plot.points;
-          timeDatasets.push({
-            type: 'line',
-            label: `Figure ${plot.figure} · Plot ${plotNumber}`,
-            data,
-            snapPoints: data.map(point => ({ ...point, snapType: 'Point' })),
-            borderColor: color.border,
-            backgroundColor: color.bg,
-            borderWidth: 1.8,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            showLine: data.length > 1,
-            fill: false
-          });
-        });
 
       timeChart.data.datasets = timeDatasets;
       applyViewportToChart(timeChart, chartViewports.time, -tSpan, tSpan, timeDatasets);
@@ -5000,7 +6037,7 @@
       while (right < text.length && /[a-zA-Z_]/.test(text[right])) right++;
       const word = text.slice(left, right);
 
-      const doc = DOCS[word.toLowerCase()];
+      const doc = DOCS[word] || DOCS[word.toLowerCase()];
       if (doc) {
         const d = doc;
         hoverDoc.innerHTML = `
@@ -5216,6 +6253,11 @@
     }
 
     ed.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        saveFile();
+        return;
+      }
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
         updateSuggestPopup(true);
@@ -5448,15 +6490,16 @@
       }
       else { m.classList.remove('active'); }
     }
-    function saveFile() {
-      const filename = document.getElementById('active-filename').textContent || 'untitled.axiom';
-      const blob = new Blob([ed.value], { type: 'text/plain' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(a.href);
-      window.axiomMarkSaved?.();
+    async function saveFile() {
+      try {
+        const savedToFile = await window.axiomSaveActiveFile?.(ed.value);
+        if (savedToFile) return;
+        window.axiomMarkSaved?.();
+        appendTerminalOutput('Saved in this browser workspace. This browser does not support saving back to a selected file.');
+      } catch (error) {
+        if (error?.name === 'AbortError') return;
+        appendTerminalOutput(`Could not save file: ${error.message}`);
+      }
     }
     window.addEventListener('keydown', (e) => { if (e.key === 'Escape') toggleFullScreen(false); });
 
@@ -5562,7 +6605,7 @@
           name: `d/dx ${definition.name}(x) at ${input}`,
           code: `r = diff(${definition.name}(x), x, at = ${input});`,
           check: result => assertDerivativeApprox(result.interp.env.r, expected),
-          expect: `≈ ${formatRoundedValue(expected, 4)}`
+          expect: `about ${formatRoundedValue(expected, 4)}`
         };
       }));
     }
@@ -5576,7 +6619,7 @@
 
       const consoleBox = document.getElementById('console');
       consoleBox.style.color = "var(--accent)";
-      consoleBox.innerText = "🧪 Running comprehensive test suite...\n\n";
+      consoleBox.innerText = "Running comprehensive test suite...\n\n";
       let reportLines = [];
 
       const tests = [
@@ -5656,8 +6699,8 @@
         {
           category: "INTEGRATION - Core Features",
           cases: [
-            { id: "int-001", name: "integrate sin from 0 to pi", code: "r = integrate(sin(t), t, 0, pi);", check: (r) => assertApprox(r.interp.env.r, 2), expect: "≈ 2.0" },
-            { id: "int-002", name: "integrate cos from 0 to pi/2", code: "r = integrate(cos(t), t, 0, pi/2);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "≈ 1.0" },
+            { id: "int-001", name: "integrate sin from 0 to pi", code: "r = integrate(sin(t), t, 0, pi);", check: (r) => assertApprox(r.interp.env.r, 2), expect: "about 2.0" },
+            { id: "int-002", name: "integrate cos from 0 to pi/2", code: "r = integrate(cos(t), t, 0, pi/2);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "about 1.0" },
             { id: "int-003", name: "assigned signal AST persists", code: "z = sin(omega*t); x = z(pi);", check: (r) => typeof r.interp.env.x === 'number', expect: "x is a number" },
             { id: "int-004", name: "integrate delta across both simple roots", code: "r = integrate(delta(t^2 - 1), t, -2, 2);", check: (r) => assertApprox(r.interp.env.r, 1), expect: "1 (two roots, each contributes 1/2)" },
             { id: "int-005", name: "integrate a weighted delta impulse", code: "r = integrate((t + 2) * delta(t - 1), t, 0, 2);", check: (r) => assertApprox(r.interp.env.r, 3), expect: "3 (weight evaluated at t = 1)" },
@@ -5737,7 +6780,7 @@
             { id: "std-005", name: "clamp(12, 0, 10) = 10", code: "r = clamp(12, 0, 10);", check: (r) => r.interp.env.r === 10, expect: "10" },
             { id: "std-006", name: "min(3, -1, 2) = -1", code: "r = min(3, -1, 2);", check: (r) => r.interp.env.r === -1, expect: "-1" },
             { id: "std-007", name: "max(3, -1, 2) = 3", code: "r = max(3, -1, 2);", check: (r) => r.interp.env.r === 3, expect: "3" },
-            { id: "std-008", name: "round(pi, 2) ≈ 3.14", code: "r = round(pi, 2);", check: (r) => assertApprox(r.interp.env.r, 3.14), expect: "≈ 3.14" },
+            { id: "std-008", name: "round(pi, 2) about 3.14", code: "r = round(pi, 2);", check: (r) => assertApprox(r.interp.env.r, 3.14), expect: "about 3.14" },
           ]
         },
         {
@@ -5798,7 +6841,7 @@
       ];
 
       for (const group of tests) {
-        reportLines.push(`━━━ ${group.category} ━━━`);
+        reportLines.push("--- " + group.category + " ---");
         for (const tc of group.cases) {
           try {
             let result = null;
@@ -5819,7 +6862,7 @@
               actual = result.interp.env.r ?? result.interp.env.y ?? result.lastResult;
             }
             logTestResult(group.category, tc.id, tc.name, tc.code, passed, actual, tc.expect, null);
-            const icon = passed ? "✓" : "✗";
+            const icon = passed ? "PASS" : "FAIL";
             const color = passed ? "" : " [FAIL]";
             reportLines.push(`  ${icon} [${tc.id}] ${tc.name}${color}`);
             if (!passed) {
@@ -5829,7 +6872,7 @@
             }
           } catch (e) {
             logTestResult(group.category, tc.id, tc.name, tc.code, false, null, tc.expect, e.message);
-            reportLines.push(`  ✗ [${tc.id}] ${tc.name} [EXCEPTION]`);
+            reportLines.push("  FAIL [" + tc.id + "] " + tc.name + " [EXCEPTION]");
             reportLines.push(`      Error: ${e.message}`);
             logError(group.category, tc.id, tc.name, tc.code, e.message, null, tc.expect);
           }
@@ -5839,12 +6882,12 @@
 
       const s = ERROR_LOG.summary;
       const pct = s.total > 0 ? Math.round((s.passed / s.total) * 100) : 0;
-      reportLines.unshift(`═══════════════════════════════════════════`);
-      reportLines.unshift(`🧪 TEST SUITE COMPLETE  |  Passed: ${s.passed}/${s.total} (${pct}%)  |  Failed: ${s.failed}`);
-      reportLines.unshift(`═══════════════════════════════════════════`);
-      reportLines.push(`═══════════════════════════════════════════`);
-      reportLines.push(`📋 Click "📋 Log" button to download structured error log (JSON)`);
-      reportLines.push(`═══════════════════════════════════════════`);
+      reportLines.unshift("========================================");
+      reportLines.unshift("TEST SUITE COMPLETE | Passed: " + s.passed + "/" + s.total + " (" + pct + "%) | Failed: " + s.failed);
+      reportLines.unshift("========================================");
+      reportLines.push("========================================");
+      reportLines.push("Click the Log button to download the structured JSON error log.");
+      reportLines.push("========================================");
 
       consoleBox.style.color = s.failed === 0 ? "#98c379" : "#e06c75";
       consoleBox.innerText = reportLines.join("\n");
@@ -5862,7 +6905,7 @@
       URL.revokeObjectURL(a.href);
       const consoleBox = document.getElementById('console');
       consoleBox.style.color = "var(--accent)";
-      consoleBox.innerText += `\n\n✅ Error log saved: ${a.download}`;
+      consoleBox.innerText += "\n\nError log saved: " + a.download;
     }
 
     /* ---- DRAG SPLITTERS ---- */
@@ -6009,7 +7052,7 @@ x_sig = sin(omega * t);
 y_sig = 0.8 * cos(2 * pi * 2 * t) * (-12 < t < 12);
 z_sig = rect(t / 6);
 
-# Click 🧪 TEST in the toolbar to run 50+ validation cases!`;
+# Use the Test button in the toolbar to run the validation suite!`;
       recompute();
 
       let t;
@@ -6021,6 +7064,29 @@ z_sig = rect(t / 6);
       });
     };
   </script>
+  <div id="plot-windows-layer" aria-hidden="true"></div>
+  <template id="plot-window-template">
+    <div class="plot-window" data-figure="">
+      <div class="plot-window-header" data-drag-handle>
+        <span class="plot-window-title">Figure</span>
+        <div class="plot-window-controls">
+          <button type="button" class="pw-btn pw-zoom-x-in" title="Zoom X in">X+</button>
+          <button type="button" class="pw-btn pw-zoom-x-out" title="Zoom X out">X-</button>
+          <button type="button" class="pw-btn pw-zoom-y-in" title="Zoom Y in">Y+</button>
+          <button type="button" class="pw-btn pw-zoom-y-out" title="Zoom Y out">Y-</button>
+          <button type="button" class="pw-btn pw-reset" title="Reset zoom">R</button>
+          <button type="button" class="pw-btn pw-minimize" title="Minimize / Restore"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M5 18h14"/></svg></button>
+          <button type="button" class="pw-btn pw-toggle" title="Collapse / Expand"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" class="pw-btn pw-maximize" title="Maximize / Restore"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5"/></svg></button>
+          <button type="button" class="pw-btn pw-close" title="Close window"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button>
+        </div>
+      </div>
+      <div class="plot-window-body">
+        <canvas class="plot-canvas"></canvas>
+      </div>
+      <div class="plot-window-resize" data-resize-handle></div>
+    </div>
+  </template>
   <script src="./ui.js"></script>
 </body>
 </html>

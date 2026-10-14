@@ -19,6 +19,32 @@
     }
   };
 
+  const cleanLegacyDemoFooter = (content) => content.replace(
+    /^# Click .* TEST in the toolbar to run 50\+ validation cases!$/gm,
+    "# Use the Test button in the toolbar to run the validation suite!"
+  );
+  const updateStarterDemoContent = (name, content, isStarter = false) => {
+    if (!isStarter) return content;
+    if (name === "Fourier Transforms.axiom") {
+      return content
+        .replaceAll("F0 = ft(decay, t, 0);", "F0 = ft(decay(t), t, 0);")
+        .replaceAll("F0Alias = fouriertransform(decay, t, 0);", "F0Alias = fouriertransform(decay(t), t, 0);")
+        .replaceAll("C1 = fs(wave, t, tau, 1);", "C1 = fs(wave(t), t, tau, 1);")
+        .replaceAll("C1Alias = fourierseries(wave, t, tau, 1);", "C1Alias = fourierseries(wave(t), t, tau, 1);")
+        .replaceAll("C1 = fs(wave(t), t, tau, 1);", "C1 = formula(fs(wave(t), t, tau, 1));")
+        .replaceAll("C1Alias = fourierseries(wave(t), t, tau, 1);", "C1Alias = formula(fourierseries(wave(t), t, tau, 1));")
+        .replaceAll('print("fs(cos(t), t, tau, 1) =", C1);', 'print("formula(fs(cos(t), t, tau, 1)) =", C1);')
+        .replaceAll('print("fourierseries(cos(t), t, tau, 1) =", C1Alias);', 'print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);');
+    }
+    if (name === "Descriptive Statistics.axiom") {
+      return content.replace(
+        'print("median(data) =", median(data), "mode(data) =", mode(data));',
+        'print("median(1, 2, 2, 4, 5) =", median(1, 2, 2, 4, 5), "mode(1, 2, 2, 4, 5) =", mode(1, 2, 2, 4, 5));'
+      );
+    }
+    return content;
+  };
+
   const writeSetting = (key, value) => {
     try {
       window.localStorage.setItem(key, value);
@@ -37,6 +63,7 @@
   const signalsDock = document.getElementById("signals-dock");
   const signalsToggle = document.getElementById("signals-toggle");
   const filenameLabel = document.getElementById("active-filename");
+  const workspaceSaveStatus = document.getElementById("workspace-save-status");
   const tabsElement = document.getElementById("editor-tabs");
   const explorerTree = document.getElementById("explorer-tree");
   const explorerPanel = document.getElementById("project-explorer");
@@ -63,6 +90,289 @@
   let selectedExplorerItem = { kind: "folder", id: "workspace-root" };
   let explorerClipboard = null;
   let draggedExplorerItem = null;
+  const STARTER_DEMO_FILES = [
+    {
+      category: "Basic Programming",
+      name: "Variables and Control Flow.axiom",
+      content: `# AXIOM DEMO: variables, operators, and control flow
+# Run this file to see the labeled examples in the output panel.
+let a = 7;
+b = 3;
+print("a + b =", a + b, "a - b =", a - b, "a * b =", a * b);
+print("a / b =", a / b, "a^b =", a^b, "10 mod 3 =", 10 mod 3);
+print("a > b =", a > b, "a == b =", a == b, "and =", a > 0 and b > 0);
+print("not false =", not false, "true or false =", true or false);
+if (a > b) { print("if: a is larger"); } else { print("else: b is larger"); }
+label = a > b ? "larger" : "smaller";
+print("ternary result =", label);
+
+# while repeats while true. for counts; continue skips a pass; break exits the loop.
+counter = 0;
+while (counter < 2) { print("while pass =", counter); counter = counter + 1; }
+for (let k = 0; k < 4; k = k + 1) {
+  if (k == 1) { continue; }
+  if (k == 3) { break; }
+  print("for pass =", k);
+}
+switch (b) { case 3: print("switch case matched 3"); break; default: print("switch default"); break; }
+
+# function and fn both declare functions; return supplies the result.
+function cube(value) { return value^3; }
+fn double(value) { return 2 * value; }
+print("cube(3) =", cube(3), "double(3) =", double(3));
+
+# null and none create symbolic variables when assigned.
+unknown = null;
+alsoUnknown = none;
+print("unknown + 2 =", unknown + 2, "none alias =", alsoUnknown);
+piecewise = { 1: a > 0, -1: otherwise };
+print("otherwise piecewise =", piecewise);
+print("true =", true, "false =", false, "FORALL =", FORALL, "EXISTS =", EXISTS);
+# where and given are reserved math-notation words; forall(...) is the supported quantifier.
+`,
+    },
+    {
+      category: "Basic Programming",
+      name: "Functions and Classes.axiom",
+      content: `# AXIOM DEMO: function declarations, classes, constructors, and methods
+class Point {
+  x = 0, y = 0;
+  function constructor(x, y) { this.x = x; this.y = y; }
+  function magnitudeSquared() { return this.x^2 + this.y^2; }
+}
+point = new Point(3, 4);
+print("new Point(3, 4): x =", point.x, "y =", point.y);
+print("point.magnitudeSquared() =", point.magnitudeSquared());
+
+# function and fn are interchangeable declaration keywords; return supplies a result.
+function squareNumber(value) { return value^2; }
+fn triple(value) { return 3 * value; }
+print("squareNumber(4) =", squareNumber(4), "triple(4) =", triple(4));
+`,
+    },
+    {
+      category: "Statistics",
+      name: "Descriptive Statistics.axiom",
+      content: `# AXIOM DEMO: statistics over values, sets, and ranges
+data = {1, 2, 2, 4, 5};
+sample = range(1:5, k, 4);
+print("count(data) =", count(data), "sum(data) =", sum(data));
+print("mean(data) =", mean(data), "average(data) =", average(data));
+print("median(1, 2, 2, 4, 5) =", median(1, 2, 2, 4, 5), "mode(1, 2, 2, 4, 5) =", mode(1, 2, 2, 4, 5));
+print("min(data) =", min(data), "max(data) =", max(data));
+print("variance(data) =", variance(data), "populationVariance(data) =", populationVariance(data));
+print("sampleVariance(data) =", sampleVariance(data));
+print("stddev(data) =", stddev(data), "standardDeviation(data) =", standardDeviation(data));
+print("sampleStdDev(data) =", sampleStdDev(data));
+print("sampleStandardDeviation(data) =", sampleStandardDeviation(data));
+print("quantile(data, 0.5) =", quantile(data, 0.5));
+print("percentile(data, 50) =", percentile(data, 50));
+print("count(range) =", count(sample), "sum(range) =", sum(sample));
+# quantile probability is in [0,1]; percentile input is in [0,100]. Sample statistics need 2+ values.
+`,
+    },
+    {
+      category: "Calculus",
+      name: "Derivatives and Formula Values.axiom",
+      content: `# AXIOM DEMO: symbolic derivatives and point evaluation
+# diff(expr, t) returns a symbolic derivative function.
+d = diff(t^3 + 2*t, t);
+print("diff(t^3 + 2*t, t) =", d);
+
+# A third argument evaluates the derivative at that point.
+atThree = diff(t^3 + 2*t, t, 3);
+print("diff(t^3 + 2*t, t, 3) =", atThree);
+atZero = diff(sin(t), t, at = 0);
+print("diff(sin(t), t, at=0) =", atZero);
+
+# formula(...) returns an array; index 0 is a structured formula AST.
+derivativeData = formula(diff(t^3, t));
+print("derivativeData[0] =", derivativeData[0]);
+print("formula result =", derivativeData);
+
+# Absolute-value equations assign both roots to an array in ascending order.
+|x| = 5;
+print("|x| = 5 -> x[0] =", x[0], "x[1] =", x[1]);
+|zeroRoot| = 0;
+print("|zeroRoot| = 0 ->", zeroRoot);
+`,
+    },
+    {
+      category: "Calculus",
+      name: "Definite and Improper Integrals.axiom",
+      content: `# AXIOM DEMO: finite, improper, and impulse integrals
+area = integrate(sin(t), t, 0, pi);
+print("integrate(sin(t), t, 0, pi) =", area);
+
+# Infinite limits require a decaying integrand.
+decayingArea = integrate(exp(-abs(t)), t, -inf, inf);
+print("integrate(exp(-abs(t)), t, -inf, inf) =", decayingArea);
+
+# integrate() handles delta impulses analytically.
+impulseArea = integrate(delta(t - 1), t, 0, 2);
+print("integrate(delta(t - 1), t, 0, 2) =", impulseArea);
+
+# u(t) stays at 1 as t approaches +infinity, so its integral over the whole line diverges.
+stepArea = integrate(u(t), t, -inf, inf);
+print("integrate(u(t), t, -inf, inf) =", stepArea);
+`,
+    },
+    {
+      category: "Mathematical Functions",
+      name: "Arithmetic and Trigonometry.axiom",
+      content: `# AXIOM DEMO: arithmetic, rounding, angle conversion, and trigonometry
+print("|-5| =", |-5|, "abs(-5) =", abs(-5));
+print("sqrt(9) =", sqrt(9), "cbrt(-8) =", cbrt(-8), "pow(2, 3) =", pow(2, 3));
+print("floor(2.8) =", floor(2.8), "ceil(2.2) =", ceil(2.2));
+print("round(pi, 2) =", round(pi, 2), "trunc(-2.8) =", trunc(-2.8));
+print("min(3, -1, 2) =", min(3, -1, 2), "max(3, -1, 2) =", max(3, -1, 2));
+print("clamp(12, 0, 10) =", clamp(12, 0, 10), "hypot(3, 4) =", hypot(3, 4));
+
+# Trigonometric functions use radians. sec, csc, and cot are reciprocal trig functions.
+print("sin(pi/2) =", sin(pi/2), "cos(0) =", cos(0), "tan(pi/4) =", tan(pi/4));
+print("sec(0) =", sec(0), "csc(pi/2) =", csc(pi/2), "cot(pi/4) =", cot(pi/4));
+print("asin(0.5) =", asin(0.5), "acos(0.5) =", acos(0.5), "atan(1) =", atan(1));
+print("atan2(1, 1) =", atan2(1, 1));
+
+# Hyperbolic and inverse-hyperbolic functions
+print("sinh(1) =", sinh(1), "cosh(1) =", cosh(1), "tanh(1) =", tanh(1));
+print("asinh(1) =", asinh(1), "acosh(2) =", acosh(2), "atanh(0.5) =", atanh(0.5));
+print("exp(1) =", exp(1), "ln(e) =", ln(e), "log(100, 10) =", log(100, 10));
+print("log10(100) =", log10(100), "log2(8) =", log2(8));
+print("sign(-4) =", sign(-4), "signum(0) =", signum(0), "sgn(4) =", sgn(4));
+print("deg(pi) =", deg(pi), "degrees(pi) =", degrees(pi));
+print("rad(180) =", rad(180), "radians(180) =", radians(180));
+`,
+    },
+    {
+      category: "Signals",
+      name: "Waveform Functions.axiom",
+      content: `# AXIOM DEMO: built-in continuous-time waveforms
+print("u(0) =", u(0), "step(-1) =", step(-1), "heaviside(0) =", heaviside(0));
+print("rect(0) =", rect(0), "sinc(0) =", sinc(0), "tri(0) =", tri(0));
+print("ramp(-2) =", ramp(-2), "pulse(0, 2) =", pulse(0, 2));
+print("sawtooth(0, tau) =", sawtooth(0, tau), "square(0) =", square(0));
+
+# Signal expressions use t and appear in the signal inspector.
+windowSignal = u(t) - u(t - 2);
+triangleSignal = tri(t / 2);
+decaySignal = exp(-abs(t));
+
+# plot(values) opens a floating figure. Uncomment to try it:
+# plot(windowSignal);
+`,
+    },
+    {
+      category: "Complex Numbers and Constants",
+      name: "Complex Arithmetic and Constants.axiom",
+      content: `# AXIOM DEMO: complex arithmetic and keyboard-friendly constant names
+z = 3 + 4*i;
+print("z =", z, "real(z) =", real(z), "imag(z) =", imag(z));
+print("conj(z) =", conj(z), "arg(z) =", arg(z), "abs(z) =", abs(z));
+print("i^2 =", i^2, "exp(i*pi) =", exp(i*pi));
+
+# Use pi, tau, e, phi, omega, c, inf, and i instead of typing special glyphs.
+print("pi =", pi, "tau =", tau, "e =", e, "phi =", phi);
+print("omega =", omega, "c =", c, "inf =", inf);
+`,
+    },
+    {
+      category: "Sets and Logic",
+      name: "Sets, Membership, and Quantifiers.axiom",
+      content: `# AXIOM DEMO: finite sets, membership, ranges, and quantifiers
+A = {1, 2, 3};
+B = {2, 3, 4};
+print("A union B =", A union B);
+print("A intersect B =", A intersect B);
+print("A diff B =", A diff B);
+print("2 in A =", 2 in A, "4 belongsto A =", 4 belongsto A);
+
+# forall(...) is the keyboard-typable name for the universal quantifier symbol.
+allPositive = forall(value, A, value > 0);
+allAboveTwo = forall(value, A, value > 2);
+print("forall(value, A, value > 0) =", allPositive);
+print("forall(value, A, value > 2) =", allAboveTwo);
+
+# range(start:stop, name, intervals) includes both endpoints.
+values = range(0:1, t, 4);
+print("range(0:1, t, 4) =", values);
+
+# These word names replace interval-bound symbols on keyboards without those glyphs.
+print("OPEN =", OPEN, "CLOSED =", CLOSED);
+print("EXCLUSIVE =", EXCLUSIVE, "INCLUSIVE =", INCLUSIVE);
+# Use forall(...) instead of typing the universal-quantifier glyph.
+`,
+    },
+    {
+      category: "Sets and Logic",
+      name: "Keyboard Names for Types and Values.axiom",
+      content: `# AXIOM DEMO: type and value names that can be typed on a standard keyboard
+# Natural numbers: N and NATURAL. Integers: Z and INTEGER.
+# Rational numbers: Q and RATIONAL. Real numbers: R and REAL. Complex numbers: COMPLEX.
+print("3 in N =", 3 in N, "3 in NATURAL =", 3 in NATURAL);
+print("-2 in Z =", -2 in Z, "-2 in INTEGER =", -2 in INTEGER);
+print("0.5 in Q =", 0.5 in Q, "0.5 in RATIONAL =", 0.5 in RATIONAL);
+print("pi in R =", pi in R, "pi in REAL =", pi in REAL);
+print("3 + 4*i in COMPLEX =", (3 + 4*i) in COMPLEX);
+
+# +R and -R are keyboard names for positive and negative real-number sets.
+print("2 in +R =", 2 in +R, "-2 in -R =", -2 in -R);
+print("type(3) =", type(3), "type(i) =", type(i), "type({1, 2}) =", type({1, 2}));
+
+# Use forall(variable, set, condition) instead of typing the universal quantifier glyph.
+# FORALL and EXISTS are keyboard-typable predefined boolean constants.
+`,
+    },
+    {
+      category: "Transforms",
+      name: "Fourier Transforms.axiom",
+      content: `# AXIOM DEMO: Fourier transform and Fourier-series coefficient aliases
+decay = exp(-abs(t));
+F0 = ft(decay(t), t, 0);
+F0Alias = fouriertransform(decay(t), t, 0);
+print("ft(decay, t, 0) =", F0);
+print("fouriertransform(decay, t, 0) =", F0Alias);
+
+# fs and fourierseries return one complex coefficient for a periodic signal.
+wave = cos(t);
+C1 = formula(fs(wave(t), t, tau, 1));
+C1Alias = formula(fourierseries(wave(t), t, tau, 1));
+print("formula(fs(cos(t), t, tau, 1)) =", C1);
+print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
+`,
+    }
+  ];
+  const savedFileHandles = new Map();
+  const saveButton = document.getElementById("save-file-button");
+
+  const openSaveHandleDatabase = () => new Promise((resolve, reject) => {
+    if (!window.indexedDB) return reject(new Error("IndexedDB is unavailable"));
+    const request = window.indexedDB.open("axiom-file-handles", 1);
+    request.onupgradeneeded = () => request.result.createObjectStore("handles");
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error("Could not open the saved-file database"));
+  });
+
+  const readSavedFileHandles = async () => {
+    const database = await openSaveHandleDatabase();
+    try {
+      await new Promise((resolve, reject) => {
+        const request = database.transaction("handles", "readonly").objectStore("handles").getAll();
+        request.onsuccess = () => {
+          request.result.forEach(record => savedFileHandles.set(record.fileId, record.handle));
+          resolve();
+        };
+        request.onerror = () => reject(request.error || new Error("Could not restore saved-file links"));
+      });
+    } finally {
+      database.close();
+    }
+  };
+
+  const saveHandlesReady = readSavedFileHandles().catch(() => {}).finally(() => {
+    if (saveButton) saveButton.disabled = false;
+  });
+  if (saveButton) saveButton.disabled = true;
 
   const activeTab = () => openTabs.find((tab) => tab.id === activeTabId) || null;
 
@@ -93,6 +403,33 @@
   const persistTabs = () => {
     syncActiveBuffer();
     writeSetting(storageKeys.tabs, JSON.stringify({ tabs: openTabs, activeTabId }));
+    persistWorkspace();
+  };
+
+  const ensureStarterDemoWorkspace = () => {
+    const root = workspaceFolders.find(folder => folder.id === "workspace-root");
+    if (!root) return;
+    let demosFolder = workspaceFolders.find(folder => folder.parentId === root.id && folder.name.toLocaleLowerCase() === "demos");
+    if (!demosFolder) {
+      demosFolder = { id: "starter-demos", name: "Demos", parentId: root.id, expanded: true, starterSeeded: false };
+      workspaceFolders.push(demosFolder);
+    }
+    demosFolder.expanded = true;
+    const shouldSeedDemos = !demosFolder.starterSeeded;
+
+    if (shouldSeedDemos) STARTER_DEMO_FILES.forEach(demo => {
+      let categoryFolder = workspaceFolders.find(folder => folder.parentId === demosFolder.id && folder.name === demo.category);
+      if (!categoryFolder) {
+        const categoryId = demo.category.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+        categoryFolder = { id: `starter-demo-${categoryId}`, name: demo.category, parentId: demosFolder.id, expanded: true };
+        workspaceFolders.push(categoryFolder);
+      }
+      categoryFolder.expanded = true;
+      if (workspaceFiles.some(file => file.folderId === categoryFolder.id && file.name.toLocaleLowerCase() === demo.name.toLocaleLowerCase())) return;
+      const fileId = `starter-demo-${categoryFolder.id}-${demo.name.toLocaleLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+      workspaceFiles.push({ id: fileId, name: demo.name, folderId: categoryFolder.id, content: demo.content, savedContent: demo.content });
+    });
+    demosFolder.starterSeeded = true;
     persistWorkspace();
   };
 
@@ -214,6 +551,7 @@
     row.style.paddingLeft = `${8 + depth * 14}px`;
     row.setAttribute("aria-expanded", String(expanded));
     const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    icon.setAttribute("viewBox", "0 0 24 24");
     icon.setAttribute("aria-hidden", "true");
     const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
     if (kind === "folder") {
@@ -654,15 +992,15 @@
     const lowerName = token.toLocaleLowerCase();
     const alias = reservedAliases[token];
     const canonicalName = alias?.name || lowerName;
-    const isConstant = groupTitle === "Immutable constants" || alias?.constant === true;
+    const docs = DOCS[displayName] || DOCS[canonicalName];
+    const isConstant = ["Immutable constants", "Predefined values"].includes(groupTitle) || alias?.constant === true;
     if (isConstant) {
       const value = new Interpreter().env[canonicalName];
-      reservedPreviewLabel.textContent = `${displayName} is an immutable constant`;
-      reservedPreviewValue.textContent = value === undefined ? "" : String(value);
+      reservedPreviewLabel.textContent = docs?.desc || `${displayName} is an immutable constant supplied by the language.`;
+      reservedPreviewValue.textContent = [docs?.sig, value === undefined ? "" : `Current value: ${String(value)}`].filter(Boolean).join("\n");
       return;
     }
 
-    const docs = DOCS[canonicalName];
     const suggestion = SUGGESTIONS.find((item) => item.name.toLocaleLowerCase() === canonicalName);
     reservedPreviewLabel.textContent = docs?.desc || `${displayName} is a reserved ${groupTitle.toLocaleLowerCase()} name`;
     reservedPreviewValue.textContent = docs?.sig || suggestion?.snippet || token;
@@ -686,7 +1024,7 @@
         item.type = "button";
         item.className = "reserved-name";
         item.textContent = name;
-        item.title = `Click to insert ${name}; hover or long press for details`;
+    item.title = `${name}: ${describeReservedName(group.title, name).split("\n").join("; ")}`;
         let longPressTimer = null;
         let didLongPress = false;
         item.addEventListener("pointerenter", () => showReservedHint(group.title, name));
@@ -773,6 +1111,9 @@
 
   const describeReservedName = (groupTitle, displayName) => {
     const name = displayName.toLocaleLowerCase();
+    if (groupTitle === "Language keywords and operators" && name === "diff") {
+      return "Set difference operator: removes every element of the right-hand set from the left-hand set. Example: {1, 2, 3} diff {2}.";
+    }
     const symbolDescriptions = {
       colon: "Separates range bounds and named arguments.",
       ternary: "Starts a conditional expression: condition ? value-if-true : value-if-false.",
@@ -780,7 +1121,7 @@
       "greater-than-or-equal": "Comparison operator that is true when the left value is greater than or equal to the right value."
     };
     if (Object.prototype.hasOwnProperty.call(symbolDescriptions, name)) return symbolDescriptions[name];
-    const docs = DOCS[name];
+    const docs = DOCS[displayName] || DOCS[name];
     const suggestion = SUGGESTIONS.find((item) => item.name.toLocaleLowerCase() === name);
     const description = docs?.desc || `${displayName} is a reserved ${groupTitle.toLocaleLowerCase()} name`;
     const signature = docs?.sig || suggestion?.snippet;
@@ -863,6 +1204,8 @@
 
   const toolbarSymbolDetails = new Map([
     ["diff()", ["Built-in functions", "diff"]],
+    ["formula()", ["Built-in functions", "formula"]],
+    ["|x|", ["Built-in functions", "abs"]],
     ["integrate()", ["Built-in functions", "integrate"]],
     ["union", ["Built-in functions", "union"]],
     ["intersect", ["Built-in functions", "intersect"]],
@@ -1076,8 +1419,61 @@
       syncWorkspaceFile(tab);
     }
     savedCodeSnapshot = editor.value;
+    if (workspaceSaveStatus) workspaceSaveStatus.textContent = tab ? `Saved to ${tab.name}` : "Saved in workspace";
     renderTabs();
     persistTabs();
+  };
+
+  window.axiomSaveActiveFile = async (content) => {
+    await saveHandlesReady;
+    if (typeof window.showSaveFilePicker !== "function") return false;
+    const tab = activeTab();
+    if (!tab) return false;
+    const fileId = tab.fileId || tab.id;
+    let handle = savedFileHandles.get(fileId);
+    if (!handle) {
+      handle = await window.showSaveFilePicker({
+        suggestedName: tab.name || "untitled.axiom",
+        types: [{ description: "Axiom source file", accept: { "text/plain": [".axiom", ".txt"] } }]
+      });
+      savedFileHandles.set(fileId, handle);
+      try {
+        const database = await openSaveHandleDatabase();
+        try {
+          await new Promise((resolve, reject) => {
+            const transaction = database.transaction("handles", "readwrite");
+            transaction.objectStore("handles").put({ fileId, handle }, fileId);
+            transaction.oncomplete = resolve;
+            transaction.onerror = () => reject(transaction.error || new Error("Could not remember the save location"));
+            transaction.onabort = () => reject(transaction.error || new Error("Could not remember the save location"));
+          });
+        } finally {
+          database.close();
+        }
+      } catch {
+        // Keep this handle for the current session if browser storage is unavailable.
+      }
+    }
+
+    let permission = await handle.queryPermission({ mode: "readwrite" });
+    if (permission !== "granted") permission = await handle.requestPermission({ mode: "readwrite" });
+    if (permission !== "granted") throw new Error("Write access was not granted for the selected file.");
+
+    const writable = await handle.createWritable();
+    try {
+      await writable.write(content);
+      await writable.close();
+    } catch (error) {
+      await writable.abort?.();
+      throw error;
+    }
+
+    tab.name = handle.name || tab.name;
+    tab.content = content;
+    tab.savedContent = content;
+    filenameLabel.textContent = tab.name;
+    window.axiomMarkSaved();
+    return true;
   };
 
   signalsToggle.addEventListener("click", () => {
@@ -1120,6 +1516,7 @@
     syncActiveBuffer();
     persistTabs();
     renderTabs();
+    if (workspaceSaveStatus) workspaceSaveStatus.textContent = "Autosaved in this browser";
   });
   window.addEventListener("resize", resizeCharts);
 
@@ -1138,8 +1535,17 @@
       workspaceFolders.unshift({ id: "workspace-root", name: "SS", parentId: null, expanded: true });
     }
     if (Array.isArray(persistedWorkspace?.files)) {
-      workspaceFiles = persistedWorkspace.files.filter((file) => file && typeof file.id === "string" && typeof file.name === "string" && typeof file.content === "string");
+      workspaceFiles = persistedWorkspace.files
+        .filter((file) => file && typeof file.id === "string" && typeof file.name === "string" && typeof file.content === "string")
+        .map((file) => ({
+          ...file,
+          content: updateStarterDemoContent(file.name, cleanLegacyDemoFooter(file.content), file.id.startsWith("starter-demo-")),
+          savedContent: typeof file.savedContent === "string"
+            ? updateStarterDemoContent(file.name, cleanLegacyDemoFooter(file.savedContent), file.id.startsWith("starter-demo-"))
+            : file.savedContent
+        }));
     }
+    ensureStarterDemoWorkspace();
 
     const serializedTabs = readSetting(storageKeys.tabs);
     let persistedTabs = null;
@@ -1154,8 +1560,8 @@
         .map((tab, index) => ({
           id: typeof tab.id === "string" ? tab.id : `restored-${index}`,
           name: tab.name,
-          content: tab.content,
-          savedContent: typeof tab.savedContent === "string" ? tab.savedContent : tab.content,
+          content: updateStarterDemoContent(tab.name, cleanLegacyDemoFooter(tab.content), tab.fileId?.startsWith("starter-demo-")),
+          savedContent: updateStarterDemoContent(tab.name, cleanLegacyDemoFooter(typeof tab.savedContent === "string" ? tab.savedContent : tab.content), tab.fileId?.startsWith("starter-demo-")),
           fileId: typeof tab.fileId === "string" ? tab.fileId : null,
           folderId: typeof tab.folderId === "string" ? tab.folderId : "workspace-root"
         }));
@@ -1166,7 +1572,7 @@
     }
     if (!openTabs.length) {
       const savedCode = readSetting(storageKeys.code);
-      if (savedCode !== null) editor.value = savedCode;
+      if (savedCode !== null) editor.value = cleanLegacyDemoFooter(savedCode);
       const initialName = readSetting(storageKeys.filename) || "workbench.axiom";
       openTabs = [{ id: `tab-${Date.now()}-${tabSequence++}`, name: initialName, content: editor.value, savedContent: editor.value }];
       activeTabId = openTabs[0].id;
