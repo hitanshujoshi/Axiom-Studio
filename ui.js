@@ -1,6 +1,8 @@
 (() => {
   const storageKeys = {
     theme: "axiom-ui-theme",
+    themeTone: "axiom-ui-theme-tone",
+    accent: "axiom-ui-accent",
     zoom: "axiom-ui-zoom",
     editorFont: "axiom-ui-editor-font",
     terminalFont: "axiom-ui-terminal-font",
@@ -28,13 +30,9 @@
     if (name === "Fourier Transforms.axiom") {
       return content
         .replaceAll("F0 = ft(decay, t, 0);", "F0 = ft(decay(t), t, 0);")
-        .replaceAll("F0Alias = fouriertransform(decay, t, 0);", "F0Alias = fouriertransform(decay(t), t, 0);")
         .replaceAll("C1 = fs(wave, t, tau, 1);", "C1 = fs(wave(t), t, tau, 1);")
-        .replaceAll("C1Alias = fourierseries(wave, t, tau, 1);", "C1Alias = fourierseries(wave(t), t, tau, 1);")
         .replaceAll("C1 = fs(wave(t), t, tau, 1);", "C1 = formula(fs(wave(t), t, tau, 1));")
-        .replaceAll("C1Alias = fourierseries(wave(t), t, tau, 1);", "C1Alias = formula(fourierseries(wave(t), t, tau, 1));")
-        .replaceAll('print("fs(cos(t), t, tau, 1) =", C1);', 'print("formula(fs(cos(t), t, tau, 1)) =", C1);')
-        .replaceAll('print("fourierseries(cos(t), t, tau, 1) =", C1Alias);', 'print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);');
+        .replaceAll('print("fs(cos(t), t, tau, 1) =", C1);', 'print("formula(fs(cos(t), t, tau, 1)) =", C1);');
     }
     if (name === "Descriptive Statistics.axiom") {
       return content.replace(
@@ -59,6 +57,8 @@
   const menu = document.getElementById("settings-menu");
   const settingsToggle = document.getElementById("settings-toggle");
   const themeSelect = document.getElementById("theme-setting");
+  const themeToneSelect = document.getElementById("theme-tone-setting");
+  const accentSelect = document.getElementById("accent-setting");
   const zoomSelect = document.getElementById("zoom-setting");
   const signalsDock = document.getElementById("signals-dock");
   const signalsToggle = document.getElementById("signals-toggle");
@@ -90,6 +90,8 @@
   let selectedExplorerItem = { kind: "folder", id: "workspace-root" };
   let explorerClipboard = null;
   let draggedExplorerItem = null;
+  let editorHasUnpersistedChanges = false;
+  let persistedEditorContent = null;
   const STARTER_DEMO_FILES = [
     {
       category: "Basic Programming",
@@ -121,10 +123,9 @@ function cube(value) { return value^3; }
 fn double(value) { return 2 * value; }
 print("cube(3) =", cube(3), "double(3) =", double(3));
 
-# null and none create symbolic variables when assigned.
+# null creates a symbolic variable when assigned.
 unknown = null;
-alsoUnknown = none;
-print("unknown + 2 =", unknown + 2, "none alias =", alsoUnknown);
+print("unknown + 2 =", unknown + 2);
 piecewise = { 1: a > 0, -1: otherwise };
 print("otherwise piecewise =", piecewise);
 print("true =", true, "false =", false, "FORALL =", FORALL, "EXISTS =", EXISTS);
@@ -157,14 +158,13 @@ print("squareNumber(4) =", squareNumber(4), "triple(4) =", triple(4));
 data = {1, 2, 2, 4, 5};
 sample = range(1:5, k, 4);
 print("count(data) =", count(data), "sum(data) =", sum(data));
-print("mean(data) =", mean(data), "average(data) =", average(data));
+print("mean(data) =", mean(data));
 print("median(1, 2, 2, 4, 5) =", median(1, 2, 2, 4, 5), "mode(1, 2, 2, 4, 5) =", mode(1, 2, 2, 4, 5));
 print("min(data) =", min(data), "max(data) =", max(data));
-print("variance(data) =", variance(data), "populationVariance(data) =", populationVariance(data));
+print("variance(data) =", variance(data));
 print("sampleVariance(data) =", sampleVariance(data));
-print("stddev(data) =", stddev(data), "standardDeviation(data) =", standardDeviation(data));
+print("stddev(data) =", stddev(data));
 print("sampleStdDev(data) =", sampleStdDev(data));
-print("sampleStandardDeviation(data) =", sampleStandardDeviation(data));
 print("quantile(data, 0.5) =", quantile(data, 0.5));
 print("percentile(data, 50) =", percentile(data, 50));
 print("count(range) =", count(sample), "sum(range) =", sum(sample));
@@ -240,8 +240,8 @@ print("asinh(1) =", asinh(1), "acosh(2) =", acosh(2), "atanh(0.5) =", atanh(0.5)
 print("exp(1) =", exp(1), "ln(e) =", ln(e), "log(100, 10) =", log(100, 10));
 print("log10(100) =", log10(100), "log2(8) =", log2(8));
 print("sign(-4) =", sign(-4), "signum(0) =", signum(0), "sgn(4) =", sgn(4));
-print("deg(pi) =", deg(pi), "degrees(pi) =", degrees(pi));
-print("rad(180) =", rad(180), "radians(180) =", radians(180));
+print("deg(pi) =", deg(pi));
+print("rad(180) =", rad(180));
 `,
     },
     {
@@ -285,7 +285,7 @@ B = {2, 3, 4};
 print("A union B =", A union B);
 print("A intersect B =", A intersect B);
 print("A diff B =", A diff B);
-print("2 in A =", 2 in A, "4 belongsto A =", 4 belongsto A);
+print("2 in A =", 2 in A, "4 in A =", 4 in A);
 
 # forall(...) is the keyboard-typable name for the universal quantifier symbol.
 allPositive = forall(value, A, value > 0);
@@ -326,19 +326,15 @@ print("type(3) =", type(3), "type(i) =", type(i), "type({1, 2}) =", type({1, 2})
     {
       category: "Transforms",
       name: "Fourier Transforms.axiom",
-      content: `# AXIOM DEMO: Fourier transform and Fourier-series coefficient aliases
+      content: `# AXIOM DEMO: Fourier transform and Fourier-series coefficients
 decay = exp(-abs(t));
 F0 = ft(decay(t), t, 0);
-F0Alias = fouriertransform(decay(t), t, 0);
 print("ft(decay, t, 0) =", F0);
-print("fouriertransform(decay, t, 0) =", F0Alias);
 
-# fs and fourierseries return one complex coefficient for a periodic signal.
+# fs returns one complex coefficient for a periodic signal.
 wave = cos(t);
 C1 = formula(fs(wave(t), t, tau, 1));
-C1Alias = formula(fourierseries(wave(t), t, tau, 1));
 print("formula(fs(cos(t), t, tau, 1)) =", C1);
-print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
 `,
     }
   ];
@@ -402,8 +398,21 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
 
   const persistTabs = () => {
     syncActiveBuffer();
+    writeSetting(storageKeys.code, editor.value);
     writeSetting(storageKeys.tabs, JSON.stringify({ tabs: openTabs, activeTabId }));
     persistWorkspace();
+    persistedEditorContent = editor.value;
+    editorHasUnpersistedChanges = false;
+    if (workspaceSaveStatus?.textContent === "Unsaved changes · autosaves every 2 minutes") {
+      workspaceSaveStatus.textContent = "Autosaved in this browser";
+    }
+  };
+
+  const flushEditorPersistence = (render = false) => {
+    if (!editorHasUnpersistedChanges) return;
+    persistTabs();
+    if (render) renderTabs();
+    if (workspaceSaveStatus) workspaceSaveStatus.textContent = "Autosaved in this browser";
   };
 
   const ensureStarterDemoWorkspace = () => {
@@ -980,20 +989,12 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
     updateFindMatches();
   };
 
-  const reservedAliases = {
-    "π": { name: "pi", constant: true },
-    "τ": { name: "tau", constant: true },
-    "φ": { name: "phi", constant: true },
-    "ℯ": { name: "e", constant: true }
-  };
-
   const showReservedHint = (groupTitle, displayName) => {
     const token = displayName.includes(" (") ? displayName.slice(0, displayName.indexOf(" (")) : displayName;
     const lowerName = token.toLocaleLowerCase();
-    const alias = reservedAliases[token];
-    const canonicalName = alias?.name || lowerName;
+    const canonicalName = lowerName;
     const docs = DOCS[displayName] || DOCS[canonicalName];
-    const isConstant = ["Immutable constants", "Predefined values"].includes(groupTitle) || alias?.constant === true;
+    const isConstant = ["Immutable constants", "Predefined values"].includes(groupTitle);
     if (isConstant) {
       const value = new Interpreter().env[canonicalName];
       reservedPreviewLabel.textContent = docs?.desc || `${displayName} is an immutable constant supplied by the language.`;
@@ -1085,7 +1086,7 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
       else if (lowerName === "case") caretOffset = insertion.indexOf(":");
       else if (lowerName === "default" || lowerName === "else") caretOffset = insertion.indexOf("{") + 1;
       else caretOffset = insertion.indexOf("\n") < 0 ? insertion.length : insertion.indexOf("\n");
-    } else if (isOperator && ["and", "or", "not", "in", "union", "intersect", "mod", "belongsto"].includes(lowerName)) {
+    } else if (isOperator && ["and", "or", "not", "in", "union", "intersect", "mod"].includes(lowerName)) {
       insertion = ` ${token} `;
       caretOffset = insertion.length;
     } else if (isOperator && lowerName === "diff") {
@@ -1231,9 +1232,24 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
     document.getElementById("reserved-open").focus({ preventScroll: true });
   };
 
-  const applyTheme = (theme) => {
+  const ACCENTS = {
+    blue: ["#61afef", "#4fa1e2"],
+    purple: ["#c678dd", "#b565c5"],
+    green: ["#98c379", "#82ad65"],
+    orange: ["#e5a75c", "#d89547"],
+    rose: ["#e06c75", "#c95761"]
+  };
+
+  const applyTheme = (theme, tone = "balanced", accent = "blue") => {
     document.body.classList.toggle("light-theme", theme === "light");
+    document.body.classList.remove("theme-tone-darker", "theme-tone-balanced", "theme-tone-brighter");
+    document.body.classList.add(`theme-tone-${["darker", "balanced", "brighter"].includes(tone) ? tone : "balanced"}`);
+    const [accentColor, accentHover] = ACCENTS[accent] || ACCENTS.blue;
+    document.documentElement.style.setProperty("--accent", accentColor);
+    document.documentElement.style.setProperty("--accent-hover", accentHover);
     themeSelect.value = theme === "light" ? "light" : "dark";
+    themeToneSelect.value = tone;
+    accentSelect.value = ACCENTS[accent] ? accent : "blue";
   };
 
   const applyZoom = (zoom) => {
@@ -1245,7 +1261,7 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
 
   const applyFontSize = (target, size) => {
     const minimum = 9;
-    const maximum = 28;
+    const maximum = 44;
     const normalizedSize = Math.min(maximum, Math.max(minimum, Number(size)));
     if (!Number.isFinite(normalizedSize)) return;
 
@@ -1272,7 +1288,11 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
     });
   };
 
-  applyTheme(readSetting(storageKeys.theme) || (document.body.classList.contains("light-theme") ? "light" : "dark"));
+  applyTheme(
+    readSetting(storageKeys.theme) || (document.body.classList.contains("light-theme") ? "light" : "dark"),
+    readSetting(storageKeys.themeTone) || "balanced",
+    readSetting(storageKeys.accent) || "blue"
+  );
   applyZoom(readSetting(storageKeys.zoom) || "1");
   applyFontSize("editor", readSetting(storageKeys.editorFont) || "13.5");
   applyFontSize("terminal", readSetting(storageKeys.terminalFont) || "12");
@@ -1313,8 +1333,18 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
   });
 
   themeSelect.addEventListener("change", () => {
-    applyTheme(themeSelect.value);
+    applyTheme(themeSelect.value, themeToneSelect.value, accentSelect.value);
     writeSetting(storageKeys.theme, themeSelect.value);
+  });
+
+  themeToneSelect.addEventListener("change", () => {
+    applyTheme(themeSelect.value, themeToneSelect.value, accentSelect.value);
+    writeSetting(storageKeys.themeTone, themeToneSelect.value);
+  });
+
+  accentSelect.addEventListener("change", () => {
+    applyTheme(themeSelect.value, themeToneSelect.value, accentSelect.value);
+    writeSetting(storageKeys.accent, accentSelect.value);
   });
 
   zoomSelect.addEventListener("change", () => {
@@ -1511,14 +1541,127 @@ print("formula(fourierseries(cos(t), t, tau, 1)) =", C1Alias);
     });
   });
 
-  editor.addEventListener("input", () => writeSetting(storageKeys.code, editor.value));
   editor.addEventListener("input", () => {
     syncActiveBuffer();
-    persistTabs();
-    renderTabs();
-    if (workspaceSaveStatus) workspaceSaveStatus.textContent = "Autosaved in this browser";
+    editorHasUnpersistedChanges = editor.value !== persistedEditorContent;
+    if (workspaceSaveStatus) {
+      workspaceSaveStatus.textContent = editorHasUnpersistedChanges
+        ? "Unsaved changes · autosaves every 2 minutes"
+        : "Autosaved in this browser";
+    }
   });
+  window.addEventListener("pagehide", () => flushEditorPersistence());
+  window.setInterval(() => flushEditorPersistence(true), 2 * 60 * 1000);
   window.addEventListener("resize", resizeCharts);
+
+  const learningLessons = [
+    {
+      title: "Sine wave: amplitude, frequency, phase",
+      description: "Change one parameter at a time and observe how the waveform and spectrum respond.",
+      code: "x = sin(t);"
+    },
+    {
+      title: "Unit step and rectangular pulse",
+      description: "Compare discontinuities in time with their frequency-domain content.",
+      code: "x = u(t) - u(t - 2);"
+    },
+    {
+      title: "Damped signal",
+      description: "Observe how decay changes the shape and spreads energy across frequency.",
+      code: "x = exp(-0.25 * t) * u(t);"
+    },
+    {
+      title: "Time shift",
+      description: "A delay shifts a signal in time and changes the phase of its spectrum.",
+      code: "x = delay(sin(t), 2);"
+    },
+    {
+      title: "Animated signal states",
+      description: "Step through a signal transformation one state at a time.",
+      code: "x = animate(rect(t), [rect(t - 1), rect(t - 2), rect(t - 3)]);"
+    },
+    {
+      title: "Scaling transformation steps",
+      description: "Advance through amplitude scaling and compare the spectrum magnitude.",
+      code: "x = animate(sin(t), [sin(t), 2 * sin(t), 0.5 * sin(t)]);"
+    },
+    {
+      title: "Differentiation intuition",
+      description: "Use supplied states to see the familiar derivative cycle of a sine wave.",
+      code: "x = animate(sin(t), [sin(t), cos(t), -sin(t)]);"
+    },
+    {
+      title: "Integration intuition",
+      description: "Step through a cosine signal and its antiderivative states.",
+      code: "x = animate(cos(t), [cos(t), sin(t), -cos(t)]);"
+    },
+    {
+      title: "Fourier analysis steps",
+      description: "Compare a rectangular pulse, a smooth pulse, and a broader spectrum state.",
+      code: "x = animate(rect(t), [rect(t), sinc(t), sinc(t / 2)]);"
+    }
+  ];
+
+  const learningModal = document.getElementById("learning-modal");
+  const learningSelector = document.getElementById("lesson-selector");
+  const lessonDescription = document.getElementById("lesson-description");
+  const lessonCode = document.getElementById("lesson-code");
+  const learningToggle = document.getElementById("learning-toggle");
+  const learningClose = document.getElementById("learning-close");
+  const presentationToggle = document.getElementById("presentation-toggle");
+  const lessonRun = document.getElementById("lesson-run");
+  const amplitude = document.getElementById("lesson-amplitude");
+  const frequency = document.getElementById("lesson-frequency");
+  const phase = document.getElementById("lesson-phase");
+  const amplitudeValue = document.getElementById("lesson-amplitude-value");
+  const frequencyValue = document.getElementById("lesson-frequency-value");
+  const phaseValue = document.getElementById("lesson-phase-value");
+
+  const refreshLesson = () => {
+    const lesson = learningLessons[Number(learningSelector.value)] || learningLessons[0];
+    lessonDescription.textContent = lesson.description;
+    lessonCode.textContent = lesson.code;
+  };
+  const runLearningCode = (code) => {
+    editor.value = code;
+    editor.dispatchEvent(new Event("input", { bubbles: true }));
+    editor.focus({ preventScroll: true });
+  };
+  learningLessons.forEach((lesson, index) => {
+    const option = document.createElement("option");
+    option.value = String(index);
+    option.textContent = lesson.title;
+    learningSelector.append(option);
+  });
+  learningSelector.addEventListener("change", refreshLesson);
+  lessonRun.addEventListener("click", () => runLearningCode(learningLessons[Number(learningSelector.value)].code));
+  learningToggle.addEventListener("click", () => learningModal.classList.add("active"));
+  learningClose.addEventListener("click", () => learningModal.classList.remove("active"));
+  learningModal.addEventListener("click", (event) => {
+    if (event.target === learningModal) learningModal.classList.remove("active");
+  });
+  presentationToggle.addEventListener("click", () => {
+    document.body.classList.toggle("presentation-mode");
+    presentationToggle.textContent = document.body.classList.contains("presentation-mode")
+      ? "Exit presentation mode" : "Presentation mode";
+    window.dispatchEvent(new Event("resize"));
+  });
+  const presentationExit = document.getElementById("presentation-exit");
+  presentationExit.addEventListener("click", () => {
+    document.body.classList.remove("presentation-mode");
+    presentationToggle.textContent = "Presentation mode";
+    window.dispatchEvent(new Event("resize"));
+  });
+  const updateLessonValues = () => {
+    amplitudeValue.value = Number(amplitude.value).toFixed(1);
+    frequencyValue.value = Number(frequency.value).toFixed(1);
+    phaseValue.value = Number(phase.value).toFixed(1);
+  };
+  [amplitude, frequency, phase].forEach((input) => input.addEventListener("input", updateLessonValues));
+  document.getElementById("lesson-apply-controls").addEventListener("click", () => {
+    runLearningCode(`x = ${amplitude.value} * sin(2 * pi * ${frequency.value} * t + ${phase.value});`);
+  });
+  refreshLesson();
 
   window.addEventListener("load", () => {
     const serializedWorkspace = readSetting(storageKeys.workspace);
