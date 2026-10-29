@@ -793,10 +793,7 @@
       .header-left { width: 100%; min-width: 0; justify-content: space-between; }
       .header-right { width: 100%; justify-content: flex-end; }
     }
-  .anim-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border)}.anim-bar[hidden]{display:none}.anim-label{font:600 .85rem ui-monospace,Consolas,monospace}
-  .anim-bar .btn:disabled{opacity:.45;cursor:default}
-  #fullscreen-anim-slot .anim-bar{margin-top:8px;border:1px solid var(--border);border-radius:4px;background:var(--bg-sidebar)}
-</style>
+  </style>
 </head>
 <body>
 
@@ -821,7 +818,6 @@
         <button type="button" class="btn icon-btn" id="undo-button" aria-label="Undo" title="Undo (Ctrl+Z)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 0 14h-2"/></svg></button>
         <button type="button" class="btn icon-btn" id="redo-button" aria-label="Redo" title="Redo (Ctrl+Y)"><svg class="icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5m5 5h-9a7 7 0 0 0 0 14h2"/></svg></button>
       </div>
-      <a class="btn" id="docs-link" href="docs.html" target="_blank" rel="noopener" title="Language guide: syntax, functions, keywords">Docs</a>
       <div class="settings-wrap">
         <button class="btn" id="settings-toggle" aria-expanded="false" aria-controls="settings-menu">Settings</button>
         <section id="settings-menu" aria-label="Appearance and editor settings" hidden>
@@ -974,14 +970,6 @@
         <span id="grid-scale-readout">Ruler: 2.5 s/div | Drag to pan | Wheel = X zoom | Ctrl+Wheel = Y zoom</span>
       </div>
 
-      <div id="anim-bar-home" hidden></div>
-      <div id="anim-bar" class="anim-bar" hidden>
-        <button type="button" id="anim-play" class="btn btn-primary" title="Show the starting signal">&#8634; Show start</button>
-        <button type="button" id="anim-previous" class="btn" title="Go back one supplied signal state" hidden>&#9664; Previous step</button>
-        <button type="button" id="anim-next" class="btn" title="Advance to the next supplied signal state" hidden>Next step &#9654;</button>
-        <span id="anim-label" class="anim-label" aria-live="polite"></span>
-      </div>
-
       <div class="mobile-chart-tabs" role="group" aria-label="Signal plot type">
         <button type="button" data-chart-view="time" aria-pressed="true">Time</button>
         <button type="button" data-chart-view="frequency" aria-pressed="false">Frequency</button>
@@ -1033,7 +1021,6 @@
         <span>Drag chart to pan | Wheel = X zoom | Ctrl+Wheel = Y zoom | Double-click = Reset</span>
       </div>
     </div>
-    <div id="fullscreen-anim-slot"></div>
     <div class="modal-grid">
       <div class="modal-box"><canvas id="fsTimeChart"></canvas></div>
       <div class="modal-box"><canvas id="fsFreqChart"></canvas></div>
@@ -1173,20 +1160,6 @@
       'print': { sig: 'print(value, ...)', param: 'zero or more values', desc: 'Writes values to the terminal output.', example: 'print("sum:", 2 + 3);' },
       'in': { sig: 'value in set', param: 'value and finite set', desc: 'Tests whether a value belongs to a set; returns 1 or 0.', example: '2 in {1, 2, 3}' },
       'belongsto': { sig: 'value belongsto set', param: 'alias for in', desc: 'Tests whether a value belongs to a set. The ASCII word in is an equivalent operator.', example: '2 belongsto {1, 2, 3}' },
-      'given': { sig: 'expression given condition', param: 'expression: the value; condition: where it is defined', desc: 'Restricts a definition. The value is used where the condition is true and the result is NaN (undefined) elsewhere.', example: 'y = 1/x given x != 0' },
-      'where': { sig: 'expression where name = value, ...', param: 'name = value: local helper definitions', desc: 'Defines helper names that exist only for the expression before it. Later helpers may use earlier ones.', example: 'y = a*t + b where a = 2, b = 1' },
-      'open': { sig: 'open(a, b)', param: 'a, b: real bounds', desc: 'The open interval (a, b), both ends excluded. Use it with in, or as the domain or range of a typed function.', example: 'x in open(0, 1)' },
-      'closed': { sig: 'closed(a, b)', param: 'a, b: real bounds', desc: 'The closed interval [a, b], both ends included. Use it with in, or as the domain or range of a typed function.', example: 'x in closed(0, 1)' },
-      'exclusive': { sig: 'exclusive(a, b)', param: 'a, b: real bounds', desc: 'Same as open(a, b): both ends excluded.', example: 'x in exclusive(0, 1)' },
-      'inclusive': { sig: 'inclusive(a, b)', param: 'a, b: real bounds', desc: 'Same as closed(a, b): both ends included.', example: 'x in inclusive(0, 1)' },
-      'openclosed': { sig: 'openclosed(a, b)', param: 'a, b: real bounds', desc: 'The interval (a, b]: a excluded, b included.', example: 'x in openclosed(0, 1)' },
-      'closedopen': { sig: 'closedopen(a, b)', param: 'a, b: real bounds', desc: 'The interval [a, b): a included, b excluded.', example: 'x in closedopen(0, 1)' },
-      'exists': { sig: 'exists(variable, finiteSet, condition)', param: 'variable: name bound to each element; finiteSet: set or range; condition: test', desc: 'Returns 1 if the condition is true for at least one element, otherwise 0.', example: 'exists(x, {1, 2, 3}, x > 2)' },
-      'impulse': { sig: 'impulse(n)', param: 'n: integer sample index', desc: 'Kronecker delta for discrete-time signals: 1 at n = 0, otherwise 0. delta[n] means the same.', example: 'x[n] = impulse(n) + impulse(n - 1)' },
-      'delay': { sig: 'delay(signal, amount)', param: 'signal: a signal or expression; amount: shift to the right', desc: 'Shifts a signal right. Continuous x(t) becomes x(t - amount); a discrete x[n] becomes x[n - amount] and needs a whole number of samples.', example: 'y = delay(x, 10)' },
-      'shift': { sig: 'shift(signal, amount)', param: 'signal: a signal or expression; amount: shift to the right', desc: 'Alias of delay.', example: 'y = shift(x, 10)' },
-      'conv': { sig: 'conv(x, h, window)', param: 'x, h: discrete-time signals; window: optional half-width of the sum (default 64)', desc: 'Convolution y[n] = sum of x[m]*h[n-m] for m from -window to window. Exact when both signals are zero outside that range.', example: 'y = conv(x, h)' },
-      'animate': { sig: 'animate(startSignal, signalSteps)', param: 'startSignal: the initial signal; signalSteps: an ordered list of complete signal states to show next', desc: 'Displays the initial signal, then each supplied signal state in order. Use Show start, Previous step, and Next step to move through the sequence; the immediately previous state stays as a dashed comparison trace. The controls are also available in fullscreen.', example: 'x = animate(startSignal, signalSteps)' },
       'forall': { sig: 'forall(variable, finiteSet, condition)', param: 'variable: identifier bound to each set element | condition: expression returning true or false', desc: 'Returns 1 when every element satisfies the condition, otherwise 0. An empty set satisfies forall because there is no counterexample.', example: 'forall(x, {1, 2, 3}, x > 0)' },
       '\u2200': { sig: 'forall(variable, finiteSet, condition)', param: 'finite set and a condition evaluated once per element', desc: 'Universal quantifier symbol; equivalent to forall().', example: 'forall(x, {1, 2, 3}, 0 < x < 4)' },
       'mod': { sig: 'left mod right', param: 'real operands', desc: 'Returns the remainder after division.', example: '10 mod 3' },
@@ -1405,13 +1378,6 @@
       { name: 'and', type: 'operator', snippet: 'and ' },
       { name: 'or', type: 'operator', snippet: 'or ' },
       { name: 'not', type: 'operator', snippet: 'not ' },
-      { name: 'exists', type: 'logic', snippet: 'exists(x, {1, 2, 3}, x > 2)' },
-      { name: 'impulse', type: 'function', snippet: 'impulse(n)' },
-      { name: 'delay', type: 'function', snippet: 'delay(x, 1)' },
-      { name: 'conv', type: 'function', snippet: 'conv(x, h)' },
-      { name: 'open', type: 'function', snippet: 'open(0, 1)' },
-      { name: 'closed', type: 'function', snippet: 'closed(0, 1)' },
-      { name: 'animate', type: 'function', snippet: 'animate(startSignal, signalSteps)' },
       { name: 'forall', type: 'logic', snippet: 'forall(x, {1, 2, 3}, x > 0)' },
       { name: '\u2200', type: 'logic', snippet: 'forall(x, {1, 2, 3}, x > 0)' },
       { name: 'let', type: 'keyword', snippet: 'let ' },
@@ -1452,7 +1418,7 @@
       },
       {
         title: 'Built-in functions',
-        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'average', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'count', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'forall', 'formula', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'mean', 'median', 'min', 'mode', 'percentile', 'plot', 'populationVariance', 'pow', 'pulse', 'quantile', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sampleStandardDeviation', 'sampleStdDev', 'sampleVariance', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'standardDeviation', 'stddev', 'step', 'sum', 'tan', 'tanh', 'tri', 'trunc', 'type', 'u', 'variance', 'impulse', 'delay', 'shift', 'conv', 'open', 'closed', 'exclusive', 'inclusive', 'openclosed', 'closedopen', 'animate']
+        names: ['abs', 'acos', 'acosh', 'arg', 'asin', 'asinh', 'atan', 'atan2', 'atanh', 'average', 'cbrt', 'ceil', 'clamp', 'conj', 'cos', 'cosh', 'count', 'cot', 'csc', 'deg', 'degrees', 'delta', 'diff', 'exp', 'floor', 'forall', 'formula', 'ft', 'fouriertransform', 'fs', 'fourierseries', 'heaviside', 'hypot', 'imag', 'integrate', 'ln', 'log', 'log10', 'log2', 'max', 'mean', 'median', 'min', 'mode', 'percentile', 'plot', 'populationVariance', 'pow', 'pulse', 'quantile', 'rad', 'radians', 'range', 'real', 'rect', 'round', 'ramp', 'sampleStandardDeviation', 'sampleStdDev', 'sampleVariance', 'sawtooth', 'sec', 'sign', 'signum', 'sgn', 'sin', 'sinc', 'sinh', 'sqrt', 'square', 'standardDeviation', 'stddev', 'step', 'sum', 'tan', 'tanh', 'tri', 'trunc', 'type', 'u', 'variance']
       },
       {
         title: 'Mathematical types',
@@ -1521,7 +1487,7 @@
       'intersect': 'Returns the elements that appear in both finite sets.',
       'mod': 'Returns the remainder after dividing the left operand by the right operand.',
       'where': 'Reserved for conditions in mathematical notation. It is not currently parsed as a standalone operator.',
-      'given': 'Restricts a value to the condition where it is defined; false conditions produce NaN.',
+      'given': 'Reserved for assumptions in mathematical notation. It is not currently parsed as a standalone operator.',
       'formula': 'Returns [expression AST, evaluated or symbolic value]. Supported built-ins expand to their formula definitions, and index 0 can be reused by symbolic operations.',
       'integrate': 'Numerically evaluates a definite integral. Infinite bounds require a convergent integral; a unit step over the whole real line diverges.',
       'diff': 'Differentiates an expression with respect to a variable. Use at = value to evaluate the derivative at a point.',
@@ -1900,7 +1866,7 @@
         const tokens = [];
         while (this.c !== null) {
           if (/\s/.test(this.c)) { this.advance(); continue; }
-          if (this.c === '#' || (this.c === '/' && this.peek() === '/')) {
+          if (this.c === '#') {
             while (this.c !== null && this.c !== '\n') this.advance();
             continue;
           }
@@ -1933,9 +1899,6 @@
           if (c === '&' && this.peek() === '&') { this.advance(); this.advance(); pushToken({ type: TT.AND, value: 'and' }); continue; }
           if (c === '|' && this.peek() === '|') { this.advance(); this.advance(); pushToken({ type: TT.OR, value: 'or' }); continue; }
           if (c === '=' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.EQ, value: '==' }); continue; }
-          if (c === '<' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
-          if (c === '>' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.GTE, value: '>=' }); continue; }
-          if (c === '!' && this.peek() === '=') { this.advance(); this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
           if (c === '\u2260') { this.advance(); pushToken({ type: TT.NEQ, value: '!=' }); continue; }
           if (c === '!') { this.advance(); pushToken({ type: TT.NOT, value: 'not' }); continue; }
           if (c === '\u2264') { this.advance(); pushToken({ type: TT.LTE, value: '<=' }); continue; }
@@ -1971,14 +1934,6 @@
         let r = '';
         while (this.c !== null && /[\d.]/.test(this.c)) { r += this.c; this.advance(); }
         if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(r)) throw new Error(`Invalid number literal '${r}'`);
-        if (this.c === 'e' || this.c === 'E') {
-          const n1 = this.src[this.pos + 1] || '', n2 = this.src[this.pos + 2] || '';
-          if (/\d/.test(n1) || ((n1 === '+' || n1 === '-') && /\d/.test(n2))) {
-            r += 'e'; this.advance();
-            if (this.c === '+' || this.c === '-') { r += this.c; this.advance(); }
-            while (this.c !== null && /\d/.test(this.c)) { r += this.c; this.advance(); }
-          }
-        }
         return { type: TT.NUMBER, value: parseFloat(r) };
       }
       readString() {
@@ -2036,15 +1991,6 @@
         return token;
       }
 
-      endStatement() {
-        if (this.match(TT.SEMICOLON)) return;
-        const prev = this.tokens[this.idx - 1], next = this.peek();
-        if (!prev || next.type === TT.EOF || next.type === TT.RBRACE || prev.type === TT.RBRACE ||
-            next.type === TT.CASE || next.type === TT.DEFAULT) return;
-        if (next.line === prev.line) {
-          throw new Error(`Unexpected '${next.value}' after a complete statement. Separate statements with ; or a new line (write 2*x or 2x for multiplication).`);
-        }
-      }
       parseProgram() {
         const stmts = [];
         while (this.peek().type !== TT.EOF) {
@@ -2055,7 +2001,7 @@
               value: { offset: start.offset, line: start.line, column: start.column }
             });
             stmts.push(statement);
-            this.endStatement();
+            this.match(TT.SEMICOLON);
           } catch (error) {
             throw attachSourceLocation(error, this.peek());
           }
@@ -2065,13 +2011,6 @@
       parseStatement() {
         if (this.match(TT.CLASS)) return this.parseClassDeclaration();
         if (this.match(TT.FUNCTION)) return this.parseFunctionDeclaration();
-        {
-          const at = offset => this.tokens[this.idx + offset]?.type;
-          if (at(0) === TT.IDENTIFIER && at(1) === TT.LBRACKET && at(2) === TT.IDENTIFIER && at(3) === TT.RBRACKET &&
-              (at(4) === TT.ASSIGN || at(4) === TT.COLON)) {
-            return this.parseDiscreteSignalDefinition();
-          }
-        }
         if (this.peek().type === TT.IDENTIFIER && this.tokens[this.idx + 1]?.type === TT.COLON) {
           return this.parseTypedFunctionDeclaration();
         }
@@ -2086,18 +2025,18 @@
         if (this.match(TT.BREAK)) return { type: 'BreakStatement' };
         if (this.match(TT.CONTINUE)) return { type: 'ContinueStatement' };
         if (this.match(TT.PRINT)) {
-          const printOpened = this.match(TT.LPAREN);
+          this.match(TT.LPAREN);
           const args = [];
           if (this.peek().type !== TT.RPAREN) {
             args.push(this.parseExpression());
             while (this.match(TT.COMMA)) args.push(this.parseExpression());
           }
-          if (printOpened) this.expect(TT.RPAREN, 'Expected ) after print arguments');
+          this.match(TT.RPAREN);
           return { type: 'PrintStatement', args };
         }
         if (this.match(TT.LET)) {
           const id = this.advance().value;
-          this.expect(TT.ASSIGN, `Expected = after 'let ${id}'`);
+          this.match(TT.ASSIGN);
           const expr = this.parseExpression();
           return { type: 'AssignStatement', name: id, expr };
         }
@@ -2130,28 +2069,6 @@
         }
         return expression;
       }
-      parseDiscreteSignalDefinition() {
-        // x[n] = expr      or      x[n]: Z -> R, x[n] = expr
-        const name = this.advance().value;
-        this.advance();
-        const indexName = this.advance().value;
-        this.advance();
-        let domain = null, range = null;
-        if (this.match(TT.COLON)) {
-          domain = this.parseTypeSpec();
-          this.expect(TT.ARROW, 'Expected -> between the signal domain and range');
-          range = this.parseTypeSpec();
-          this.expect(TT.COMMA, 'Expected , before the signal definition');
-          const again = this.expect(TT.IDENTIFIER, `Expected ${name}[${indexName}] = ...`).value;
-          if (again !== name) throw new Error(`Signal name '${again}' must match '${name}'`);
-          this.expect(TT.LBRACKET, 'Expected [ after the signal name');
-          const secondIndex = this.expect(TT.IDENTIFIER, 'Expected the index name').value;
-          if (secondIndex !== indexName) throw new Error(`Index '${secondIndex}' must match '${indexName}'`);
-          this.expect(TT.RBRACKET, 'Expected ] after the index name');
-        }
-        this.expect(TT.ASSIGN, `Expected = in the definition of ${name}[${indexName}]`);
-        return { type: 'DiscreteSignalDefinition', name, indexName, domain, range, expr: this.parseExpression() };
-      }
       parseTypedFunctionDeclaration() {
         const name = this.expect(TT.IDENTIFIER, 'typed function requires a name').value;
         this.expect(TT.COLON);
@@ -2165,16 +2082,6 @@
         return { type: 'TypedFunctionDeclaration', name, domain, range, expression: this.parseExpression() };
       }
       parseTypeSpec() {
-        const formWord = this.peek();
-        if (formWord.type === TT.IDENTIFIER && INTERVAL_WORD_FORMS.has(String(formWord.value).toLowerCase()) && this.tokens[this.idx + 1]?.type === TT.LPAREN) {
-          const [includeLower, includeUpper] = INTERVAL_WORD_FORMS.get(String(formWord.value).toLowerCase());
-          this.advance(); this.advance();
-          const lower = this.parseAdditive();
-          this.expect(TT.COMMA, 'Expected , between interval bounds');
-          const upper = this.parseAdditive();
-          this.expect(TT.RPAREN, 'Expected ) after interval bounds');
-          return { type: 'MathIntervalType', lower, upper, includeLower, includeUpper };
-        }
         const opening = this.match(TT.LBRACKET) || this.match(TT.LPAREN);
         if (opening) {
           const lower = this.parseAdditive();
@@ -2273,7 +2180,7 @@
           if (this.peek().type === TT.EOF) throw new Error('Unterminated block; expected }');
           const previousIndex = this.idx;
           body.push(this.parseStatement());
-          this.endStatement();
+          this.match(TT.SEMICOLON);
           if (this.idx === previousIndex) throw new Error('Unable to parse block statement');
         }
         this.advance();
@@ -2344,43 +2251,17 @@
         while (![TT.CASE, TT.DEFAULT, TT.RBRACE, TT.EOF].includes(this.peek().type)) {
           const previousIndex = this.idx;
           body.push(this.parseStatement());
-          this.endStatement();
+          this.match(TT.SEMICOLON);
           if (this.idx === previousIndex) throw new Error('Unable to parse switch case statement');
         }
         return body;
       }
-      parseExpression() {
-        let expr = this.parseTernary();
-        for (;;) {
-          const word = this.peek();
-          const lowerWord = word.type === TT.IDENTIFIER ? String(word.value).toLowerCase() : '';
-          if (lowerWord === 'given') {
-            // expr given cond  ->  expr where cond holds, NaN (undefined) elsewhere
-            this.advance();
-            const cond = this.parseTernary();
-            expr = { type: 'TernaryExpression', cond, trueBranch: expr, falseBranch: { type: 'NumberLiteral', value: NaN } };
-          } else if (lowerWord === 'where') {
-            // expr where a = 1, b = a + 1  ->  local definitions substituted into expr
-            this.advance();
-            const bindings = [];
-            do {
-              const name = this.expect(TT.IDENTIFIER, 'Expected a name after where').value;
-              this.expect(TT.ASSIGN, `Expected = after '${name}' in where`);
-              bindings.push({ name, value: this.parseTernary() });
-            } while (this.match(TT.COMMA));
-            for (let i = 0; i < bindings.length; i++) {
-              for (let j = i + 1; j < bindings.length; j++) bindings[j].value = substituteVariableNode(bindings[j].value, bindings[i].name, bindings[i].value);
-            }
-            bindings.forEach(binding => { expr = substituteVariableNode(expr, binding.name, binding.value); });
-          } else break;
-        }
-        return expr;
-      }
+      parseExpression() { return this.parseTernary(); }
       parseTernary() {
         let cond = this.parseLogicalOr();
         if (this.match(TT.QUESTION)) {
           const trueBranch = this.parseExpression();
-          this.expect(TT.COLON, "Expected : between the two branches of '? :'");
+          this.match(TT.COLON);
           const falseBranch = this.parseExpression();
           return { type: 'TernaryExpression', cond, trueBranch, falseBranch };
         }
@@ -2458,31 +2339,12 @@
         }
         return left;
       }
-      startsImplicitProduct(left) {
-        const next = this.peek(), prev = this.tokens[this.idx - 1];
-        if (!prev || next.line !== prev.line) return false;
-        const afterNumber = left.type === 'NumberLiteral' && prev.type === TT.NUMBER;
-        const afterGroup = prev.type === TT.RPAREN;
-        if (!afterNumber && !afterGroup) return false;
-        if (next.type === TT.LPAREN) return true;
-        if (next.type === TT.IDENTIFIER) {
-          const word = String(next.value).toLowerCase();
-          if (['diff', 'forall', 'given', 'where'].includes(word)) return false;
-          return this.tokens[this.idx + 1]?.type !== TT.ASSIGN;
-        }
-        return false;
-      }
       parseMultiplicative() {
         let left = this.parseUnary();
-        while (true) {
-          if ([TT.MUL, TT.DIV, TT.MOD].includes(this.peek().type)) {
-            const op = this.advance().value;
-            const right = this.parseUnary();
-            left = { type: 'BinaryExpression', left, op, right };
-          } else if (this.startsImplicitProduct(left)) {
-            const right = this.parseUnary();
-            left = { type: 'BinaryExpression', left, op: '*', right };
-          } else break;
+        while ([TT.MUL, TT.DIV, TT.MOD].includes(this.peek().type)) {
+          const op = this.advance().value;
+          const right = this.parseUnary();
+          left = { type: 'BinaryExpression', left, op, right };
         }
         return left;
       }
@@ -2510,16 +2372,6 @@
       }
       parsePrimary() {
         const tok = this.peek();
-        if (tok.type === TT.LBRACKET) {
-          this.advance();
-          const items = [];
-          if (this.peek().type !== TT.RBRACKET) {
-            items.push(this.parseExpression());
-            while (this.match(TT.COMMA)) items.push(this.parseExpression());
-          }
-          this.expect(TT.RBRACKET, 'Expected ] after array items');
-          return { type: 'ArrayLiteral', items };
-        }
         if (tok.type === TT.BAR) {
           this.advance();
           const expression = this.parseExpression();
@@ -2564,7 +2416,7 @@
               return { type: 'SetComprehensionExpression', resultName: firstExpr.name, bindingName, expression, conditions };
             }
             const branches = [];
-            branches.push({ value: firstExpr, condition: this.peek().type === TT.OTHERWISE ? (this.advance(), { type: 'NumberLiteral', value: 1, isOtherwise: true }) : this.parseExpression() });
+            branches.push({ value: firstExpr, condition: this.parseExpression() });
             while (this.match(TT.COMMA)) {
               const branchValue = this.parseExpression();
               if (!this.match(TT.COLON)) {
@@ -2573,17 +2425,14 @@
               let branchCond;
               if (this.peek().type === TT.OTHERWISE) {
                 this.advance();
-                branchCond = { type: 'NumberLiteral', value: 1, isOtherwise: true };
+                branchCond = { type: 'NumberLiteral', value: 1 };
               } else {
                 branchCond = this.parseExpression();
               }
               branches.push({ value: branchValue, condition: branchCond });
             }
-            this.expect(TT.RBRACE, 'Expected } to close the piecewise definition');
-            const lastBranch = branches[branches.length - 1];
-            let piecewise = lastBranch.condition.isOtherwise
-              ? lastBranch.value
-              : { type: 'TernaryExpression', cond: lastBranch.condition, trueBranch: lastBranch.value, falseBranch: { type: 'NumberLiteral', value: NaN } };
+            this.match(TT.RBRACE);
+            let piecewise = branches[branches.length - 1].value;
             for (let i = branches.length - 2; i >= 0; i--) {
               piecewise = {
                 type: 'TernaryExpression',
@@ -2603,7 +2452,7 @@
               }
               items.push(this.parseExpression());
             }
-            this.expect(TT.RBRACE, 'Expected } to close the set');
+            this.match(TT.RBRACE);
             return { type: 'SetLiteral', items };
           }
         }
@@ -2649,7 +2498,7 @@
         }
         if (this.match(TT.LPAREN)) {
           const expr = this.parseExpression();
-          this.expect(TT.RPAREN, 'Expected ) to close the opening (');
+          this.match(TT.RPAREN);
           return expr;
         }
         throw new Error(`Unexpected token '${tok.value}'`);
@@ -2890,14 +2739,13 @@
                 return this.diff(this.bin(base, '^', exp), varName);
               }
               else {
-                throw Object.assign(new Error(`diff() does not know how to differentiate ${node.name}(); define it as a function or use a built-in`), { axiomDiff: true });
+                return this.num(0);
               }
               if (name === 'abs') return outer;
               return this.bin(outer, '*', du);
             }
           }
         } catch (e) {
-          if (e && e.axiomDiff) throw e;
           return this.num(0);
         }
         return this.num(0);
@@ -3205,15 +3053,7 @@
       return makeComplex(a.real - b.real, a.imaginary - b.imaginary);
     }
 
-    let zeroTimesInfinityDepth = 0;
-    function isZeroMathValue(v) { return v === 0 || (isComplexNumber(v) && v.real === 0 && v.imaginary === 0); }
-    function isInfiniteMathValue(v) {
-      if (typeof v === 'number') return v === Infinity || v === -Infinity;
-      return isComplexNumber(v) && (Math.abs(v.real) === Infinity || Math.abs(v.imaginary) === Infinity) && !Number.isNaN(v.real) && !Number.isNaN(v.imaginary);
-    }
     function multiplyMathValues(left, right) {
-      if (zeroTimesInfinityDepth > 0 && !left?.isFormulaValue && !right?.isFormulaValue &&
-          ((isZeroMathValue(left) && isInfiniteMathValue(right)) || (isZeroMathValue(right) && isInfiniteMathValue(left)))) return 0;
       if (left?.isFormulaValue || right?.isFormulaValue) {
         return new FormulaValue(SymbolicEngine.bin(
           left?.isFormulaValue ? left.expression : SymbolicEngine.num(left), '*',
@@ -3325,41 +3165,13 @@
         if (value?.isSet) return Array.from(value.elements);
         return [value];
       });
-      if (!values.length && !['sum', 'count'].includes(String(name).toLowerCase())) throw new Error(`${name}() expects at least one observation`);
+      if (!values.length) throw new Error(`${name}() expects at least one observation`);
       return values.map((value, index) => {
         if (typeof value !== 'number' || !Number.isFinite(value)) {
           throw new Error(`${name}() observation ${index + 1} must be a finite real number`);
         }
         return value;
       });
-    }
-
-    const INTERVAL_WORD_FORMS = new Map([
-      ['open', [false, false]], ['exclusive', [false, false]],
-      ['closed', [true, true]], ['inclusive', [true, true]],
-      ['openclosed', [false, true]], ['closedopen', [true, false]]
-    ]);
-    function substituteVariableNode(tree, name, replacement) {
-      if (!tree || typeof tree !== 'object') return tree;
-      if (Array.isArray(tree)) return tree.map(child => substituteVariableNode(child, name, replacement));
-      if (tree.type === 'Variable' && tree.name === name) return replacement;
-      const copy = { ...tree };
-      for (const [key, value] of Object.entries(tree)) if (value && typeof value === 'object') copy[key] = substituteVariableNode(value, name, replacement);
-      return copy;
-    }
-    class DiscreteSignal {
-      constructor(name, compute, meta = {}) {
-        this.name = name; this.compute = compute; this.indexName = meta.indexName || 'n';
-        this.isDiscreteSignal = true; this.cache = new Map();
-      }
-      at(k) {
-        if (!Number.isInteger(k)) throw new Error(`${this.name}[${this.indexName}] is only defined for integer ${this.indexName} (got ${k})`);
-        if (this.cache.has(k)) return this.cache.get(k);
-        const value = this.compute(k);
-        this.cache.set(k, value);
-        return value;
-      }
-      toString() { return `${this.name}[${this.indexName}] (discrete-time signal)`; }
     }
 
     class ReturnSignal {
@@ -3391,7 +3203,6 @@
         this.loopDepth = 0;
         this.switchDepth = 0;
         this.functionDepth = 0;
-        this.animationFrame = 0;
       }
       assertAssignableName(name) {
         const normalizedName = name.toLowerCase();
@@ -3511,53 +3322,11 @@
         }
         return false;
       }
-      animationStateNodes(args) {
-        if (args.length !== 2) throw new Error('animate() expects animate(startSignal, signalSteps)');
-        let listNode = args[1];
-        const seen = new Set();
-        while (listNode?.type === 'Variable' && !seen.has(listNode.name)) {
-          seen.add(listNode.name);
-          const assigned = this.env[`${listNode.name}_ast`];
-          if (!assigned) break;
-          listNode = assigned;
-        }
-        if (listNode?.type !== 'ArrayLiteral' || listNode.items.length === 0) {
-          throw new Error('animate() signalSteps must be a non-empty list, for example [u(t - 1), u(t - 2)]');
-        }
-        return [args[0], ...listNode.items];
-      }
-      inlineTimeSignals(node, seen = new Set()) {
-        // Replaces names of time-dependent signals with their equations so a time shift reaches the whole chain.
-        const dependsOnT = (tree, visited) => {
-          if (!tree || typeof tree !== 'object') return false;
-          if (Array.isArray(tree)) return tree.some(child => dependsOnT(child, visited));
-          if (tree.type === 'Variable') {
-            if (tree.name === 't') return true;
-            const ast = this.env[`${tree.name}_ast`];
-            if (ast && !visited.has(tree.name)) { visited.add(tree.name); return dependsOnT(ast, visited); }
-            return false;
-          }
-          return Object.values(tree).some(value => value && typeof value === 'object' && dependsOnT(value, visited));
-        };
-        const inline = (tree, visited) => {
-          if (!tree || typeof tree !== 'object') return tree;
-          if (Array.isArray(tree)) return tree.map(child => inline(child, visited));
-          if (tree.type === 'Variable' && tree.name !== 't') {
-            const ast = this.env[`${tree.name}_ast`];
-            if (ast && !visited.has(tree.name) && dependsOnT(ast, new Set([tree.name]))) return inline(ast, new Set([...visited, tree.name]));
-            return tree;
-          }
-          const copy = { ...tree };
-          for (const [key, value] of Object.entries(tree)) if (value && typeof value === 'object') copy[key] = inline(value, visited);
-          return copy;
-        };
-        return inline(node, seen);
-      }
-      callUserFunction(definition, argumentNodes, instance = null, preEvaluated = false) {
+      callUserFunction(definition, argumentNodes, instance = null) {
         if (argumentNodes.length !== definition.parameters.length) {
           throw new Error(`${definition.name}() expects ${definition.parameters.length} arguments, got ${argumentNodes.length}`);
         }
-        const argumentsEvaluated = preEvaluated ? argumentNodes : argumentNodes.map(argument => this.execute(argument));
+        const argumentsEvaluated = argumentNodes.map(argument => this.execute(argument));
         if (definition.isTyped && definition.domain) {
           for (let idx = 0; idx < argumentsEvaluated.length; idx++) {
             if (!this.evaluateTypeSpec(definition.domain, argumentsEvaluated[idx])) {
@@ -3612,7 +3381,6 @@
           case 'BooleanLiteral': return node.value;
           case 'NumberLiteral': return node.value;
           case 'StringLiteral': return node.value;
-          case 'ArrayLiteral': return node.items.map(item => this.execute(item));
           case 'AbsoluteValueExpression': {
             const value = this.execute(node.expression);
             if (value?.isFormulaValue) return new FormulaValue({ type: 'AbsoluteValueExpression', expression: value.expression });
@@ -3643,60 +3411,6 @@
             includeLower: node.includeLower,
             includeUpper: node.includeUpper
           };
-          case 'DiscreteSignalDefinition': {
-            this.assertAssignableName(node.name);
-            const interpreter = this;
-            const definitionEnv = this.env;
-            if (node.expr?.type === 'FunctionCall' && node.expr.name.toLowerCase() === 'animate') {
-              const states = this.animationStateNodes(node.expr.args);
-              const firstState = states[0];
-              const sourceName = firstState?.type === 'Variable' ? firstState.name : 'signal';
-              const signal = new DiscreteSignal(node.name, k => {
-                if (node.domain && !interpreter.evaluateTypeSpec(node.domain, k)) {
-                  throw new Error(`${node.name}[${k}] is outside the declared domain`);
-                }
-                const savedEnv = interpreter.env;
-                interpreter.env = Object.create(definitionEnv);
-                interpreter.env[node.indexName] = k;
-                try {
-                  const frame = Math.min(interpreter.animationFrame, states.length - 1);
-                  const state = interpreter.execute(states[frame]);
-                  const value = state?.isDiscreteSignal ? state.at(k) : state;
-                  if (node.range && value !== null && value !== undefined && !interpreter.evaluateTypeSpec(node.range, value)) {
-                    throw new Error(`${node.name}[${k}] = ${formatTerminalValue(value)} is outside the declared range`);
-                  }
-                  return value;
-                } finally {
-                  interpreter.env = savedEnv;
-                }
-              }, { indexName: node.indexName });
-              signal.cache = { has: () => false, get: () => undefined, set: () => {} };
-              signal.animated = true;
-              signal.animationSequenceLength = states.length;
-              signal.sourceName = sourceName;
-              this.env[node.name] = signal;
-              return signal;
-            }
-            const signal = new DiscreteSignal(node.name, k => {
-              if (node.domain && !interpreter.evaluateTypeSpec(node.domain, k)) {
-                throw new Error(`${node.name}[${k}] is outside the declared domain`);
-              }
-              const savedEnv = interpreter.env;
-              interpreter.env = Object.create(definitionEnv);
-              interpreter.env[node.indexName] = k;
-              try {
-                const value = interpreter.execute(node.expr);
-                if (node.range && value !== null && value !== undefined && !interpreter.evaluateTypeSpec(node.range, value)) {
-                  throw new Error(`${node.name}[${k}] = ${formatTerminalValue(value)} is outside the declared range`);
-                }
-                return value;
-              } finally {
-                interpreter.env = savedEnv;
-              }
-            }, { indexName: node.indexName });
-            this.env[node.name] = signal;
-            return signal;
-          }
           case 'TypedFunctionDeclaration': {
             const normalizedName = node.name.toLowerCase();
             if (isReservedName(node.name)) throw new Error(`Cannot define reserved function '${node.name}'`);
@@ -3865,22 +3579,7 @@
             return object.fields[node.name];
           }
           case 'IndexExpression': {
-            if (node.object.type === 'Variable' && !(node.object.name in this.env)) {
-              // Math-style discrete notation for built-ins: u[n], delta[n], rect[n] ...
-              const k = requireReal(this.execute(node.index), 'index');
-              if (!Number.isInteger(k)) throw new Error(`${node.object.name}[n] is only defined for integer n (got ${k})`);
-              const builtin = node.object.name.toLowerCase();
-              if (builtin === 'delta' || builtin === 'impulse') return k === 0 ? 1 : 0;
-              if (builtin === 'u' || builtin === 'step' || builtin === 'heaviside') return k >= 0 ? 1 : 0;
-              try {
-                return this.executeFunction(node.object.name, [{ type: 'NumberLiteral', value: k }]);
-              } catch (error) {
-                if (/unknown function|undefined function|not defined/i.test(String(error.message))) throw new Error(`Undefined variable '${node.object.name}'`);
-                throw error;
-              }
-            }
             const object = this.execute(node.object);
-            if (object && object.isDiscreteSignal) return object.at(requireReal(this.execute(node.index), 'index'));
             const index = requireReal(this.execute(node.index), 'index');
             if (!Number.isInteger(index) || index < 0) throw new Error('Array index must be a non-negative integer');
             if (!Array.isArray(object) || index >= object.length) throw new Error('Index is outside the array bounds');
@@ -4129,16 +3828,7 @@
             }
             return this.execute(node.result);
           }
-          case 'FunctionCall': {
-            // A named signal can be sampled with the same call syntax as a continuous signal:
-            // x(2) is equivalent to x[2] when x is a discrete-time signal.
-            const callable = this.env[node.name];
-            if (callable?.isDiscreteSignal) {
-              if (node.args.length !== 1) throw new Error(`${node.name}() expects one integer sample index`);
-              return callable.at(requireReal(this.execute(node.args[0]), node.name));
-            }
-            return this.executeFunction(node.name, node.args);
-          }
+          case 'FunctionCall': return this.executeFunction(node.name, node.args);
         }
       }
 
@@ -4325,7 +4015,7 @@
             return new FormulaValue({ type: 'FunctionCall', name, args: values.map(value =>
               value?.isFormulaValue ? value.expression : SymbolicEngine.num(value)) });
           }
-          return this.callUserFunction(userFunction, values, null, true);
+          return this.callUserFunction(userFunction, values);
         }
 
         if (lower === 'plot') {
@@ -4379,109 +4069,6 @@
           return null;
         }
 
-        if (INTERVAL_WORD_FORMS.has(lower)) {
-          if (args.length !== 2) throw new Error(`${name}() expects a lower and an upper bound, for example ${name}(0, 1)`);
-          const [includeLower, includeUpper] = INTERVAL_WORD_FORMS.get(lower);
-          return {
-            isMathInterval: true,
-            lower: requireReal(this.execute(args[0]), `${name}() lower bound`),
-            upper: requireReal(this.execute(args[1]), `${name}() upper bound`),
-            includeLower, includeUpper
-          };
-        }
-
-        if (lower === 'exists') {
-          if (args.length !== 3) throw new Error('exists() expects a variable, a finite set or range, and a condition');
-          if (args[0]?.type !== 'Variable') throw new Error('exists() first argument must be a variable name');
-          const collection = this.execute(args[1]);
-          const values = collection?.isSet ? Array.from(collection.elements) : Array.isArray(collection) ? collection : null;
-          if (!values) throw new Error('exists() expects a finite set or range as its second argument');
-          for (const value of values) {
-            const condition = evaluateWithVariable(args[0].name, value, () => this.execute(args[2]));
-            if (this.isTruthy(condition)) return 1.0;
-          }
-          return 0.0;
-        }
-
-        if (lower === 'impulse') {
-          if (args.length !== 1) throw new Error('impulse() expects exactly one argument');
-          return requireReal(this.execute(args[0]), 'impulse() argument') === 0 ? 1 : 0;
-        }
-
-        if (lower === 'delay' || lower === 'shift') {
-          if (args.length !== 2) throw new Error(`${name}() expects ${name}(signal, amount)`);
-          const amount = requireReal(this.execute(args[1]), `${name}() amount`);
-          const target = args[0].type === 'Variable' && args[0].name in this.env ? this.env[args[0].name] : null;
-          if (target && target.isDiscreteSignal) {
-            if (!Number.isInteger(amount)) throw new Error(`${name}() of a discrete-time signal needs a whole number of samples`);
-            return new DiscreteSignal(`${name}(${target.name})`, k => target.at(k - amount), { indexName: target.indexName });
-          }
-          // Continuous: x(t) becomes x(t - amount). Signals defined by name are expanded first so the whole chain shifts.
-          const dependsOnT = (node, seen) => {
-            if (!node || typeof node !== 'object') return false;
-            if (Array.isArray(node)) return node.some(child => dependsOnT(child, seen));
-            if (node.type === 'Variable') {
-              if (node.name === 't') return true;
-              const ast = this.env[`${node.name}_ast`];
-              if (ast && !seen.has(node.name)) { seen.add(node.name); return dependsOnT(ast, seen); }
-              return false;
-            }
-            return Object.values(node).some(value => value && typeof value === 'object' && dependsOnT(value, seen));
-          };
-          const inline = (node, seen) => {
-            if (!node || typeof node !== 'object') return node;
-            if (Array.isArray(node)) return node.map(child => inline(child, seen));
-            if (node.type === 'Variable' && node.name !== 't') {
-              const ast = this.env[`${node.name}_ast`];
-              if (ast && !seen.has(node.name) && dependsOnT(ast, new Set([node.name]))) return inline(ast, new Set([...seen, node.name]));
-              return node;
-            }
-            const copy = { ...node };
-            for (const [key, value] of Object.entries(node)) if (value && typeof value === 'object') copy[key] = inline(value, seen);
-            return copy;
-          };
-          const source = inline(args[0], new Set());
-          const shifted = substituteVariableNode(source, 't', {
-            type: 'BinaryExpression', left: { type: 'Variable', name: 't' }, op: '-', right: { type: 'NumberLiteral', value: amount }
-          });
-          return this.execute(shifted);
-        }
-
-        if (lower === 'animate') {
-          const states = this.animationStateNodes(args);
-          const target = this.execute(states[0]);
-          const interpreter = this;
-          if (target?.isDiscreteSignal) {
-            const animated = new DiscreteSignal(`animate(${target.name})`, k => {
-              const frame = Math.min(interpreter.animationFrame, states.length - 1);
-              const signal = interpreter.execute(states[frame]);
-              if (!signal?.isDiscreteSignal) throw new Error(`animate() state ${frame} must be a discrete-time signal`);
-              return signal.at(k);
-            }, { indexName: target.indexName });
-            animated.cache = { has: () => false, get: () => undefined, set: () => {} };
-            animated.animated = true; animated.animationSequenceLength = states.length; animated.sourceName = target.name;
-            return animated;
-          }
-          return this.execute(states[Math.min(this.animationFrame, states.length - 1)]);
-        }
-
-        if (lower === 'conv') {
-          if (args.length < 2 || args.length > 3) throw new Error('conv() expects conv(x, h) or conv(x, h, window)');
-          const first = this.execute(args[0]), second = this.execute(args[1]);
-          if (!first?.isDiscreteSignal || !second?.isDiscreteSignal) throw new Error('conv() works on discrete-time signals such as x[n] = ...');
-          const windowSize = args.length === 3 ? Math.round(requireReal(this.execute(args[2]), 'conv() window')) : 64;
-          if (!(windowSize >= 0 && windowSize <= 5000)) throw new Error('conv() window must be between 0 and 5000');
-          return new DiscreteSignal('conv', k => {
-            let sum = 0;
-            for (let m = -windowSize; m <= windowSize; m++) {
-              const left = first.at(m);
-              if (left === 0) continue;
-              sum = addMathValues(sum, multiplyMathValues(left, second.at(k - m)));
-            }
-            return sum;
-          }, { indexName: 'n' });
-        }
-
         if (lower === 'forall') {
           if (args.length !== 3) throw new Error('forall() expects a variable, a finite set or range, and a condition');
           if (args[0]?.type !== 'Variable') throw new Error('forall() first argument must be a variable name');
@@ -4503,7 +4090,6 @@
           if (value === null) return 'null';
           if (isComplexNumber(value)) return 'complex';
           if (value?.isSet) return 'set';
-          if (value?.isDiscreteSignal) return 'discrete signal';
           if (value?.isAxiomObject) return value.className || 'object';
           if (value instanceof SymbolicFunction) return 'function';
           if (value?.isFormulaValue) return 'formula';
@@ -4512,11 +4098,6 @@
         }
 
         if (lower === 'integrate') {
-          if (args.length !== 4 || !args[1] || args[1].type !== 'Variable') {
-            throw new Error('integrate() expects integrate(expression, variable, from, to)');
-          }
-          zeroTimesInfinityDepth++;
-          try {
           const substituteVariable = (node, variableName, replacement) => {
             if (!node || typeof node !== 'object') return node;
             if (node.type === 'Variable' && node.name === variableName) return replacement;
@@ -4661,8 +4242,6 @@
               }
               if (!Number.isFinite(slope) || Math.abs(slope) < 1e-12) continue;
               let value = impulse.sign / Math.abs(slope);
-              const onBound = bound => Number.isFinite(bound) && Math.abs(root - bound) <= 1e-9 * Math.max(1, Math.abs(bound));
-              if (onBound(start) || onBound(stop)) value *= 0.5;
               for (const factor of impulse.factors) {
                 value = multiplyMathValues(value, evaluateWithVariable(varName, root, () => this.execute(factor)));
               }
@@ -4674,71 +4253,12 @@
             (sum, impulse) => addMathValues(sum, getImpulseContributions(impulse, start, stop)),
             value
           );
-          const isNumeric = v => typeof v === 'number' || isComplexNumber(v);
-          const magnitude = v => isComplexNumber(v) ? Math.hypot(v.real, v.imaginary) : Math.abs(v);
-          const isFiniteValue = v => isComplexNumber(v) ? (Number.isFinite(v.real) && Number.isFinite(v.imaginary)) : Number.isFinite(v);
-          const GK_X = [0.991455371120812639206854697526329, 0.949107912342758524526189684047851, 0.864864423359769072789712788640926, 0.741531185599394439863864773280788, 0.586087235467691130294144838258730, 0.405845151377397166906606412076961, 0.207784955007898467600689403773245, 0];
-          const GK_WK = [0.022935322010529224963732008058970, 0.063092092629978553290700663189204, 0.104790010322250183839876322541518, 0.140653259715525918745189590510238, 0.169004726639267902826583426598550, 0.190350578064785409913256402421014, 0.204432940075298892414161999234649, 0.209482141084727828012999174891714];
-          const GK_WG = [0.129484966168869693270611432679082, 0.279705391489276667901467771423780, 0.381830050505118944950369775488975, 0.417959183673469387755102040816327];
-          const MAX_EVALUATIONS = 120000;
-          // Adaptive Gauss-Kronrod (G7/K15). `sample(x)` returns the integrand (already including any change-of-variable jacobian).
-          const adaptiveIntegral = (sample, a, b, panels, locate) => {
-            let nonFinite = 0;
-            const safeSample = x => {
-              const v = sample(x);
-              if (!isNumeric(v)) throw new Error('integrate() integrand must evaluate to a number');
-              if (!isFiniteValue(v)) { nonFinite++; return 0; }
-              return v;
-            };
-            const span = b - a;
-            const minWidth = Math.abs(span) * 1e-13;
-            const panel = (lo, hi) => {
-              const before = nonFinite;
-              const c = 0.5 * (lo + hi), h = 0.5 * (hi - lo);
-              const fc = safeSample(c);
-              let rk = multiplyMathValues(GK_WK[7], fc);
-              let rg = multiplyMathValues(GK_WG[3], fc);
-              for (let j = 0; j < 7; j++) {
-                const dx = h * GK_X[j];
-                const pair = addMathValues(safeSample(c - dx), safeSample(c + dx));
-                rk = addMathValues(rk, multiplyMathValues(GK_WK[j], pair));
-                if (j % 2 === 1) rg = addMathValues(rg, multiplyMathValues(GK_WG[(j - 1) / 2], pair));
-              }
-              const value = multiplyMathValues(h, rk);
-              const gauss = multiplyMathValues(h, rg);
-              let error = magnitude(addMathValues(value, multiplyMathValues(-1, gauss)));
-              if (nonFinite > before && Math.abs(hi - lo) > minWidth) error = Infinity;
-              return { lo, hi, value, error };
-            };
-            let segments = [];
-            for (let k = 0; k < panels; k++) segments.push(panel(a + span * k / panels, a + span * (k + 1) / panels));
-            let evaluations = panels * 15;
-            for (;;) {
-              let totalError = 0, totalAbs = 0, worst = -1, worstError = -1;
-              segments.forEach((segment, index) => {
-                totalError += segment.error;
-                totalAbs += magnitude(segment.value);
-                if (Math.abs(segment.hi - segment.lo) > minWidth && segment.error > worstError) { worst = index; worstError = segment.error; }
-              });
-              if (totalError <= Math.max(1e-14, 1e-10 * totalAbs) || worst < 0) break;
-              if (evaluations > MAX_EVALUATIONS) {
-                if (totalError <= 1e-6 * Math.max(1e-12, totalAbs)) break;
-                throw new Error('integrate() did not converge. The integrand may diverge, oscillate too fast, or have a non-integrable singularity inside the bounds; try narrower bounds.');
-              }
-              const target = segments[worst];
-              const mid = 0.5 * (target.lo + target.hi);
-              segments.splice(worst, 1, panel(target.lo, mid), panel(mid, target.hi));
-              evaluations += 30;
-            }
-            // A divergent singularity keeps contributing at every scale; a convergent one fades away.
-            const totalAbs = segments.reduce((sum, segment) => sum + magnitude(segment.value), 0);
-            const fine = segments.filter(segment => Math.abs(segment.hi - segment.lo) <= 1e-12 * Math.abs(span));
-            const offender = fine.find(segment => magnitude(segment.value) > 2e-4 * Math.max(1, totalAbs));
-            if (offender) {
-              const where = locate(0.5 * (offender.lo + offender.hi));
-              throw new Error(`integrate() does not converge: the integral diverges or has a non-integrable singularity near ${varName} = ${Number.isFinite(where) ? Number(where.toPrecision(6)) : where}`);
-            }
-            return segments.reduce((sum, segment) => addMathValues(sum, segment.value), 0);
+          const simpson = (sample, start, stop, steps) => {
+            const h = (stop - start) / steps;
+            let sum = addMathValues(sample(start), sample(stop));
+            for (let i = 1; i < steps; i += 2) sum = addMathValues(sum, multiplyMathValues(4, sample(start + i * h)));
+            for (let i = 2; i < steps - 1; i += 2) sum = addMathValues(sum, multiplyMathValues(2, sample(start + i * h)));
+            return multiplyMathValues(h / 3, sum);
           };
 
           if (from === to) return 0;
@@ -4748,52 +4268,62 @@
           let result;
 
           if (Number.isFinite(lower) && Number.isFinite(upper)) {
-            result = adaptiveIntegral(evaluateAt, lower, upper, 16, x => x);
+            result = simpson(evaluateAt, lower, upper, 1000);
             result = addImpulseContributions(result, lower, upper);
           } else {
+            const steps = 4000;
+            const epsilon = 1e-5;
+            const magnitude = value => isComplexNumber(value) ? Math.hypot(value.real, value.imaginary) : Math.abs(value);
             const divergentTails = [];
-            const requireDecayingTail = (nearStart, nearEnd, farStart, farEnd) => {
-              const peak = (from, to) => {
-                let best = 0, last;
-                for (let k = 0; k < 8; k++) {
-                  last = evaluateAt(from + (to - from) * k / 7);
-                  best = Math.max(best, magnitude(last));
-                }
-                return { best, last };
-              };
-              const inner = peak(nearStart, nearEnd), outer = peak(farStart, farEnd);
-              if (!Number.isFinite(inner.best) || !Number.isFinite(outer.best) ||
-                  (outer.best > 1e-10 && (inner.best <= 1e-10 || outer.best >= inner.best * 0.85))) {
-                const innerValue = evaluateAt(nearStart), outerValue = evaluateAt(farStart);
+            const requireDecayingTail = (innerPoint, outerPoint) => {
+              const innerValue = evaluateAt(innerPoint);
+              const outerValue = evaluateAt(outerPoint);
+              const innerMagnitude = magnitude(innerValue);
+              const outerMagnitude = magnitude(outerValue);
+              if (!Number.isFinite(innerMagnitude) || !Number.isFinite(outerMagnitude) ||
+                  (outerMagnitude > 1e-10 && (innerMagnitude <= 1e-10 || outerMagnitude >= innerMagnitude * 0.85))) {
                 const sameRealTail = typeof innerValue === 'number' && typeof outerValue === 'number' &&
                   Math.abs(innerValue - outerValue) <= 1e-10 * Math.max(1, Math.abs(innerValue), Math.abs(outerValue)) &&
                   Math.abs(outerValue) > 1e-10;
-                if (sameRealTail) { divergentTails.push(Math.sign(outerValue)); return; }
+                if (sameRealTail) {
+                  divergentTails.push(Math.sign(outerValue));
+                  return;
+                }
                 throw new Error('integrate() infinite bounds require a decaying integrand; include a signal such as x(t)');
               }
             };
-            const hi = Number.isFinite(upper) ? upper : 0, lo = Number.isFinite(lower) ? lower : 0;
-            if (lower === -Infinity) requireDecayingTail(hi - 64, hi - 100, hi - 200, hi - 256);
-            if (upper === Infinity) requireDecayingTail(lo + 64, lo + 100, lo + 200, lo + 256);
-            const integrateMapped = (map, jacobian) => {
-              const sample = u => {
-                const x = map(u);
-                const value = evaluateAt(x);
-                if (!isFiniteValue(value) && Math.abs(x) > 1e8) return 0;
-                return multiplyMathValues(value, jacobian(u));
-              };
-              return adaptiveIntegral(sample, 0, 1, 256, map);
+            if (lower === -Infinity) requireDecayingTail(Number.isFinite(upper) ? upper - 64 : -64, Number.isFinite(upper) ? upper - 256 : -256);
+            if (upper === Infinity) requireDecayingTail(Number.isFinite(lower) ? lower + 64 : 64, Number.isFinite(lower) ? lower + 256 : 256);
+            const integrateMapped = (map, jacobian, start, stop) => {
+              const sample = (u) => multiplyMathValues(evaluateAt(map(u)), jacobian(u));
+              return simpson(sample, start, stop, steps);
             };
+
             if (divergentTails.length) {
               result = divergentTails.every(sign => sign === divergentTails[0])
                 ? (divergentTails[0] > 0 ? Infinity : -Infinity)
                 : NaN;
             } else if (lower === -Infinity && upper === Infinity) {
-              result = integrateMapped(u => Math.tan(Math.PI * (u - 0.5)), u => Math.PI / Math.pow(Math.cos(Math.PI * (u - 0.5)), 2));
+              result = integrateMapped(
+                u => Math.tan(Math.PI * (u - 0.5)),
+                u => Math.PI / Math.pow(Math.cos(Math.PI * (u - 0.5)), 2),
+                epsilon,
+                1 - epsilon
+              );
             } else if (Number.isFinite(lower) && upper === Infinity) {
-              result = integrateMapped(u => lower + u / (1 - u), u => 1 / Math.pow(1 - u, 2));
+              result = integrateMapped(
+                u => lower + u / (1 - u),
+                u => 1 / Math.pow(1 - u, 2),
+                0,
+                1 - epsilon
+              );
             } else if (lower === -Infinity && Number.isFinite(upper)) {
-              result = integrateMapped(u => upper - (1 - u) / u, u => 1 / (u * u));
+              result = integrateMapped(
+                u => upper - (1 - u) / u,
+                u => 1 / (u * u),
+                epsilon,
+                1
+              );
             } else {
               throw new Error('integrate() requires ordered finite or infinite real bounds');
             }
@@ -4801,9 +4331,6 @@
           }
 
           return multiplyMathValues(direction, result);
-          } finally {
-            zeroTimesInfinityDepth--;
-          }
         }
 
         if (lower === 'diff') {
@@ -4833,31 +4360,6 @@
               return { ...node, expression: substituteKnownVars(node.expression) };
             }
             if (node.type === 'FunctionCall') {
-              const substituteIn = (tree, name, replacement) => {
-                if (!tree || typeof tree !== 'object') return tree;
-                if (Array.isArray(tree)) return tree.map(child => substituteIn(child, name, replacement));
-                if (tree.type === 'Variable' && tree.name === name) return replacement;
-                const copy = { ...tree };
-                for (const [key, value] of Object.entries(tree)) if (value && typeof value === 'object') copy[key] = substituteIn(value, name, replacement);
-                return copy;
-              };
-              const callable = this.env[node.name];
-              if (callable instanceof SymbolicFunction && node.args.length === 1) {
-                return substituteKnownVars(substituteIn(callable.expression, callable.variableName, node.args[0]));
-              }
-              const userFunction = this.functions.get(String(node.name).toLowerCase());
-              if (userFunction) {
-                const statements = userFunction.body?.body || [];
-                if (statements.length !== 1 || statements[0].type !== 'ReturnStatement' || !statements[0].value ||
-                    userFunction.parameters.length !== node.args.length) {
-                  throw new Error(`diff() can only differentiate '${node.name}()' when its body is a single return expression`);
-                }
-                let body = statements[0].value;
-                userFunction.parameters.forEach((parameter, index) => { body = substituteIn(body, parameter, node.args[index]); });
-                return substituteKnownVars(body);
-              }
-              const assignedSignal = this.env[`${node.name}_ast`];
-              if (assignedSignal && node.args.length === 1) return substituteKnownVars(substituteIn(assignedSignal, 't', node.args[0]));
               return { ...node, args: node.args.map(substituteKnownVars) };
             }
             if (node.type === 'TernaryExpression') {
@@ -5095,8 +4597,6 @@
           return Math.sqrt(normalizedVariance) * scale;
         }
 
-        const UNARY_BUILTINS = new Set(['sin','cos','tan','sec','csc','cot','asin','acos','atan','sinh','cosh','tanh','asinh','acosh','atanh','exp','ln','log10','log2','sqrt','cbrt','abs','floor','ceil','trunc','sign','signum','sgn','deg','degrees','rad','radians','real','imag','conj','arg','u','step','heaviside','delta','ramp','rect','tri']);
-        if (UNARY_BUILTINS.has(lower) && args.length !== 1) throw new Error(`${name}() expects exactly one argument`);
         switch (lower) {
           case 'sin': return isComplexNumber(x) ? complexSin(x) : Math.sin(x);
           case 'cos': return isComplexNumber(x) ? complexCos(x) : Math.cos(x);
@@ -5223,9 +4723,6 @@
       { border: '#ffb700', bg: 'rgba(255, 183, 0, 0.12)' },
       { border: '#a855f7', bg: 'rgba(168, 85, 247, 0.12)' }
     ];
-    const AXIS_Y_COLOR = '#ff8c42';
-    const AXIS_X_COLOR = '#fff1c1';
-    const PREVIOUS_STEP_COLOR = 'rgba(203, 213, 225, 0.52)';
 
     function updateTimeSpan() {
       const val = parseFloat(document.getElementById('time-span-input').value);
@@ -5238,27 +4735,14 @@
       }
     }
 
-    const FFT_SIZE = 131072;
-    // When every displayed channel is a discrete-time signal the views switch to n (samples) and cycles/sample.
-    let discreteOnlyHalf = null;
-    const baseTimeMin = () => discreteOnlyHalf !== null ? -discreteOnlyHalf - 0.5 : -tSpan;
-    const baseTimeMax = () => discreteOnlyHalf !== null ? discreteOnlyHalf + 0.5 : tSpan;
-    const baseFreqMin = () => discreteOnlyHalf !== null ? -0.5 : freqAxis[0];
-    const baseFreqMax = () => discreteOnlyHalf !== null ? 0.5 : freqAxis[freqAxis.length - 1];
     function recalculateAxes() {
-      // Power-of-two step sizes keep every grid nested, so the same t always lands on the same sample for any span.
-      // Keep one time grid at every span. This makes extrema and FFT inputs independent
-      // of the visible window instead of silently halving the sample density at 32 s.
-      dt = 1 / 256;
-      const half = Math.round(tSpan / dt);
-      // Half-step offset keeps jumps (such as u(t) at t = 0) between samples instead of on one, which removes a dt/2 bias.
-      N_TIME = 2 * half;
-      timeAxis = Float64Array.from({ length: N_TIME }, (_, i) => (i - half + 0.5) * dt);
+      dt = (2 * tSpan) / (N_TIME - 1);
+      timeAxis = Float64Array.from({ length: N_TIME }, (_, i) => -tSpan + i * dt);
 
-      // Fixed output grid of 1/32 Hz, so the frequency bins never move when the span changes.
-      df = 1 / 32;
-      const bins = Math.floor(Math.min(50, 0.5 / dt) / df);
-      freqAxis = Float64Array.from({ length: 2 * bins + 1 }, (_, i) => (i - bins) * df);
+      const nyquistFrequency = 1 / (2 * dt);
+      const fMax = Math.min(nyquistFrequency, Math.max(10, 50 / tSpan));
+      df = (2 * fMax) / 599;
+      freqAxis = Float64Array.from({ length: 600 }, (_, i) => -fMax + i * df);
     }
 
     function setSignalsWidth(percent) {
@@ -5289,7 +4773,7 @@
         vp.xMax = center + half;
       };
       if (isFreq === null || isFreq === false) apply(chartViewports.time, -tSpan, tSpan);
-      if (isFreq === null || isFreq === true) apply(chartViewports.freq, baseFreqMin(), baseFreqMax());
+      if (isFreq === null || isFreq === true) apply(chartViewports.freq, freqAxis[0], freqAxis[freqAxis.length - 1]);
       renderActiveChannel();
     }
 
@@ -5448,20 +4932,14 @@
           scales: {
             x: {
               type: 'linear',
-              min: isFreq ? baseFreqMin() : baseTimeMin(),
-              max: isFreq ? baseFreqMax() : baseTimeMax(),
-              grid: {
-                color: context => context.tick?.value === 0 ? AXIS_Y_COLOR : 'rgba(92, 99, 112, 0.15)',
-                lineWidth: context => context.tick?.value === 0 ? 2.2 : 1
-              },
-              ticks: { color: context => context.tick?.value === 0 ? AXIS_Y_COLOR : '#5c6370', font: { size: 10 }, maxTicksLimit: 10 }
+              min: isFreq ? freqAxis[0] : -tSpan,
+              max: isFreq ? freqAxis[freqAxis.length - 1] : tSpan,
+              grid: { color: 'rgba(92, 99, 112, 0.15)' },
+              ticks: { color: '#5c6370', font: { size: 10 }, maxTicksLimit: 10 }
             },
             y: {
-              grid: {
-                color: context => context.tick?.value === 0 ? AXIS_X_COLOR : 'rgba(92, 99, 112, 0.15)',
-                lineWidth: context => context.tick?.value === 0 ? 2.2 : 1
-              },
-              ticks: { color: context => context.tick?.value === 0 ? AXIS_X_COLOR : '#5c6370', font: { size: 10 }, maxTicksLimit: 8 }
+              grid: { color: 'rgba(92, 99, 112, 0.15)' },
+              ticks: { color: '#5c6370', font: { size: 10 }, maxTicksLimit: 8 }
             }
           }
         }
@@ -5582,13 +5060,10 @@
         entry.chart.data.datasets = [dataset];
         const xs = entry.points.map(point => point.x);
         const ys = entry.points.map(point => point.y);
-        const finiteExtent = (values, fallbackMin, fallbackMax) => {
-          let low = Infinity, high = -Infinity;
-          for (const value of values) { if (Number.isFinite(value)) { if (value < low) low = value; if (value > high) high = value; } }
-          return low <= high ? [low, high] : [fallbackMin, fallbackMax];
-        };
-        let [xMin, xMax] = finiteExtent(xs, 0, 1);
-        let [yMin, yMax] = finiteExtent(ys, 0, 1);
+        let xMin = xs.length ? Math.min(...xs) : 0;
+        let xMax = xs.length ? Math.max(...xs) : 1;
+        let yMin = ys.length ? Math.min(...ys) : 0;
+        let yMax = ys.length ? Math.max(...ys) : 1;
         const xPad = xMax === xMin ? 0.5 : (xMax - xMin) * 0.05;
         const yPad = yMax === yMin ? Math.max(0.5, Math.abs(yMin) * 0.05) : (yMax - yMin) * 0.1;
         entry.baseBounds = { xMin: xMin - xPad, xMax: xMax + xPad, yMin: yMin - yPad, yMax: yMax + yPad };
@@ -5855,7 +5330,6 @@
         seen.delete(value);
         return formatted;
       }
-      if (value?.isDiscreteSignal) return value.toString();
       if (value?.isMathSetType) return value.toString?.() || value.symbol || value.name;
       if (value?.isFormulaValue) return value.toString();
       if (value instanceof SymbolicFunction) return value.toString();
@@ -5965,63 +5439,38 @@
       job.resolve(null);
     }
 
-    function computeFourierInWorker(signals, dtOverride) {
+    function computeFourierInWorker(signals, hannWindow) {
       if (signals.length === 0) return Promise.resolve([]);
       return new Promise((resolve, reject) => {
-        const source = `
-          function fft(re, im) {
-            const n = re.length;
-            for (let i = 1, j = 0; i < n; i++) {
-              let bit = n >> 1;
-              for (; j & bit; bit >>= 1) j ^= bit;
-              j ^= bit;
-              if (i < j) { let x = re[i]; re[i] = re[j]; re[j] = x; x = im[i]; im[i] = im[j]; im[j] = x; }
+        const source = `self.onmessage = ({ data }) => {
+          const { signals, frequencies, hannWindow, sampleCount, startTime, dt } = data;
+          const results = signals.map(({ name, samples }) => {
+            const weightedSamples = Float64Array.from(samples, (value, index) => value * hannWindow[index] * dt);
+            const magnitudes = new Float64Array(frequencies.length);
+            for (let i = 0; i < frequencies.length; i++) {
+              const frequency = frequencies[i];
+              const phaseStep = -2 * Math.PI * frequency * dt;
+              const stepRe = Math.cos(phaseStep);
+              const stepIm = Math.sin(phaseStep);
+              const initialPhase = -2 * Math.PI * frequency * startTime;
+              let phaseRe = Math.cos(initialPhase);
+              let phaseIm = Math.sin(initialPhase);
+              let re = 0;
+              let im = 0;
+              for (let j = 0; j < sampleCount; j++) {
+                const sample = weightedSamples[j];
+                re += sample * phaseRe;
+                im += sample * phaseIm;
+                const nextPhaseRe = phaseRe * stepRe - phaseIm * stepIm;
+                phaseIm = phaseRe * stepIm + phaseIm * stepRe;
+                phaseRe = nextPhaseRe;
+              }
+              magnitudes[i] = Math.sqrt(re * re + im * im);
             }
-            for (let len = 2; len <= n; len <<= 1) {
-              const ang = -2 * Math.PI / len, wr = Math.cos(ang), wi = Math.sin(ang), half = len >> 1;
-              for (let i = 0; i < n; i += len) {
-                let cr = 1, ci = 0;
-                for (let k = 0; k < half; k++) {
-                  const a = i + k, b = a + half;
-                  const tr = re[b] * cr - im[b] * ci, ti = re[b] * ci + im[b] * cr;
-                  re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
-                  const nr = cr * wr - ci * wi; ci = cr * wi + ci * wr; cr = nr;
-                }
-              }
-            }
-          }
-          self.onmessage = ({ data }) => {
-            const { signals, bins, stride, fftSize, dt, usable } = data;
-            const results = signals.map(({ name, samples, persistent }) => {
-              const count = samples.length;
-              const re = new Float64Array(fftSize), im = new Float64Array(fftSize);
-              let weightSum = 0;
-              for (let k = 0; k < count; k++) {
-                // Persistent signals (tones) use a Hann window and are normalised by its gain, so a tone of
-                // amplitude A reads A/2 at +-f for any span. Transient signals use no window and read |X(f)|.
-                const w = persistent ? 0.5 * (1 - Math.cos(2 * Math.PI * k / (count - 1))) : 1;
-                re[k] = samples[k] * w;
-                weightSum += w;
-              }
-              fft(re, im);
-              const scale = persistent ? 1 / weightSum : dt;
-              const out = new Float64Array(2 * bins + 1);
-              // Peak-hold across each output bin, so a narrow peak keeps its true height whatever the span is.
-              const reach = stride >> 1;
-              for (let j = -bins; j <= bins; j++) {
-                if (Math.abs(j) > usable) { out[j + bins] = 0; continue; }
-                let best = 0;
-                for (let d = -reach; d < stride - reach; d++) {
-                  const index = ((((j * stride + d) % fftSize) + fftSize) % fftSize);
-                  const magnitude = re[index] * re[index] + im[index] * im[index];
-                  if (magnitude > best) best = magnitude;
-                }
-                out[j + bins] = Math.sqrt(best) * scale;
-              }
-              return { name, yFreq: out };
-            });
-            self.postMessage(results);
-          };`;
+            return { name, yFreq: magnitudes };
+          });
+          self.postMessage(results);
+        };`;
         const url = URL.createObjectURL(new Blob([source], { type: 'text/javascript' }));
         let worker;
         try {
@@ -6050,171 +5499,15 @@
           URL.revokeObjectURL(url);
           reject(event.error || new Error(event.message || 'Fourier worker failed'));
         };
-        const dtUsed = dtOverride || dt;
         worker.postMessage({
           signals,
-          bins: (freqAxis.length - 1) / 2,
-          stride: Math.round(dtUsed * FFT_SIZE * df),
-          usable: Math.min((freqAxis.length - 1) / 2, Math.floor(0.5 / dtUsed / df)),
-          fftSize: FFT_SIZE,
-          dt: dtUsed
+          frequencies: freqAxis,
+          hannWindow,
+          sampleCount: N_TIME,
+          startTime: timeAxis[0],
+          dt
         });
       });
-    }
-
-    function computePersistent(values) {
-      let peak = 0, edge = 0;
-      for (let i = 0; i < values.length; i++) { const v = Math.abs(values[i]); if (Number.isFinite(v) && v > peak) peak = v; }
-      const edgeCount = Math.max(2, Math.floor(values.length * 0.05));
-      for (let i = 0; i < edgeCount; i++) {
-        const a = Math.abs(values[i]), b = Math.abs(values[values.length - 1 - i]);
-        edge = Math.max(edge, Number.isFinite(a) ? a : 0, Number.isFinite(b) ? b : 0);
-      }
-      return peak > 0 && edge > 0.05 * peak;
-    }
-
-    function buildDiscreteChannel(value, name, color) {
-      // Use a fixed analysis window so a display span change does not redefine the
-      // finite sequence used by the discrete-time spectrum.
-      const half = 200;
-      const nAxis = Array.from({ length: 2 * half + 1 }, (_, i) => i - half);
-      const yTime = Float64Array.from(nAxis, n => {
-        try { const v = value.at(n); return typeof v === 'number' ? v : (v && typeof v.real === 'number' ? Math.hypot(v.real, v.imaginary) : NaN); } catch (e) { return NaN; }
-      });
-      const persistent = computePersistent(yTime);
-      const fAxis = Float64Array.from({ length: 4097 }, (_, j) => -0.5 + j / 4096);
-      const weights = Float64Array.from(yTime, (_, i) => persistent ? 0.5 * (1 - Math.cos(2 * Math.PI * i / (yTime.length - 1))) : 1);
-      const weightSum = weights.reduce((a, b) => a + b, 0);
-      const yFreq = Float64Array.from(fAxis, f => {
-        let re = 0, im = 0;
-        for (let i = 0; i < nAxis.length; i++) {
-          const v = yTime[i];
-          if (!Number.isFinite(v) || v === 0) continue;
-          const phase = -2 * Math.PI * f * nAxis[i];
-          re += v * weights[i] * Math.cos(phase);
-          im += v * weights[i] * Math.sin(phase);
-        }
-        return Math.hypot(re, im) / (persistent ? weightSum : 1);
-      });
-      return { name: `${name}[n]`, discrete: true, nAxis, yTime, fAxis, yFreq, persistent, color };
-    }
-
-    /* ---- animate(): step through explicitly supplied signal states ---- */
-    let animation = null, animWired = false;
-
-    function findAnimateCall(node) {
-      if (!node || typeof node !== 'object') return null;
-      if (Array.isArray(node)) { for (const child of node) { const found = findAnimateCall(child); if (found) return found; } return null; }
-      if (node.type === 'FunctionCall' && String(node.name).toLowerCase() === 'animate') return node;
-      for (const value of Object.values(node)) { if (value && typeof value === 'object') { const found = findAnimateCall(value); if (found) return found; } }
-      return null;
-    }
-
-    function animationLabel(entry, frame) {
-      const output = entry.discrete ? `${entry.name}[n]` : `${entry.name}(t)`;
-      const source = frame === 0 ? 'startSignal' : `signalSteps[${frame - 1}]`;
-      return `${output} \u2190 ${source}`;
-    }
-
-    function updateAnimationBar() {
-      const bar = document.getElementById('anim-bar');
-      if (!bar) return;
-      bar.hidden = !animation;
-      if (!animation) return;
-      const items = animation.items;
-      const nextButton = document.getElementById('anim-next');
-      const previousButton = document.getElementById('anim-previous');
-      nextButton.hidden = animation.frameCount < 2;
-      previousButton.hidden = animation.frameCount < 2;
-      previousButton.disabled = animation.currentFrame <= 0;
-      nextButton.disabled = animation.currentFrame >= animation.frameCount - 1;
-      document.getElementById('anim-play').innerHTML = '&#8634; Show start';
-      const frame = animation.currentFrame || 0;
-      const formula = items.map(entry => animationLabel(entry, Math.min(frame, entry.frameCount - 1))).join('   |   ');
-      document.getElementById('anim-label').textContent = `Step ${frame + 1} of ${animation.frameCount}: ${formula}`;
-    }
-
-    function setupAnimation(interp, continuousEntries, signals) {
-      const entries = continuousEntries.map(entry => {
-        const first = entry.call.args[0];
-        const states = interp.animationStateNodes(entry.call.args);
-        return { ...entry, name: entry.stmt.name, frameCount: states.length, sourceName: first && first.type === 'Variable' ? first.name : 'signal' };
-      });
-      const discrete = Object.entries(interp.env)
-        .filter(([, value]) => value && value.isDiscreteSignal && value.animated)
-        .map(([name, value]) => ({ name, value, discrete: true, frameCount: value.animationSequenceLength, sourceName: value.sourceName }));
-      const items = [...entries, ...discrete];
-      const frameCount = items.length ? Math.max(...items.map(entry => entry.frameCount)) : 0;
-      animation = items.length ? { interp, entries, discrete, signals, items, frameCount, currentFrame: 0, activeNames: new Set(), shadows: new Map() } : null;
-      if (animation && !animWired) {
-        animWired = true;
-        document.getElementById('anim-play').addEventListener('click', () => revealAnimationFrame(0));
-        document.getElementById('anim-next').addEventListener('click', () => {
-          if (!animation || animation.frameCount < 2) return;
-          revealAnimationFrame(Math.min(animation.frameCount - 1, animation.currentFrame + 1));
-        });
-        document.getElementById('anim-previous').addEventListener('click', () => {
-          if (!animation || animation.frameCount < 2) return;
-          revealAnimationFrame(Math.max(0, animation.currentFrame - 1));
-        });
-      }
-      updateAnimationBar();
-    }
-
-    async function revealAnimationFrame(frame) {
-      if (!animation?.items.length) return;
-      const activeAnimation = animation;
-      const version = (activeAnimation.renderVersion || 0) + 1;
-      activeAnimation.renderVersion = version;
-      const nextFrame = Math.max(0, Math.min(frame, activeAnimation.frameCount - 1));
-      if (nextFrame !== activeAnimation.currentFrame) {
-        activeAnimation.shadows = new Map();
-        for (const entry of activeAnimation.items) {
-          const signal = activeAnimation.signals[entry.name];
-          if (!signal) continue;
-          activeAnimation.shadows.set(entry.name, {
-            ...signal,
-            yTime: Float64Array.from(signal.yTime || []),
-            yFreq: signal.yFreq ? Float64Array.from(signal.yFreq) : null,
-            nAxis: signal.nAxis ? Float64Array.from(signal.nAxis) : null,
-            fAxis: signal.fAxis ? Float64Array.from(signal.fAxis) : null,
-            tAxis: signal.tAxis ? Float64Array.from(signal.tAxis) : null
-          });
-        }
-      } else if (nextFrame === 0) activeAnimation.shadows = new Map();
-      activeAnimation.currentFrame = nextFrame;
-      activeAnimation.interp.animationFrame = activeAnimation.currentFrame;
-      activeAnimation.entries.forEach(entry => { entry.evalEnv.animationFrame = activeAnimation.currentFrame; });
-      activeAnimation.activeNames = new Set(activeAnimation.items.map(entry => entry.name));
-      const fourierJobs = [];
-      for (const entry of activeAnimation.entries) {
-        const signal = activeAnimation.signals[entry.name];
-        if (!signal) continue;
-        const y = new Float64Array(N_TIME);
-        for (let i = 0; i < N_TIME; i++) {
-          const value = entry.sample(timeAxis[i], activeAnimation.currentFrame);
-          y[i] = typeof value === 'number' && Number.isFinite(value) ? value : 0;
-        }
-        signal.yTime = y;
-        signal.persistent = computePersistent(y);
-        fourierJobs.push({ name: entry.name, samples: y, persistent: signal.persistent });
-      }
-      for (const entry of activeAnimation.discrete) {
-        const signal = activeAnimation.signals[entry.name];
-        if (signal) Object.assign(signal, buildDiscreteChannel(entry.value, entry.name, signal.color));
-      }
-      updateAnimationBar();
-      renderActiveChannel();
-      if (fourierJobs.length) {
-        try {
-          const results = await computeFourierInWorker(fourierJobs);
-          if (animation !== activeAnimation || activeAnimation.renderVersion !== version || !results) return;
-          results.forEach(result => { if (activeAnimation.signals[result.name]) activeAnimation.signals[result.name].yFreq = result.yFreq; });
-        } catch (error) {}
-      }
-      if (animation !== activeAnimation || activeAnimation.renderVersion !== version) return;
-      renderActiveChannel();
-      updateAnimationBar();
     }
 
     async function recompute({ reportErrors = false } = {}) {
@@ -6265,6 +5558,9 @@
         const sigStmts = stmts.filter(stmt => stmt.type === 'AssignStatement' && dependsOnTime(stmt.expr, assignmentAsts));
         const dynamicNames = new Set(Object.keys(assignmentAsts).filter(name => dependsOnTime(assignmentAsts[name], assignmentAsts, new Set([name]))));
         const nextSignals = {};
+        const hannWindow = Float64Array.from({ length: N_TIME }, (_, index) =>
+          0.5 * (1 - Math.cos((2 * Math.PI * index) / (N_TIME - 1)))
+        );
 
         const collectVariables = (node, names = new Set()) => {
           if (!node || typeof node !== 'object') return names;
@@ -6290,22 +5586,19 @@
           visiting.delete(name);
         };
 
-        const sampleSignal = (expression, evalEnv, timeValue, frame = 0) => {
-          evalEnv.animationFrame = frame;
+        const sampleSignal = (expression, evalEnv, timeValue) => {
           evalEnv.env.t = timeValue;
           for (const name of dynamicNames) refreshDynamicVariable(name, evalEnv);
           const value = evalEnv.execute(expression);
           return value instanceof SymbolicFunction ? value.evaluate(evalEnv, timeValue) : value;
         };
 
-        const animatedEntries = [];
         for (const [idx, stmt] of sigStmts.entries()) {
           const colorObj = CHANNEL_COLORS[idx % CHANNEL_COLORS.length];
           const evalEnv = new Interpreter();
           Object.assign(evalEnv.env, interp.env);
           evalEnv.functions = interp.functions;
           evalEnv.deltaWidth = 2 * dt;
-          evalEnv.animationFrame = 0;
 
           const probeIndices = [0, Math.floor(N_TIME / 2), N_TIME - 1];
           const hasNumericSamples = probeIndices.some(index => {
@@ -6320,30 +5613,20 @@
             yTime[i] = typeof value === 'number' && Number.isFinite(value) ? value : 0;
           }
 
-          let peak = 0, edge = 0;
-          for (let i = 0; i < N_TIME; i++) peak = Math.max(peak, Math.abs(yTime[i]));
-          const edgeCount = Math.max(16, Math.floor(N_TIME * 0.05));
-          for (let i = 0; i < edgeCount; i++) edge = Math.max(edge, Math.abs(yTime[i]), Math.abs(yTime[N_TIME - 1 - i]));
-          nextSignals[stmt.name] = { name: `${stmt.name}(t)`, yTime, yFreq: null, color: colorObj, persistent: peak > 0 && edge > 0.05 * peak };
-          const animateCall = findAnimateCall(stmt.expr);
-          if (animateCall) animatedEntries.push({ stmt, evalEnv, call: animateCall, sample: (timeValue, frame = 0) => sampleSignal(stmt.expr, evalEnv, timeValue, frame) });
+          nextSignals[stmt.name] = { name: `${stmt.name}(t)`, yTime, yFreq: null, color: colorObj };
         }
 
         const transformedSignals = await computeFourierInWorker(
-          Object.entries(nextSignals).map(([name, signal]) => ({ name, samples: signal.yTime, persistent: signal.persistent }))
+          Object.entries(nextSignals).map(([name, signal]) => ({ name, samples: signal.yTime })),
+          hannWindow
         );
         if (version !== recomputeVersion) return;
         if (!transformedSignals) return;
         transformedSignals.forEach(result => {
           if (nextSignals[result.name]) nextSignals[result.name].yFreq = result.yFreq;
         });
-        for (const [name, value] of Object.entries(interp.env)) {
-          if (!value || !value.isDiscreteSignal) continue;
-          nextSignals[name] = buildDiscreteChannel(value, name, CHANNEL_COLORS[Object.keys(nextSignals).length % CHANNEL_COLORS.length]);
-        }
         registeredSignals = nextSignals;
         registeredPlots = interp.plots;
-        setupAnimation(interp, animatedEntries, nextSignals);
         updateChannelDropdown();
         renderActiveChannel();
 
@@ -6397,8 +5680,6 @@
       if (!isFinite(minY) || !isFinite(maxY) || minY === maxY) {
         minY = -1; maxY = 1;
       }
-      minY = Math.min(minY, 0);
-      maxY = Math.max(maxY, 0);
       const pad = Math.max((maxY - minY) * 0.1, 0.05);
       return { yMin: minY - pad, yMax: maxY + pad };
     }
@@ -6433,68 +5714,11 @@
       const timeDatasets = [];
       const freqDatasets = [];
       const keys = mode === 'ALL' ? Object.keys(registeredSignals) : (registeredSignals[mode] ? [mode] : []);
-      if (!window.__axiomStemsRegistered && typeof Chart !== 'undefined' && Chart.register) {
-        window.__axiomStemsRegistered = true;
-        Chart.register({
-          id: 'axiomStems',
-          afterDatasetsDraw(chart) {
-            const yScale = chart.scales && chart.scales.y;
-            if (!yScale) return;
-            const ctx = chart.ctx;
-            chart.data.datasets.forEach((dataset, index) => {
-              if (!dataset.stems) return;
-              const meta = chart.getDatasetMeta(index);
-              if (meta.hidden) return;
-              const baseline = yScale.getPixelForValue(0);
-              ctx.save();
-              ctx.strokeStyle = dataset.borderColor;
-              ctx.lineWidth = 1.6;
-              meta.data.forEach(point => {
-                if (point.skip) return;
-                ctx.beginPath(); ctx.moveTo(point.x, baseline); ctx.lineTo(point.x, point.y); ctx.stroke();
-              });
-              ctx.restore();
-            });
-          }
-        });
-      }
-      {
-        const shown = keys.map(key => registeredSignals[key]);
-        const previousHalf = discreteOnlyHalf;
-        discreteOnlyHalf = shown.length && shown.every(sig => sig.discrete)
-          ? Math.max(...shown.map(sig => sig.nAxis[sig.nAxis.length - 1])) : null;
-        if (previousHalf !== discreteOnlyHalf) {
-          ['time', 'freq'].forEach(chartKey => { chartViewports[chartKey].xMin = null; chartViewports[chartKey].xMax = null; });
-        }
-      }
 
       keys.forEach(key => {
         const sig = registeredSignals[key];
-        const isRevealed = animation?.activeNames?.has(key);
-        const timePts = sig.discrete
-          ? Array.from(sig.nAxis, (n, i) => ({ x: n, y: sig.yTime[i] })).filter(point => Number.isFinite(point.y))
-          : Array.from(sig.tAxis || timeAxis, (t, i) => ({ x: t, y: sig.yTime[i] }));
-        const freqPts = Array.from(sig.discrete ? sig.fAxis : freqAxis, (f, i) => ({ x: f, y: sig.yFreq[i] }));
-        const shadow = animation?.shadows?.get(key);
-        if (shadow) {
-          const shadowTimePts = shadow.discrete
-            ? Array.from(shadow.nAxis || [], (n, i) => ({ x: n, y: shadow.yTime[i] })).filter(point => Number.isFinite(point.y))
-            : Array.from(shadow.tAxis || timeAxis, (t, i) => ({ x: t, y: shadow.yTime[i] }));
-          const shadowFreqPts = shadow.yFreq
-            ? Array.from(shadow.discrete ? shadow.fAxis : freqAxis, (f, i) => ({ x: f, y: shadow.yFreq[i] }))
-            : [];
-          timeDatasets.push({
-            type: 'line', label: `Previous step: ${sig.name}`, data: shadowTimePts,
-            borderColor: PREVIOUS_STEP_COLOR, borderWidth: 1.7, borderDash: [6, 4],
-            pointRadius: shadow.discrete ? 3 : 0, pointHoverRadius: 3,
-            ...(shadow.discrete ? { showLine: false, stems: true, backgroundColor: PREVIOUS_STEP_COLOR } : {})
-          });
-          if (shadowFreqPts.length) freqDatasets.push({
-            type: 'line', label: `Previous step: |${sig.name}|`, data: shadowFreqPts,
-            borderColor: PREVIOUS_STEP_COLOR, borderWidth: 1.5, borderDash: [6, 4],
-            fill: false, pointRadius: 0
-          });
-        }
+        const timePts = Array.from(timeAxis, (t, i) => ({ x: t, y: sig.yTime[i] }));
+        const freqPts = Array.from(freqAxis, (f, i) => ({ x: f, y: sig.yFreq[i] }));
 
         timeDatasets.push({
           type: 'line',
@@ -6502,19 +5726,18 @@
           data: timePts,
           snapPoints: getSignalSnapPoints(timePts),
           borderColor: sig.color.border,
-          borderWidth: isRevealed ? 3.1 : 1.8,
-          pointRadius: 0,
-          ...(sig.discrete ? { showLine: false, pointRadius: 4, pointHoverRadius: 6, stems: true, backgroundColor: sig.color.border } : {})
+          borderWidth: 1.8,
+          pointRadius: 0
         });
 
         freqDatasets.push({
           type: 'line',
-          label: `|${sig.name}| ${sig.persistent ? 'amplitude' : 'transform'}`,
+          label: `|${sig.name}|`,
           data: freqPts,
           snapPoints: getSignalSnapPoints(freqPts),
           borderColor: sig.color.border,
           backgroundColor: sig.color.bg,
-          borderWidth: isRevealed ? 3.1 : 1.8,
+          borderWidth: 1.8,
           fill: mode !== 'ALL',
           pointRadius: 0
         });
@@ -6525,7 +5748,7 @@
       timeChart.update();
 
       freqChart.data.datasets = freqDatasets;
-      applyViewportToChart(freqChart, chartViewports.freq, baseFreqMin(), baseFreqMax(), freqDatasets);
+      applyViewportToChart(freqChart, chartViewports.freq, freqAxis[0], freqAxis[freqAxis.length - 1], freqDatasets);
       freqChart.update();
 
       if (document.getElementById('fullscreen-modal').classList.contains('active')) {
@@ -6534,7 +5757,7 @@
         fsTimeChart.update();
 
         fsFreqChart.data.datasets = freqDatasets;
-        applyViewportToChart(fsFreqChart, chartViewports.freq, baseFreqMin(), baseFreqMax(), freqDatasets);
+        applyViewportToChart(fsFreqChart, chartViewports.freq, freqAxis[0], freqAxis[freqAxis.length - 1], freqDatasets);
         fsFreqChart.update();
       }
     }
@@ -6546,8 +5769,8 @@
       const rect = chart.canvas.getBoundingClientRect();
       if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) return false;
       const viewport = isFreq ? chartViewports.freq : chartViewports.time;
-      const baseXMin = isFreq ? baseFreqMin() : baseTimeMin();
-      const baseXMax = isFreq ? baseFreqMax() : baseTimeMax();
+      const baseXMin = isFreq ? freqAxis[0] : -tSpan;
+      const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
       const xMin = viewport.xMin ?? baseXMin;
       const xMax = viewport.xMax ?? baseXMax;
       const yRange = viewport.yMin != null && viewport.yMax != null
@@ -6587,8 +5810,8 @@
       const centerX = (first.x + second.x) / 2;
       const centerY = (first.y + second.y) / 2;
       const viewport = isFreq ? chartViewports.freq : chartViewports.time;
-      const baseXMin = isFreq ? baseFreqMin() : baseTimeMin();
-      const baseXMax = isFreq ? baseFreqMax() : baseTimeMax();
+      const baseXMin = isFreq ? freqAxis[0] : -tSpan;
+      const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
       const xMin = viewport.xMin ?? baseXMin;
       const xMax = viewport.xMax ?? baseXMax;
       const yRange = viewport.yMin != null && viewport.yMax != null
@@ -6634,8 +5857,8 @@
         if (evt.clientX < rect.left || evt.clientX > rect.right || evt.clientY < rect.top || evt.clientY > rect.bottom) return;
 
         const vp = isFreq ? chartViewports.freq : chartViewports.time;
-        const baseXMin = isFreq ? baseFreqMin() : baseTimeMin();
-        const baseXMax = isFreq ? baseFreqMax() : baseTimeMax();
+        const baseXMin = isFreq ? freqAxis[0] : -tSpan;
+        const baseXMax = isFreq ? freqAxis[freqAxis.length - 1] : tSpan;
 
         const factor = evt.deltaY < 0 ? 1.2 : 1 / 1.2;
 
@@ -7254,9 +6477,6 @@
     }
     function toggleFullScreen(open) {
       const m = document.getElementById('fullscreen-modal');
-      const animBar = document.getElementById('anim-bar');
-      const animHome = document.getElementById('anim-bar-home');
-      const animSlot = document.getElementById('fullscreen-anim-slot');
       if (open) {
         const mainTsInput = document.getElementById('time-span-input');
         const fsTsInput = document.getElementById('fs-time-span-input');
@@ -7264,15 +6484,11 @@
         const mainSelect = document.getElementById('channel-selector');
         const fsSelect = document.getElementById('fs-channel-selector');
         if (mainSelect && fsSelect) updateFullscreenChannelDropdown();
-        if (animBar && animSlot) animSlot.appendChild(animBar);
         m.classList.add('active');
         renderActiveChannel();
         requestAnimationFrame(() => { fsTimeChart.resize(); fsFreqChart.resize(); });
       }
-      else {
-        m.classList.remove('active');
-        if (animBar && animHome?.parentNode) animHome.parentNode.insertBefore(animBar, animHome.nextSibling);
-      }
+      else { m.classList.remove('active'); }
     }
     async function saveFile() {
       try {
@@ -7511,8 +6727,7 @@
             { id: "stat-014", name: "quantile includes upper endpoint", code: "r = quantile({1, 2, 9}, 1);", check: (r) => r.interp.env.r === 9, expect: "9" },
             { id: "stat-015", name: "min and max accept ranges", code: "r = min(range(5:1, x, 4)) + max(range(5:1, x, 4));", check: (r) => r.interp.env.r === 6, expect: "6" },
             { id: "stat-016", name: "chained comparison works as statistics gate", code: "r = 0 < 5 < 10 ? mean(range(0:4, x, 4)) : -1;", check: (r) => r.interp.env.r === 2, expect: "2" },
-            { id: "stat-017", name: "sum of empty data is 0", code: "r = sum({});", check: (r) => r.interp.env.r === 0, expect: "empty sum is 0" },
-            { id: "stat-017b", name: "count of empty data is 0", code: "r = count({});", check: (r) => r.interp.env.r === 0, expect: "empty count is 0" },
+            { id: "stat-017", name: "sum rejects empty data", code: "r = sum({});", expectError: "at least one observation", expect: "empty data is rejected" },
             { id: "stat-018", name: "mean rejects complex data", code: "r = mean(i);", expectError: "finite real number", expect: "complex values are rejected" },
             { id: "stat-019", name: "sample variance requires two observations", code: "r = sampleVariance(1);", expectError: "at least two observations", expect: "sample size must be at least two" },
             { id: "stat-020", name: "quantile rejects out-of-range probability", code: "r = quantile({1, 2}, 1.1);", expectError: "between 0 and 1", expect: "probability is constrained to [0, 1]" },
@@ -7522,85 +6737,6 @@
             { id: "stat-024", name: "mean remains stable for extreme values", code: "r = mean(-10^200, 10^200);", check: (r) => r.interp.env.r === 0, expect: "0" },
             { id: "stat-025", name: "standard deviation remains stable for extreme values", code: "r = stddev(-10^200, 10^200);", check: (r) => assertApprox(r.interp.env.r / 1e200, 1), expect: "1e200" },
             { id: "stat-026", name: "extrema support the maximum range size", code: "r = min(range(0:100000, x, 100000)) + max(range(0:100000, x, 100000));", check: (r) => r.interp.env.r === 100000, expect: "100000" },
-          ]
-        },
-        // ============ REGRESSION: syntax and numerics fixes ============
-        {
-          category: "FIXES - Operators, Numbers & Implicit Multiplication",
-          cases: [
-            { id: "fix-001", name: "ASCII <= works", code: "x = 3; r = x <= 5;", check: (r) => r.interp.env.r === 1, expect: "1" },
-            { id: "fix-002", name: "ASCII >= works", code: "r = 3 >= 5;", check: (r) => r.interp.env.r === 0, expect: "0" },
-            { id: "fix-003", name: "ASCII != works", code: "r = 1 != 2;", check: (r) => r.interp.env.r === 1, expect: "1" },
-            { id: "fix-004", name: "scientific notation 1e3", code: "r = 1e3;", check: (r) => r.interp.env.r === 1000, expect: "1000" },
-            { id: "fix-005", name: "scientific notation 2.5e-2", code: "r = 2.5e-2;", check: (r) => assertApprox(r.interp.env.r, 0.025, 1e-12), expect: "0.025" },
-            { id: "fix-006", name: "implicit multiplication 2pi", code: "r = 2pi;", check: (r) => assertApprox(r.interp.env.r, 2 * Math.PI), expect: "6.2832" },
-            { id: "fix-007", name: "implicit multiplication 2(3+1)", code: "r = 2(3+1);", check: (r) => r.interp.env.r === 8, expect: "8" },
-            { id: "fix-008", name: "implicit multiplication 3x", code: "x = 4; r = 3x;", check: (r) => r.interp.env.r === 12, expect: "12" },
-            { id: "fix-009", name: "implicit multiplication 2x^2 binds power first", code: "x = 3; r = 2x^2;", check: (r) => r.interp.env.r === 18, expect: "18" },
-            { id: "fix-010", name: "adjacent groups multiply (1+2)(3)", code: "r = (1+2)(3);", check: (r) => r.interp.env.r === 9, expect: "9" },
-            { id: "fix-011", name: "// comments", code: "r = 7; // note", check: (r) => r.interp.env.r === 7, expect: "7" },
-            { id: "fix-012", name: "unclosed ( is an error", code: "r = (1 + 2;", expectError: "Expected )", expect: "error" },
-            { id: "fix-013", name: "unclosed { set is an error", code: "r = {1, 2;", expectError: "Expected }", expect: "error" },
-            { id: "fix-014", name: "two statements on one line need a separator", code: "x = 1 y = 2;", expectError: "Separate statements", expect: "error" },
-            { id: "fix-015", name: "single-branch piecewise is NaN outside its condition", code: "n = -3; r = {5 : n>0};", check: (r) => Number.isNaN(r.interp.env.r), expect: "NaN" },
-            { id: "fix-016", name: "piecewise without otherwise is NaN where no branch applies", code: "n = 0; r = {5 : n>0, 10 : n<0};", check: (r) => Number.isNaN(r.interp.env.r), expect: "NaN" },
-            { id: "fix-018", name: "user function receives its arguments", code: "function area(w, h) { return w * h; } r = area(3, 4);", check: (r) => r.interp.env.r === 12, expect: "12" },
-            { id: "fix-019", name: "recursive function terminates", code: "function fact(k) { if (k <= 1) { return 1; } return k * fact(k - 1); } r = fact(5);", check: (r) => r.interp.env.r === 120, expect: "120" },
-            { id: "fix-020", name: "function composition", code: "function sq(a) { return a * a; } function inc(a) { return a + 1; } r = sq(inc(2));", check: (r) => r.interp.env.r === 9, expect: "9" },
-            { id: "fix-017", name: "unary built-ins check their argument count", code: "r = sin();", expectError: "exactly one argument", expect: "error" }
-          ]
-        },
-        {
-          category: "FIXES - Integration, Transforms & Differentiation",
-          cases: [
-            { id: "fix-101", name: "wide oscillating range converges", code: "r = integrate(sin(t), t, 0, 10000);", check: (r) => assertApprox(r.interp.env.r, 1 - Math.cos(10000), 1e-6), expect: "1.95216" },
-            { id: "fix-102", name: "endpoint singularity 1/sqrt(t)", code: "r = integrate(1/sqrt(t), t, 0, 1);", check: (r) => assertApprox(r.interp.env.r, 2, 1e-6), expect: "2" },
-            { id: "fix-103", name: "endpoint singularity ln(t)", code: "r = integrate(ln(t), t, 0, 1);", check: (r) => assertApprox(r.interp.env.r, -1, 1e-6), expect: "-1" },
-            { id: "fix-104", name: "removable singularity sin(t)/t", code: "r = integrate(sin(t)/t, t, 0, 10);", check: (r) => assertApprox(r.interp.env.r, 1.6583475942, 1e-6), expect: "1.65835" },
-            { id: "fix-105", name: "improper 1/t^2 from 1 to inf", code: "r = integrate(1/t^2, t, 1, inf);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-8), expect: "1" },
-            { id: "fix-106", name: "divergent 1/t to inf is an error", code: "r = integrate(1/t, t, 1, inf);", expectError: "integrate()", expect: "error" },
-            { id: "fix-107", name: "non-integrable singularity inside bounds is an error", code: "r = integrate(1/t, t, -1, 1);", expectError: "integrate()", expect: "error" },
-            { id: "fix-108", name: "jump discontinuity u(t-0.3)", code: "r = integrate(u(t-0.3), t, 0, 1);", check: (r) => assertApprox(r.interp.env.r, 0.7, 1e-8), expect: "0.7" },
-            { id: "fix-109", name: "integrate checks its arguments", code: "r = integrate(t);", expectError: "expects integrate(expression, variable, from, to)", expect: "error" },
-            { id: "fix-110", name: "delta on a bound counts half so splits add up", code: "r = integrate(delta(t), t, -1, 0) + integrate(delta(t), t, 0, 1);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-9), expect: "1" },
-            { id: "fix-111", name: "FT of causal exponential is finite", code: "x = exp(-t)*u(t); r = FT(x(t), t, 1);", check: (r) => isComplexNumber(r.interp.env.r) && assertApprox(r.interp.env.r.real, 0.5, 1e-6) && Math.abs(r.interp.env.r.imaginary + 0.5) < 1e-6, expect: "0.5 - 0.5i" },
-            { id: "fix-112", name: "FT of rect at 0 is 1", code: "r = FT(rect(t), t, 0);", check: (r) => assertApprox(r.interp.env.r, 1, 1e-8), expect: "1" },
-            { id: "fix-113", name: "diff expands user functions", code: "function g(v){ return v^2; } r = diff(g(x), x, at=2);", check: (r) => assertDerivativeApprox(r.interp.env.r, 4), expect: "4" },
-            { id: "fix-114", name: "diff expands typed functions", code: "f: R -> R, f = x^3; r = diff(f(x), x, at = 2);", check: (r) => assertDerivativeApprox(r.interp.env.r, 12), expect: "12" },
-            { id: "fix-115", name: "diff of an unknown function is an error", code: "r = diff(foo(x), x);", expectError: "does not know how to differentiate", expect: "error" }
-          ]
-        },
-        {
-          category: "FEATURES - Keywords, Intervals & Discrete Time",
-          cases: [
-            { id: "kw-001", name: "given keeps the value where the condition holds", code: "x = 4; r = sqrt(x) given x >= 0;", check: (r) => r.interp.env.r === 2, expect: "2" },
-            { id: "kw-002", name: "given is NaN where the condition fails", code: "x = -4; r = sqrt(x) given x >= 0;", check: (r) => Number.isNaN(r.interp.env.r), expect: "NaN" },
-            { id: "kw-003", name: "where defines local helpers in order", code: "r = a*b + c where a = 2, b = a + 1, c = 4;", check: (r) => r.interp.env.r === 10, expect: "10" },
-            { id: "kw-004", name: "open interval excludes its ends", code: "r = 5 in open(0, 5);", check: (r) => r.interp.env.r === 0, expect: "0" },
-            { id: "kw-005", name: "closed interval includes its ends", code: "r = 5 in closed(0, 5);", check: (r) => r.interp.env.r === 1, expect: "1" },
-            { id: "kw-006", name: "openclosed is (a, b]", code: "r = (0 in openclosed(0, 1)) + 10*(1 in openclosed(0, 1));", check: (r) => r.interp.env.r === 10, expect: "10" },
-            { id: "kw-007", name: "open() works as a typed domain", code: "f: open(0, 1) -> R, f = x^2; r = f(1);", expectError: "outside its declared domain", expect: "error" },
-            { id: "kw-008", name: "exists finds one match", code: "r = exists(k, {1, 2, 3}, k > 2);", check: (r) => r.interp.env.r === 1, expect: "1" },
-            { id: "kw-009", name: "exists returns 0 when nothing matches", code: "r = exists(k, {1, 2, 3}, k > 5);", check: (r) => r.interp.env.r === 0, expect: "0" },
-            { id: "dt-001", name: "discrete signal x[n] = 0.5^n*u[n]", code: "h[n] = 0.5^n * u[n]; r = h[3];", check: (r) => r.interp.env.r === 0.125, expect: "0.125" },
-            { id: "dt-002", name: "discrete signal is zero before its start", code: "h[n] = 0.5^n * u[n]; r = h[-2];", check: (r) => r.interp.env.r === 0, expect: "0" },
-            { id: "dt-003", name: "typed discrete signal checks its domain", code: "h[n]: N -> R, h[n] = 2*n; r = h[-1];", expectError: "outside the declared domain", expect: "error" },
-            { id: "dt-004", name: "typed discrete signal checks its range", code: "h[n]: Z -> N, h[n] = -1; r = h[0];", expectError: "outside the declared range", expect: "error" },
-            { id: "dt-005", name: "x[1.5] is an error", code: "x[n] = n; r = x[1.5];", expectError: "only defined for integer", expect: "error" },
-            { id: "dt-006", name: "delta[n] is the Kronecker delta", code: "r = delta[0] + 10*delta[3] + 100*impulse(0);", check: (r) => r.interp.env.r === 101, expect: "101" },
-            { id: "dt-007", name: "u[n] is the discrete step", code: "r = u[-1] + 10*u[0];", check: (r) => r.interp.env.r === 10, expect: "10" },
-            { id: "dt-008", name: "conv of two discrete signals", code: "x[n] = delta[n] + 2*delta[n-1]; h[n] = delta[n] + delta[n-1]; y = conv(x, h); r = y[0] + 10*y[1] + 100*y[2];", check: (r) => r.interp.env.r === 231, expect: "231" },
-            { id: "dt-009", name: "delay of a discrete signal", code: "x[n] = u[n]; y = delay(x, 3); r = y[2] + 10*y[3];", check: (r) => r.interp.env.r === 10, expect: "10" },
-            { id: "dt-010", name: "delay of a continuous signal shifts right", code: "x = exp(-t)*u(t); t = 3; r = delay(x, 2);", check: (r) => assertApprox(r.interp.env.r, Math.exp(-1), 1e-9), expect: "0.3679" },
-            { id: "dt-011", name: "delay shifts a signal built from other signals", code: "x = u(t); y = 2*x; t = 12; r = delay(y, 10);", check: (r) => r.interp.env.r === 2, expect: "2" },
-            { id: "an-001", name: "animate starts from startSignal", code: "x = animate(u(t), [u(t - 1), u(t - 3)]);", check: (r) => r.interp.env.x === 1, expect: "1" },
-            { id: "an-002", name: "animate selects first supplied signal step", code: "x = animate(u(t), [u(t - 1), u(t - 3)]);", check: (r) => { r.interp.env.t = 2; r.interp.animationFrame = 1; return r.interp.execute(r.interp.env.x_ast) === 1; }, expect: "1" },
-            { id: "an-003", name: "animate selects later supplied signal step", code: "x = animate(u(t), [u(t - 1), u(t - 3)]);", check: (r) => { r.interp.env.t = 2; r.interp.animationFrame = 2; return r.interp.execute(r.interp.env.x_ast) === 0; }, expect: "0" },
-            { id: "an-004", name: "animate accepts a named signalSteps list", code: "startSignal = u(t); signalSteps = [u(t - 2), u(t - 4)]; x = animate(startSignal, signalSteps);", check: (r) => r.interp.env.x === 1, expect: "1" },
-            { id: "an-005", name: "animate rejects an empty signalSteps list", code: "x = animate(u(t), []);", expectError: "signalSteps must be a non-empty list", expect: "error" },
-            { id: "an-006", name: "animate sequences discrete signals", code: "startSignal[n] = u[n]; signalSteps = [delay(startSignal, 1), delay(startSignal, 3)]; y = animate(startSignal, signalSteps);", check: (r) => { r.interp.animationFrame = 2; return r.interp.env.y.at(2) === 0; }, expect: "0" },
-            { id: "an-007", name: "animate clamps to its final supplied state", code: "x = animate(u(t), [u(t - 1)]);", check: (r) => { r.interp.env.t = 2; r.interp.animationFrame = 20; return r.interp.execute(r.interp.env.x_ast) === 1; }, expect: "1" },
-            { id: "dt-012", name: "type() names a discrete signal", code: "x[n] = 1; r = type(x);", check: (r) => r.interp.env.r === 'discrete signal', expect: "discrete signal" }
           ]
         },
         // ============ CATEGORY 5: STANDARD FUNCTIONS ============
